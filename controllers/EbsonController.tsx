@@ -17,7 +17,6 @@ import { DeleteAllProductsByCompany,
         UpsertProduct,
         GetUniqueProduct,
         GetAllProductsByCompanyid } from '../helpers/PrismaHelper'
-import { product } from '@prisma/client';
 import { sheetProduct } from '../types/sheets';
 
 // company id 3, get data from google sheets and insert into database from Ebson
@@ -54,7 +53,7 @@ const WriteAllFiles = async() => {
   }
 }
 
-const productsNoLongerComingInWriteFile = async(productsNoLongerInDatabase: Array<product>) => {
+const productsNoLongerComingInWriteFile = async(productsNoLongerInDatabase: Array<any>) => {
   // write product info of products no longer coming into the database (and send email to company)
   fs.writeFile("writefiles/nolonger.txt", JSON.stringify(productsNoLongerInDatabase))
   // SendEmail("Products no longer coming in from company")
