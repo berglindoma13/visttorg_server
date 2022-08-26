@@ -1,0 +1,22 @@
+export interface sheetProduct {
+  nr: string,
+  name: string,
+  long: string,
+  short: string,
+  fl: string,
+  link: string,
+  mark: string,
+  pic: string,
+  fsc: string,
+  fsclink: string,
+  epd: string,
+  epdlink: string,
+  voc: string,
+  voclink: string,
+  sv: string,
+  svans: string,
+  breeam:string,
+  blue: string,
+  ev: string,
+  ce: string
+}

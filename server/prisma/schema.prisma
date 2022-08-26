@@ -1,0 +1,82 @@
+//Run npx prisma generate everytime a change is made
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  output = "../node_modules/.prisma/client"
+}
+
+model company {
+  id            Int       @id @default(autoincrement())
+  name          String
+  websiteurl    String
+  products      product[]
+}
+
+model product {
+  id               Int                  @id @default(autoincrement())
+  productid        String               @unique
+  title            String
+  companyid        Int
+  sellingcompany   company             @relation(fields: [companyid], references: [id])
+  description      String?
+  shortdescription String?
+  categories       category[]           @relation("ConnectedCategory")
+  url              String? // bætti við spurningarmerki, ef að fyrirtæki eru ekki með vefverslun
+  brand            String
+  productimageurl  String?
+  //productimageref attachedFile?
+  certificates     productcertificate[]
+  // myProducts       myProducts[]
+  approved        Boolean?
+  createdAt       DateTime?
+  updatedAt       DateTime?
+}
+
+model productcertificate {
+  id               Int         @id @default(autoincrement())
+  certificateid    Int
+  certificate      certificate @relation(fields: [certificateid], references: [id])
+  fileurl          String?
+  productid        String
+  connectedproduct product    @relation(fields: [productid], references: [productid])
+  validDate        DateTime?
+}
+
+model certificate {
+  id                 Int                  @id @default(autoincrement())
+  name               String
+  productcertificate productcertificate[]
+}
+
+model category {
+  id       Int       @id @default(autoincrement())
+  name     String @unique
+  products product[] @relation("ConnectedCategory")
+}
+
+model manualProducts {
+  id       Int       @id @default(autoincrement())
+}
+
+model postlist {
+  id  Int @id @default(autoincrement())
+  email String
+}
+
+// model attachedFile {
+//   id       Int       @id @default(autoincrement())
+//   connectedproduct product @relation(fields: [id], references: [id])
+//   filebytes Bytes
+//   filetype String
+// } 
+
+// model myProducts {
+//   id Int @id @default(autoincrement())
+//   productid        String
+//   connectedproduct product    @relation(fields: [productid], references: [productid])
+// }
