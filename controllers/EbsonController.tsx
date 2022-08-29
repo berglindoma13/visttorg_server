@@ -144,7 +144,7 @@ const UpsertProductInDatabase = async(product : DatabseProduct, approved : boole
 }
 
 // check if product list database has any products that are not coming from sheets anymore
-const isProductListFound = async(incomingProducts : Array<DatabseProduct>) => {
+const deleteOldProducts = async(incomingProducts : Array<DatabseProduct>) => {
   // get all current products from this company
   const currentProducts = await GetAllProductsByCompanyid(3)
   const productsNoLongerInDatabase = currentProducts.filter(curr_prod => {
@@ -160,8 +160,8 @@ const isProductListFound = async(incomingProducts : Array<DatabseProduct>) => {
 }
 
 const ProcessForDatabase = async(products : Array<DatabseProduct>) => {
-  // check if product is in database but not coming in from company anymore
-  isProductListFound(products)
+  // check if any product in the list is in database but not coming in from company api anymore
+  deleteOldProducts(products)
 
   products.map(async(product) => {
     const prod = await GetUniqueProduct(product.id)
