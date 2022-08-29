@@ -7,6 +7,7 @@ const BykoController_1 = require("../controllers/BykoController");
 const EbsonController_1 = require("../controllers/EbsonController");
 const Postlist_1 = require("../controllers/Postlist");
 exports.allRoutes = (0, express_1.Router)();
+//ALMENNT
 exports.allRoutes.get('/', (req, res) => {
     res.send('Server is up and running here!');
 });
