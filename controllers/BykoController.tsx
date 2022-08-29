@@ -5,7 +5,7 @@ import axios from 'axios'
 import fs from 'fs'
 import BykoCategoryMapper from '../mappers/categories/byko'
 import { CertificateValidator } from '../helpers/CertificateValidator'
-import { Certificate } from '../types/models'
+import { DatabaseCertificate } from '../types/models'
 import BykoCertificateMapper from '../mappers/certificates/byko'
  
 // BYKO COMPANY ID = 1
@@ -180,9 +180,9 @@ const ProcessForDatabase = async(data : BykoResponseData) => {
 // SV_ALLOWED = 5
 // BREEAM = 6
 // BLENGILL = 7
-const CreateProductCertificates = async(product : BykoProduct, productValidatedCertificates: Array<Certificate>) => {
+const CreateProductCertificates = async(product : BykoProduct, productValidatedCertificates: Array<DatabaseCertificate>) => {
   
-  await Promise.all(productValidatedCertificates.map(async (certificate : Certificate) => {
+  await Promise.all(productValidatedCertificates.map(async (certificate : DatabaseCertificate) => {
     if(certificate.name === 'EPD'){
       //TODO -> TÉKKA HVORT CONNECTEDPRODUCT = NULL VIRKI EKKI ÖRUGGLEGA RÉTT
       return await prisma.productcertificate.create({
@@ -351,7 +351,7 @@ const getMappedCategory = (category: string) => {
 const UpsertProductInDatabase = async(product : BykoProduct) => {
 
   //Map certificates and validate them before adding to database
-  const convertedCertificates: Array<Certificate> = product.certificates.map(certificate => { return {
+  const convertedCertificates: Array<DatabaseCertificate> = product.certificates.map(certificate => { return {
     //@ts-ignore
     name: BykoCertificateMapper[certificate.cert]} 
   })
