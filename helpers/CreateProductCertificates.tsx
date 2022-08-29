@@ -1,14 +1,14 @@
 import { TestControllerProduct, validDateObj } from '../types/testResult'
-import { Certificate, DatabseProduct } from '../types/models'
+import { DatabaseCertificate, DatabseProduct } from '../types/models'
 import { prismaInstance } from '../lib/prisma'
 
 interface certificateObject {
   id: number
 }
 
-export const CreateProductCertificates = async(product : DatabseProduct, validDateCertificates : Array<validDateObj>, productValidatedCertificates: Array<Certificate>) => {
+export const CreateProductCertificates = async(product : DatabseProduct, validDateCertificates : Array<validDateObj>, productValidatedCertificates: Array<DatabaseCertificate>) => {
     let certificateObjectList: Array<certificateObject> = [];
-    await Promise.all(productValidatedCertificates.map(async (certificate : Certificate) => {
+    await Promise.all(productValidatedCertificates.map(async (certificate : DatabaseCertificate) => {
       if(certificate.name === 'EPD'){
         //TODO -> TÉKKA HVORT CONNECTEDPRODUCT = NULL VIRKI EKKI ÖRUGGLEGA RÉTT
         var date = null;
