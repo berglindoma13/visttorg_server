@@ -7,7 +7,7 @@ import BykoCategoryMapper from '../mappers/categories/byko'
 import { CertificateValidator } from '../helpers/CertificateValidator'
 import { Certificate } from '../types/models'
 import BykoCertificateMapper from '../mappers/certificates/byko'
-
+ 
 // BYKO COMPANY ID = 1
 
 const prisma = new PrismaClient()
