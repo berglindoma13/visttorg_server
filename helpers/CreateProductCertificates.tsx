@@ -1,13 +1,12 @@
 import { TestControllerProduct, validDateObj } from '../types/testResult'
-import { Certificate } from '../types/models'
+import { Certificate, DatabseProduct } from '../types/models'
 import { prismaInstance } from '../lib/prisma'
 
 interface certificateObject {
   id: number
 }
 
-// TODO breyta testControllerProduct í meira general product til að geta notað þetta fall fyrir allt
-export const CreateProductCertificates = async(product : TestControllerProduct, validDateCertificates : Array<validDateObj>, productValidatedCertificates: Array<Certificate>) => {
+export const CreateProductCertificates = async(product : DatabseProduct, validDateCertificates : Array<validDateObj>, productValidatedCertificates: Array<Certificate>) => {
     let certificateObjectList: Array<certificateObject> = [];
     await Promise.all(productValidatedCertificates.map(async (certificate : Certificate) => {
       if(certificate.name === 'EPD'){

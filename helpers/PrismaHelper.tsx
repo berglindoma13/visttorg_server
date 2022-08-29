@@ -1,5 +1,5 @@
 import { prismaInstance } from "../lib/prisma";
-import { TestControllerProduct } from "../types/testResult";
+import { DatabseProduct } from "../types/models";
 
 export const DeleteAllProductsByCompany = async(companyid : number) => {
     // delete all products with given company id
@@ -47,7 +47,7 @@ export const DeleteProductCertificates = async(productid : string) => {
     })
 }
 
-export const UpsertProduct = async(product : TestControllerProduct, approved : boolean, companyid : number) => {
+export const UpsertProduct = async(product : DatabseProduct, approved : boolean, companyid : number) => {
     await prismaInstance.product.upsert({
         where: {
           productid : product.id

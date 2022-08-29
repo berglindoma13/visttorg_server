@@ -1,9 +1,9 @@
 import reader from 'g-sheets-api';
 //@ts-ignore
 import fs from'file-system';
-import { Certificate } from '../types/models'
+import { DatabaseCertificate, DatabseProduct } from '../types/models'
 import { CertificateValidator } from '../helpers/CertificateValidator'
-import { TestControllerProduct, allProducts, validDateObj } from '../types/testResult'
+import { validDateObj } from '../types/testResult'
 import { SendEmail } from '../helpers/SendEmail'
 import { ValidDate } from '../helpers/ValidDate'
 import { Request, Response } from 'express';
@@ -18,12 +18,13 @@ import { DeleteAllProductsByCompany,
         GetUniqueProduct,
         GetAllProductsByCompanyid } from '../helpers/PrismaHelper'
 import { sheetProduct } from '../types/sheets';
+import { product } from '@prisma/client';
 
 // company id 3, get data from google sheets and insert into database from Ebson
 
-var updatedProducts: Array<TestControllerProduct> = [];
-var createdProducts: Array<TestControllerProduct> = [];
-var productsNotValid: Array<TestControllerProduct> = [];
+var updatedProducts: Array<DatabseProduct> = [];
+var createdProducts: Array<DatabseProduct> = [];
+var productsNotValid: Array<DatabseProduct> = [];
 
 export const InsertAllSheetsProducts = async(req: Request,res: Response) => {
     // get all data from sheets file
@@ -53,7 +54,7 @@ const WriteAllFiles = async() => {
   }
 }
 
-const productsNoLongerComingInWriteFile = async(productsNoLongerInDatabase: Array<any>) => {
+const productsNoLongerComingInWriteFile = async(productsNoLongerInDatabase: Array<product>) => {
   // write product info of products no longer coming into the database (and send email to company)
   fs.writeFile("writefiles/nolonger.txt", JSON.stringify(productsNoLongerInDatabase))
   // SendEmail("Products no longer coming in from company")
@@ -63,14 +64,14 @@ const productsNoLongerComingInWriteFile = async(productsNoLongerInDatabase: Arra
 const getProducts = () => {
   const options = {
     apiKey: 'AIzaSyAZQk1HLOZhbbIf6DruJMqsK-CBuRPr7Eg', //google api key in testProject console
-    sheetId: '1SFHaI8ZqPUrQU3LLgCsrLBUtk4vzyl6_FQ02nm6XehI',
+    sheetId: '1xyt08puk_-Ox2s-oZESp6iO1sCK8OAQsK1Z9GaovfqQ', //1SFHaI8ZqPUrQU3LLgCsrLBUtk4vzyl6_FQ02nm6XehI // 1mbdkZvGHbBnj4QeOQdfAIQWQ1uOUQdm5aWYmoV
     returnAllResults: false,
   };
 
   reader(options, (results: Array<sheetProduct>) => {
-    const allprod : Array<TestControllerProduct> = [];
+    const allprod : Array<DatabseProduct> = [];
     for (var i=1; i< results.length; i++) {
-      var temp_prod : TestControllerProduct = {
+      const temp_prod : DatabseProduct = {
           id: results[i].nr,
           prodName: results[i].name,
           longDescription: results[i].long,
@@ -84,44 +85,33 @@ const getProducts = () => {
           vocUrl: results[i].voclink,
           ceUrl: results[i].ce,
           certificates: [
-              {name: "fsc", val: results[i].fsc },
-              { name: "epd", val: results[i].epd },
-              { name: "voc", val: results[i].voc },
-              { name: "sv_allowed", val: results[i].sv },
-              { name: "sv", val: results[i].svans },
-              { name: "breeam", val: results[i].breeam },
-              { name: "blengill", val: results[i].blue },
-              { name: "ev", val: results[i].ev },
-              { name: "ce", val: "TRUE" }
-          ]
+              results[i].fsc === 'TRUE' ? {name: "FSC"} : null,
+              results[i].epd  === 'TRUE' ? { name: "EPD"} : null,
+              results[i].voc  === 'TRUE' ? { name: "VOC"} : null,
+              results[i].sv  === 'TRUE' ? { name: "SV_ALLOWED"} : null,
+              results[i].svans  === 'TRUE' ? { name: "SV" } : null,
+              results[i].breeam  === 'TRUE' ? { name: "BREEAM" } : null,
+              results[i].blue  === 'TRUE' ? { name: "BLENGILL" } : null,
+              results[i].ev  === 'TRUE' ? { name: "EV" } : null,
+              results[i].ce  === 'TRUE' ? { name: "CE" } : null
+          ].filter(cert => cert !== null)
       }
       allprod.push(temp_prod)
+
+      console.log('temp_prod', temp_prod)
     }
     // process for database
-    // ProcessForDatabase(allprod);
+    ProcessForDatabase(allprod);
   }, () => {
     console.error('ERROR')
   });
 }
 
-const UpsertProductInDatabase = async(product : TestControllerProduct, approved : boolean, create : boolean, certChange : boolean) => {
+const UpsertProductInDatabase = async(product : DatabseProduct, approved : boolean, create : boolean, certChange : boolean) => {
   // get all product certificates from sheets
-  // const convertedCertificates: Array<Certificate> = product.certificates.map(certificate => { 
-  //   if(certificate.val=="TRUE") {
-  //     return { name: certificate.name.toUpperCase() }
-  //   }
-  // })
 
-  //TODO ASK MARIA
-  const convertedCertificates: Array<Certificate> = product.certificates.filter(certificate => { 
-    if(certificate.val=="TRUE") {
-      return { name: certificate.name.toUpperCase() }
-    }
-  })
-
-  //@ts-ignore
-  Object.keys(convertedCertificates).forEach(key => convertedCertificates[key] === undefined && delete convertedCertificates[key]);
-  const validatedCertificates = CertificateValidator({ certificates: convertedCertificates, fscUrl: product.fscUrl, epdUrl: product.epdUrl, vocUrl: product.vocUrl, ceUrl: product.ceUrl })
+  // Object.keys(convertedCertificates).forEach(key => convertedCertificates[key] === undefined && delete convertedCertificates[key]);
+  const validatedCertificates = CertificateValidator({ certificates: product.certificates, fscUrl: product.fscUrl, epdUrl: product.epdUrl, vocUrl: product.vocUrl, ceUrl: product.ceUrl })
   
   var validDate: validDateObj[] = []
   // no valid certificates for this product
@@ -154,7 +144,7 @@ const UpsertProductInDatabase = async(product : TestControllerProduct, approved 
 }
 
 // check if product list database has any products that are not coming from sheets anymore
-const isProductListFound = async(incomingProducts : Array<TestControllerProduct>) => {
+const isProductListFound = async(incomingProducts : Array<DatabseProduct>) => {
   // get all current products from this company
   const currentProducts = await GetAllProductsByCompanyid(3)
   const productsNoLongerInDatabase = currentProducts.filter(curr_prod => {
@@ -169,7 +159,7 @@ const isProductListFound = async(incomingProducts : Array<TestControllerProduct>
   })
 }
 
-const ProcessForDatabase = async(products : Array<TestControllerProduct>) => {
+const ProcessForDatabase = async(products : Array<DatabseProduct>) => {
   // check if product is in database but not coming in from company anymore
   isProductListFound(products)
 

@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateProductCertificates = void 0;
 const prisma_1 = require("../lib/prisma");
-// TODO breyta testControllerProduct í meira general product til að geta notað þetta fall fyrir allt
 const CreateProductCertificates = (product, validDateCertificates, productValidatedCertificates) => __awaiter(void 0, void 0, void 0, function* () {
     let certificateObjectList = [];
     yield Promise.all(productValidatedCertificates.map((certificate) => __awaiter(void 0, void 0, void 0, function* () {

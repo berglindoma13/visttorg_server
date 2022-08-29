@@ -1,8 +1,8 @@
 const download = require("download");
 const pdf = require('pdf-parse');
 const fs = require("fs");
-import { Certificate } from '../types/models'
-import { TestControllerProduct, validDateObj } from '../types/testResult'
+import { Certificate, DatabseProduct } from '../types/models'
+import { validDateObj } from '../types/testResult'
 
 const check = ((parsedate : Date) => {
   // check if data extracted from pdf files is valid or not
@@ -18,7 +18,7 @@ const check = ((parsedate : Date) => {
 })
 
 // check date on epd/fsc/voc files, takes all validated certificates for product and returns array with all valida dates
-export const ValidDate = async(validatedCertificates : Array<Certificate>, product : TestControllerProduct) => {
+export const ValidDate = async(validatedCertificates : Array<Certificate>, product : DatabseProduct) => {
   var arr = new Array<validDateObj>(3)
   await Promise.all(validatedCertificates.map(async(cert) => {
     if (cert.name === "EPD") {

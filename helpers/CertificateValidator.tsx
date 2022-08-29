@@ -1,18 +1,18 @@
-import { Certificate } from '../types/models'
+import { DatabaseCertificate } from '../types/models'
 
 interface CertificateValidatorProps {
-  certificates: Array<Certificate>
+  certificates: Array<DatabaseCertificate>
   epdUrl?: string
   fscUrl?: string
   vocUrl?: string
   ceUrl?: string
 }
 
-export const CertificateValidator = ({ certificates, epdUrl, fscUrl, vocUrl, ceUrl } : CertificateValidatorProps) : Array<Certificate> => {
+export const CertificateValidator = ({ certificates, epdUrl, fscUrl, vocUrl, ceUrl } : CertificateValidatorProps) : Array<DatabaseCertificate> => {
 
-  const ValidCertificates: Array<Certificate> = []
+  const ValidCertificates: Array<DatabaseCertificate> = []
 
-  certificates.map((certificate: Certificate) => {
+  certificates.map((certificate: DatabaseCertificate) => {
     switch(certificate.name) {
       case 'EPD':
         if(!!epdUrl){ValidCertificates.push({ name: 'EPD'})}

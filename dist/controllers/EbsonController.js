@@ -62,13 +62,13 @@ const productsNoLongerComingInWriteFile = (productsNoLongerInDatabase) => __awai
 const getProducts = () => {
     const options = {
         apiKey: 'AIzaSyAZQk1HLOZhbbIf6DruJMqsK-CBuRPr7Eg',
-        sheetId: '1SFHaI8ZqPUrQU3LLgCsrLBUtk4vzyl6_FQ02nm6XehI',
+        sheetId: '1xyt08puk_-Ox2s-oZESp6iO1sCK8OAQsK1Z9GaovfqQ',
         returnAllResults: false,
     };
     (0, g_sheets_api_1.default)(options, (results) => {
         const allprod = [];
         for (var i = 1; i < results.length; i++) {
-            var temp_prod = {
+            const temp_prod = {
                 id: results[i].nr,
                 prodName: results[i].name,
                 longDescription: results[i].long,
@@ -82,41 +82,30 @@ const getProducts = () => {
                 vocUrl: results[i].voclink,
                 ceUrl: results[i].ce,
                 certificates: [
-                    { name: "fsc", val: results[i].fsc },
-                    { name: "epd", val: results[i].epd },
-                    { name: "voc", val: results[i].voc },
-                    { name: "sv_allowed", val: results[i].sv },
-                    { name: "sv", val: results[i].svans },
-                    { name: "breeam", val: results[i].breeam },
-                    { name: "blengill", val: results[i].blue },
-                    { name: "ev", val: results[i].ev },
-                    { name: "ce", val: "TRUE" }
-                ]
+                    results[i].fsc === 'TRUE' ? { name: "FSC" } : null,
+                    results[i].epd === 'TRUE' ? { name: "EPD" } : null,
+                    results[i].voc === 'TRUE' ? { name: "VOC" } : null,
+                    results[i].sv === 'TRUE' ? { name: "SV_ALLOWED" } : null,
+                    results[i].svans === 'TRUE' ? { name: "SV" } : null,
+                    results[i].breeam === 'TRUE' ? { name: "BREEAM" } : null,
+                    results[i].blue === 'TRUE' ? { name: "BLENGILL" } : null,
+                    results[i].ev === 'TRUE' ? { name: "EV" } : null,
+                    results[i].ce === 'TRUE' ? { name: "CE" } : null
+                ].filter(cert => cert !== null)
             };
             allprod.push(temp_prod);
+            console.log('temp_prod', temp_prod);
         }
         // process for database
-        // ProcessForDatabase(allprod);
+        ProcessForDatabase(allprod);
     }, () => {
         console.error('ERROR');
     });
 };
 const UpsertProductInDatabase = (product, approved, create, certChange) => __awaiter(void 0, void 0, void 0, function* () {
     // get all product certificates from sheets
-    // const convertedCertificates: Array<Certificate> = product.certificates.map(certificate => { 
-    //   if(certificate.val=="TRUE") {
-    //     return { name: certificate.name.toUpperCase() }
-    //   }
-    // })
-    //TODO ASK MARIA
-    const convertedCertificates = product.certificates.filter(certificate => {
-        if (certificate.val == "TRUE") {
-            return { name: certificate.name.toUpperCase() };
-        }
-    });
-    //@ts-ignore
-    Object.keys(convertedCertificates).forEach(key => convertedCertificates[key] === undefined && delete convertedCertificates[key]);
-    const validatedCertificates = (0, CertificateValidator_1.CertificateValidator)({ certificates: convertedCertificates, fscUrl: product.fscUrl, epdUrl: product.epdUrl, vocUrl: product.vocUrl, ceUrl: product.ceUrl });
+    // Object.keys(convertedCertificates).forEach(key => convertedCertificates[key] === undefined && delete convertedCertificates[key]);
+    const validatedCertificates = (0, CertificateValidator_1.CertificateValidator)({ certificates: product.certificates, fscUrl: product.fscUrl, epdUrl: product.epdUrl, vocUrl: product.vocUrl, ceUrl: product.ceUrl });
     var validDate = [];
     // no valid certificates for this product
     if (validatedCertificates.length === 0) {
