@@ -20,7 +20,7 @@ const Postlist = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!(0, emailValidation_1.validateEmail)(postlistEmail)) {
         return res.status(400).send('Netfang ekki gilt');
     }
-    prisma_1.prismaInstance.postlist.create({
+    yield prisma_1.prismaInstance.postlist.create({
         data: {
             email: postlistEmail
         }
