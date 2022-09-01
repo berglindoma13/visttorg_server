@@ -7,13 +7,16 @@ const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const routes_1 = require("./routes");
 const cors_1 = __importDefault(require("cors"));
+const body_parser_1 = __importDefault(require("body-parser"));
+var jsonParser = body_parser_1.default.json();
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT;
-var whitelist = ['http://localhost:3000', 'https://vistbokserver.herokuapp.com'];
+var whitelist = ['http://localhost:3000', 'https://vistbokserver.herokuapp.com', 'https://visttorg-primary.vercel.app'];
 var corsOptions = {
     origin: function (origin, callback) {
-        if (whitelist.indexOf(origin) !== -1) {
+        console.log('origin', origin);
+        if (whitelist.indexOf(origin) !== -1 || !origin) {
             callback(null, true);
         }
         else {
@@ -21,8 +24,9 @@ var corsOptions = {
         }
     }
 };
-// app.use(cors(corsOptions))
-app.use('/', routes_1.routes, (0, cors_1.default)(corsOptions));
+app.use((0, cors_1.default)(corsOptions));
+app.use(jsonParser);
+app.use('/', routes_1.routes);
 app.listen(port, () => {
     console.log(`⚡️[server]: Server is running at https://localhost:${port}`);
 });
