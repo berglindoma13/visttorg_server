@@ -135,7 +135,7 @@ const UpsertProductInDatabase = (product, approved, create, certChange) => __awa
     }
 });
 // check if product list database has any products that are not coming from sheets anymore
-const isProductListFound = (incomingProducts) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteOldProducts = (incomingProducts) => __awaiter(void 0, void 0, void 0, function* () {
     // get all current products from this company
     const currentProducts = yield (0, PrismaHelper_1.GetAllProductsByCompanyid)(3);
     const productsNoLongerInDatabase = currentProducts.filter(curr_prod => {
@@ -150,8 +150,8 @@ const isProductListFound = (incomingProducts) => __awaiter(void 0, void 0, void 
     });
 });
 const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, function* () {
-    // check if product is in database but not coming in from company anymore
-    isProductListFound(products);
+    // check if any product in the list is in database but not coming in from company api anymore
+    deleteOldProducts(products);
     products.map((product) => __awaiter(void 0, void 0, void 0, function* () {
         const prod = yield (0, PrismaHelper_1.GetUniqueProduct)(product.id);
         var approved = false;
