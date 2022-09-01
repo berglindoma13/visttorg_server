@@ -98,7 +98,7 @@ const getProducts = () => {
       }
       allprod.push(temp_prod)
 
-      console.log('temp_prod', temp_prod)
+      // console.log('temp_prod', temp_prod)
     }
     // process for database
     ProcessForDatabase(allprod);
@@ -122,24 +122,30 @@ const UpsertProductInDatabase = async(product : DatabseProduct, approved : boole
 
   if(create === true) {
     if (validatedCertificates.length !== 0) {
-      createdProducts.push(product)
-      // check valid date when product is created
-      validDate = await ValidDate(validatedCertificates, product)
+      if (product.id !== "") {
+        createdProducts.push(product)
+        // check valid date when product is created
+        var validDate = await ValidDate(validatedCertificates, product)
+      }
     }
   }
   if(certChange === true) {
     //delete all productcertificates so they wont be duplicated and so they are up to date
     DeleteProductCertificates(product.id)
     if(validatedCertificates.length !== 0 ) {
-      updatedProducts.push(product)
-      // check valid date when the certificates have changed
-      validDate = await ValidDate(validatedCertificates, product)
+      if (product.id !== "") {
+        updatedProducts.push(product)
+        // check valid date when the certificates have changed
+        var validDate = await ValidDate(validatedCertificates, product)
+      }
     }
   }
-  // update or create product in database
-  await UpsertProduct(product, approved, 3)
-  if(certChange === true || create === true) {
-    await CreateProductCertificates(product, validDate, validatedCertificates)
+  // update or create product in database if the product has a productnumber (vörunúmer)
+  if(product.id !== "") {
+    await UpsertProduct(product, approved, 3)
+    if(certChange === true || create === true) {
+      await CreateProductCertificates(product, validDate, validatedCertificates)
+    }
   }
 }
 
@@ -166,7 +172,7 @@ const ProcessForDatabase = async(products : Array<DatabseProduct>) => {
   products.map(async(product) => {
     const prod = await GetUniqueProduct(product.id)
     var approved = false;
-    var create = false
+    // var create = false
     if (prod !== null){
       approved = !!prod.approved ? prod.approved : false;
       var certChange : boolean = false;
@@ -195,7 +201,7 @@ const ProcessForDatabase = async(products : Array<DatabseProduct>) => {
       })
     }
     else {
-      create = true;
+      var create = true;
       var certChange = true;
     }
     UpsertProductInDatabase(product, approved, create, certChange)

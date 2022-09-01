@@ -94,7 +94,7 @@ const getProducts = () => {
                 ].filter(cert => cert !== null)
             };
             allprod.push(temp_prod);
-            console.log('temp_prod', temp_prod);
+            // console.log('temp_prod', temp_prod)
         }
         // process for database
         ProcessForDatabase(allprod);
@@ -114,28 +114,34 @@ const UpsertProductInDatabase = (product, approved, create, certChange) => __awa
     }
     if (create === true) {
         if (validatedCertificates.length !== 0) {
-            createdProducts.push(product);
-            // check valid date when product is created
-            validDate = yield (0, ValidDate_1.ValidDate)(validatedCertificates, product);
+            if (product.id !== "") {
+                createdProducts.push(product);
+                // check valid date when product is created
+                var validDate = yield (0, ValidDate_1.ValidDate)(validatedCertificates, product);
+            }
         }
     }
     if (certChange === true) {
         //delete all productcertificates so they wont be duplicated and so they are up to date
         (0, PrismaHelper_1.DeleteProductCertificates)(product.id);
         if (validatedCertificates.length !== 0) {
-            updatedProducts.push(product);
-            // check valid date when the certificates have changed
-            validDate = yield (0, ValidDate_1.ValidDate)(validatedCertificates, product);
+            if (product.id !== "") {
+                updatedProducts.push(product);
+                // check valid date when the certificates have changed
+                var validDate = yield (0, ValidDate_1.ValidDate)(validatedCertificates, product);
+            }
         }
     }
-    // update or create product in database
-    yield (0, PrismaHelper_1.UpsertProduct)(product, approved, 3);
-    if (certChange === true || create === true) {
-        yield (0, CreateProductCertificates_1.CreateProductCertificates)(product, validDate, validatedCertificates);
+    // update or create product in database if the product has a productnumber (vörunúmer)
+    if (product.id !== "") {
+        yield (0, PrismaHelper_1.UpsertProduct)(product, approved, 3);
+        if (certChange === true || create === true) {
+            yield (0, CreateProductCertificates_1.CreateProductCertificates)(product, validDate, validatedCertificates);
+        }
     }
 });
 // check if product list database has any products that are not coming from sheets anymore
-const isProductListFound = (incomingProducts) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteOldProducts = (incomingProducts) => __awaiter(void 0, void 0, void 0, function* () {
     // get all current products from this company
     const currentProducts = yield (0, PrismaHelper_1.GetAllProductsByCompanyid)(3);
     const productsNoLongerInDatabase = currentProducts.filter(curr_prod => {
@@ -150,12 +156,12 @@ const isProductListFound = (incomingProducts) => __awaiter(void 0, void 0, void 
     });
 });
 const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, function* () {
-    // check if product is in database but not coming in from company anymore
-    isProductListFound(products);
+    // check if any product in the list is in database but not coming in from company api anymore
+    deleteOldProducts(products);
     products.map((product) => __awaiter(void 0, void 0, void 0, function* () {
         const prod = yield (0, PrismaHelper_1.GetUniqueProduct)(product.id);
         var approved = false;
-        var create = false;
+        // var create = false
         if (prod !== null) {
             approved = !!prod.approved ? prod.approved : false;
             var certChange = false;
@@ -184,7 +190,7 @@ const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, funct
             });
         }
         else {
-            create = true;
+            var create = true;
             var certChange = true;
         }
         UpsertProductInDatabase(product, approved, create, certChange);
