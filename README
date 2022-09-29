@@ -1,0 +1,7 @@
+======== SETJA UPP NÝTT FYRIRTÆKI MEÐ EXCEL SKJAL ===========
+1. Búa til nýtt excel skal á Vistbok@visttorg.is google sheets aðgangi -> Nafanvenja: FyrirtækixVistbók
+2. Setja rétta dálka í skjal -> afrita önnur skjöl
+3. Setja upp tímastillta afritsvirkni
+4. Setja upp nýjan controller á server
+5. Setja upp rétt fyrirtækja ID í controller
+6. Tengja excel skjal í controller

@@ -1,42 +1,70 @@
-import { PrismaClient } from '@prisma/client'
 import { Request, Response } from 'express';
-import { BykoCertificate, BykoProduct, BykoResponseData } from '../types/byko'
+import { BykoProduct, BykoResponseData } from '../types/byko'
 import axios from 'axios'
 import fs from 'fs'
 import BykoCategoryMapper from '../mappers/categories/byko'
-import { CertificateValidator } from '../helpers/CertificateValidator'
-import { DatabaseCertificate } from '../types/models'
+import { DatabaseProduct, ConnectedCategory, ProductWithPropsProps, DatabaseProductCertificate } from '../types/models'
 import BykoCertificateMapper from '../mappers/certificates/byko'
+import { DeleteAllProductsByCompany,
+  DeleteAllCertByCompany,
+  GetUniqueProduct,
+  GetAllInvalidProductCertsByCompany,
+  GetAllInvalidProductCertsByCompanyAndCertId,
+} from '../helpers/PrismaHelper'
+import { deleteOldProducts, VerifyProduct, WriteAllFiles } from '../helpers/ProductHelper';
+import prismaInstance from '../lib/prisma';
+import { certIdFinder } from '../mappers/certificates/certificateIds';
  
 // BYKO COMPANY ID = 1
 
-const prisma = new PrismaClient()
 const BykoAPI = "https://byko.is/umhverfisvottadar?password=cert4env"
+const CompanyID = 1
 
-const mockProduct = {
-  id: '12345',
-  axId: '',
-  retailer: 'BYKO',
-  brand: 'Önnur vörumerki',
-  prodName: 'Burðarviður 45x95 mm',
-  shortDescription: 'Heflað timbur',
-  longDescription: 'Burðarviður styrkflokkur C24.',
-  metaTitle: 'Styrkleiksflokkað timbur',
-  metaKeywords: '',
-  prodTypeParent: 'Timbur',
-  prodType: 'Burðarviður',
-  groupId: 235017,
-  groupName: 'Timbur',
-  url: 'https://byko.is/leit/vara?ProductID=200907',
-  prodImage: '/Admin/Public/GetImage.ashx?width=400&height=400&crop=5&Compression=75&DoNotUpscale=true&image=/Files/Images/Products/200907___0_fullsize.jpg',
-  fscUrl: 'https://byko.is/Files/Files/PDF%20skjol/BREEAM/FSC_certificate_valid_to_31.05.2024.pdf',
-  epdUrl: '',
-  vocUrl: '',
-  certificates: [
-    { cert: 'FSC' },
-    { cert: 'Leyfilegt í svansvottað hús' },
-    { cert: 'BREEAM' }
-  ]
+var updatedProducts: Array<DatabaseProduct> = [];
+var createdProducts: Array<DatabaseProduct> = [];
+var productsNotValid: Array<DatabaseProduct> = [];
+
+const convertBykoProductToDatabaseProduct = async(product: BykoProduct) => {
+
+  //map the product category to vistbóks category dictionary
+  // TODO - FIX TO USE THE GENERIC MAPPING FUNCTION - SIMPLIFY
+  const mappedCategory: Array<ConnectedCategory> = []
+  const prodTypeParentCategories = await getMappedCategory(product.prodTypeParent)
+  const prodTypeCategories = await getMappedCategory(product.prodType)
+  prodTypeCategories.map(cat => mappedCategory.push(cat))
+  prodTypeParentCategories.map(cat => mappedCategory.push(cat))
+
+  //Map certificates and validate them before adding to database
+  const convertedCertificates: Array<string> = product.certificates.map(certificate => { return BykoCertificateMapper[certificate.cert] })
+
+  const convertedProduct : DatabaseProduct = {
+    id: product.axId !== '' ? `${CompanyID}${product.axId}` : product.axId,
+    prodName: product.prodName,
+    longDescription: product.longDescription,
+    shortDescription: product.shortDescription,
+    fl: mappedCategory,
+    prodImage: `https://byko.is${product.prodImage}`,
+    url: product.url,
+    brand: product.brand,
+    fscUrl: product.fscUrl,
+    epdUrl: product.epdUrl,
+    vocUrl: product.vocUrl,
+    //fix this when byko adds CE files to the API
+    ceUrl: '',
+    certificates: [
+        product.fscUrl !== '' ? {name: "FSC"} : null,
+        product.epdUrl  !== '' ? { name: "EPD"} : null,
+        product.vocUrl  !== '' ? { name: "VOC"} : null,
+        convertedCertificates.includes('SV_ALLOWED') ? { name: "SV_ALLOWED"} : null,
+        convertedCertificates.includes('SV') ? { name: "SV" } : null,
+        convertedCertificates.includes('BREEAM')  ? { name: "BREEAM" } : null,
+        convertedCertificates.includes('BLENGILL')  ? { name: "BLENGILL" } : null,
+        convertedCertificates.includes('EV')  ? { name: "EV" } : null,
+        // results[i].ce  === 'TRUE' ? { name: "CE" } : null
+    ].filter(cert => cert !== null)
+  }
+
+  return convertedProduct
 }
 
 export const InsertAllBykoProducts = async(req: Request, res: Response) => {
@@ -44,73 +72,22 @@ export const InsertAllBykoProducts = async(req: Request, res: Response) => {
 
   //Check if it comes back undefined, then there was an error retreiving the data
   if(!!bykoData){
-
-    //delete all productcertificates so they wont be duplicated and so they are up to date
-    await prisma.productcertificate.deleteMany({
-      where: {
-        connectedproduct: {
-          companyid: 1
-        }
-      }
-    })
     
-    //process all data and insert into database
-    await ProcessForDatabase(bykoData)
-    
-    //if the json from byko has multiple pages, make sure to call all the pages to get all the products
-    if(bykoData.totalPageCount > 1){
-      for(var i = 0; i < bykoData.totalPageCount; i++){
-        const moreData : BykoResponseData | undefined = await requestBykoApi(i+2)
-        if(!!moreData){
-          await ProcessForDatabase(moreData)
-        }
-      }
+    //process all data and insert into database - first convert to databaseProduct Array
+    const allConvertedBykoProducts = []
+    for(var i = 0; i < bykoData.productList.length; i++){
+      const convertedProduct = await convertBykoProductToDatabaseProduct(bykoData.productList[i])
+      //here is a single product
+      allConvertedBykoProducts.push(convertedProduct)
     }
+
+    await ProcessForDatabase(allConvertedBykoProducts)
 
     return res.end("Successful import");
   }else{
     return res.end("Byko response was invalid");
   }
 };
-
-export const TestProduct = async(req: Request, res: Response) => {
-  // await UpsertProductInDatabase(mockProduct)
-
-  const products = await prisma.product.findMany({
-    where:{ productid : "12345" },
-    include: {
-      sellingcompany: true,
-      categories : true,
-      certificates: {
-        include: {
-          certificate : true
-        }
-      }
-    },
-  });
-
-  const certs = await prisma.productcertificate.findFirst({
-    where: {
-      productid: "12345"
-    }
-  })
-
-  const allProducts = await prisma.product.findMany({
-    where:{ productid : mockProduct.id },
-    include: {
-      sellingcompany: true,
-      categories : true,
-      certificates: {
-        include: {
-          certificate : true
-        }
-      }
-    },
-  });
-
-
-  return res.end('WHOOP')
-}
 
 export const GetAllCategories = async(req: Request, res: Response) => {
   const bykoData : BykoResponseData | undefined = await requestBykoApi(1);
@@ -125,30 +102,9 @@ export const GetAllCategories = async(req: Request, res: Response) => {
 }
 
 export const DeleteAllProducts = async(req: Request, res: Response) => {
-  await prisma.product.deleteMany({
-    where: {
-      companyid: 1
-    }
-  })
+  await DeleteAllCertByCompany(1)
+  await DeleteAllProductsByCompany(1)
   res.end("All deleted");
-}
-
-export const DeleteAllCategories = async(req: Request, res: Response) => {
-  await prisma.category.deleteMany({})
-  //TOOD - only delete byko categories
-  res.end("All deleted");
-}
-
-export const DeleteAllProducCertificates = async(req: Request, res: Response) => {
-  await prisma.productcertificate.deleteMany({
-    where: {
-      connectedproduct: {
-        companyid: 1
-      }
-    }
-  })
-  
-  res.end("All Byko product certificates deleted");
 }
 
 const requestBykoApi = async(pageNr : number) => {
@@ -162,144 +118,174 @@ const requestBykoApi = async(pageNr : number) => {
   });
 }
 
-const ProcessForDatabase = async(data : BykoResponseData) => {
-  for(var i = 0; i < data.productList.length; i++){
-    //here is a single product
-    await UpsertProductInDatabase(data.productList[i])
-  }
-  // for(var i = 0; i < 100; i++){
-  //   await UpsertProductInDatabase(data[i])
-  // }
-}
+const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
+  // check if any product in the list is in database but not coming in from company api anymore
+  deleteOldProducts(products, CompanyID)
 
-//PRODUCT CERTIFICATE ID'S
-// EPD = 1
-// FSC = 2
-// VOC = 3
-// SV = 4
-// SV_ALLOWED = 5
-// BREEAM = 6
-// BLENGILL = 7
-const CreateProductCertificates = async(product : BykoProduct, productValidatedCertificates: Array<DatabaseCertificate>) => {
-  
-  await Promise.all(productValidatedCertificates.map(async (certificate : DatabaseCertificate) => {
-    if(certificate.name === 'EPD'){
-      //TODO -> TÉKKA HVORT CONNECTEDPRODUCT = NULL VIRKI EKKI ÖRUGGLEGA RÉTT
-      return await prisma.productcertificate.create({
-        data: {
-          certificate : {
-            connect : { id : 1 }
-          },
-          connectedproduct : {
-            connect : { productid : product.id },
-          },
-          fileurl : product.epdUrl
-        }
-      }).then((prodcert) => {
-        // const obj = { id : prodcert.id }
-        // certificateObjectList.push(obj)
-      })
-    }
+  //Reset global lists
+  updatedProducts = [];
+  createdProducts = [];
+  productsNotValid = []
 
-    if(certificate.name === 'FSC'){
-      return await prisma.productcertificate.create({
-        data: {
-          certificate : {
-            connect : { id : 2 }
-          },
-          connectedproduct : {
-            connect : { productid : product.id },
-          },
-          fileurl : product.fscUrl
-        }
-      }).then((prodcert) => {
-        // const obj = { id : prodcert.id }
-        // certificateObjectList.push(obj)
-      })
-    }
 
-    if(certificate.name === 'VOC'){
-      return await prisma.productcertificate.create({
-        data: {
-          certificate : {
-            connect : { id : 3 }
-          },
-          connectedproduct : {
-            connect : { productid : product.id },
-          },
-          fileurl : product.vocUrl
-        }
-      }).then((prodcert) => {
-        // const obj = { id : prodcert.id }
-        // certificateObjectList.push(obj)
-      })
-    }
+  const allProductPromises = products.map(async(product) => {
+    const productWithProps:ProductWithPropsProps = { approved: false, certChange: false, create: false, product: null, productState: 1, validDate: null, validatedCertificates:[]}
+    const prod = await GetUniqueProduct(product.id)
 
-    if(certificate.name === 'SV'){
-      return await prisma.productcertificate.create({
-        data: {
-          certificate : {
-            connect : { id : 4 }
-          },
-          connectedproduct : {
-            connect : { productid : product.id },
+    var approved = false;
+    var created = false
+    var certChange = false
+
+    if (prod !== null){
+      approved = !!prod.approved ? prod.approved : false;
+      prod.certificates.map((cert) => {
+        if (cert.certificateid == 1) {
+          // epd file url is not the same
+          if(cert.fileurl !== product.epdUrl) {
+            certChange = true;
+            approved = false;
           }
         }
-      }).then((prodcert) => {
-        // const obj = { id : prodcert.id }
-        // certificateObjectList.push(obj)
-      })
-    }
-
-    if(certificate.name === 'SV_ALLOWED'){
-      return await prisma.productcertificate.create({
-        data: {
-          certificate : {
-            connect : { id : 5 }
-          },
-          connectedproduct : {
-            connect : { productid : product.id },
+        if (cert.certificateid == 2) {
+          // fsc file url is not the same
+          if(cert.fileurl !== product.fscUrl) {
+            certChange = true;
+            approved = false;
           }
         }
-      }).then((prodcert) => {
-        // const obj = { id : prodcert.id }
-        // certificateObjectList.push(obj)
-      })
-    }
-
-    if(certificate.name === 'BREEAM'){
-      return await prisma.productcertificate.create({
-        data: {
-          certificate : {
-            connect : { id : 6 }
-          },
-          connectedproduct : {
-            connect : { productid : product.id },
+        if (cert.certificateid == 3) {
+          // voc file url is not the same
+          if(cert.fileurl !== product.vocUrl) {
+            certChange = true;
+            approved = false;
           }
         }
-      }).then((prodcert) => {
-        // const obj = { id : prodcert.id }
-        // certificateObjectList.push(obj)
       })
     }
-    if(certificate.name === 'BLENGILL'){
-      return await prisma.productcertificate.create({
-        data: {
-          certificate : {
-            connect : { id : 7 }
-          },
-          connectedproduct : {
-            connect : { productid : product.id },
-          }
-        }
-      }).then((prodcert) => {
-        // const obj = { id : prodcert.id }
-        // certificateObjectList.push(obj)
-      })
+    else {
+      created = true;
+      //var certChange = true;
     }
-  })).then(() => {
     
+    productWithProps.approved = approved
+    productWithProps.certChange = certChange
+    productWithProps.create = created
+    productWithProps.product = product
+
+    const productInfo = await VerifyProduct(product, created,  certChange)
+
+    productWithProps.productState = productInfo.productState
+    productWithProps.validDate = productInfo.validDate
+    productWithProps.validatedCertificates = productInfo.validatedCertificates
+
+    if(productInfo.productState === 1){
+      productsNotValid.push(product)
+    }else if(productInfo.productState === 2){
+      createdProducts.push(product)
+    }
+    else if(productInfo.productState === 3){
+      updatedProducts.push(product)
+    }
+
+    return productWithProps
   })
+  
+  Promise.all(allProductPromises).then(async(productsWithProps) => {
+
+    const filteredArray = productsWithProps.filter(prod => prod.productState !== 1)
+
+    await prismaInstance.$transaction(
+      filteredArray.map(productWithProps => {
+
+        return prismaInstance.product.upsert({
+          where: {
+            productid : productWithProps.product.id
+          },
+          update: {
+              approved: productWithProps.approved,
+              title: productWithProps.product.prodName,
+              productid : productWithProps.product.id,
+              sellingcompany: {
+                  connect: { id : CompanyID}
+              },
+              categories : {
+                connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl            
+              },
+              description : productWithProps.product.longDescription,
+              shortdescription : productWithProps.product.shortDescription,
+              productimageurl : productWithProps.product.prodImage,
+              url : productWithProps.product.url,
+              brand : productWithProps.product.brand,
+              updatedAt: new Date()
+          },
+          create: {
+              title: productWithProps.product.prodName,
+              productid : productWithProps.product.id,
+              sellingcompany: {
+                  connect: { id : CompanyID}
+              },
+              categories : {
+                connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl
+              },
+              description : productWithProps.product.longDescription,
+              shortdescription : productWithProps.product.shortDescription,
+              productimageurl : productWithProps.product.prodImage,
+              url : productWithProps.product.url,
+              brand : productWithProps.product.brand,
+              createdAt: new Date(),
+              updatedAt: new Date()
+          }
+        })
+
+      })
+    )
+
+    const allCertificates: Array<DatabaseProductCertificate> = filteredArray.map(prod => {
+      return prod.validatedCertificates.map(cert => {
+        let fileurl = ''
+        let validdate = null
+        if(cert.name === 'EPD'){
+          fileurl = prod.product.epdUrl
+          validdate = prod.validDate[0].date
+        }
+        else if(cert.name === 'FSC'){
+          fileurl = prod.product.fscUrl
+          validdate = prod.validDate[1].date
+        }
+        else if(cert.name === 'VOC'){
+          fileurl = prod.product.vocUrl
+          validdate = prod.validDate[2].date
+        }
+        const certItem: DatabaseProductCertificate = { 
+          name: cert.name,
+          fileurl: fileurl,
+          validDate: validdate,
+          productId: prod.product.id
+        }
+        return certItem
+      })
+    }).flat()
+
+     await prismaInstance.$transaction(
+      allCertificates.map(cert => {
+        return prismaInstance.productcertificate.create({
+          data: {
+            certificate : {
+              connect : { id : certIdFinder[cert.name] }
+            },
+            connectedproduct : {
+              connect : { productid : cert.productId },
+            },
+            fileurl : cert.fileurl,
+            validDate : cert.validDate
+          }
+        })
+      })
+    ) 
+  }).then(() => {
+    // write all appropriate files
+    WriteAllFiles(createdProducts, updatedProducts, productsNotValid, 'Byko')
+  });
 }
 
 const ListCategories = async(data : BykoResponseData) => {
@@ -328,10 +314,6 @@ const ListCategories = async(data : BykoResponseData) => {
 
 }
 
-interface ConnectedCategory {
-  name: string
-}
-
 const getMappedCategory = (category: string) => {
   const matchedCategory: Array<ConnectedCategory> = []
   const categoryList: Array<string> = category.split(';')
@@ -348,71 +330,25 @@ const getMappedCategory = (category: string) => {
   })
 }
 
-const UpsertProductInDatabase = async(product : BykoProduct) => {
+export const GetAllInvalidBykoCertificates = async(req, res) => {
+  const allCerts = await GetAllInvalidProductCertsByCompany(CompanyID)
 
-  //Map certificates and validate them before adding to database
-  const convertedCertificates: Array<DatabaseCertificate> = product.certificates.map(certificate => { return {
-    //@ts-ignore
-    name: BykoCertificateMapper[certificate.cert]} 
+  console.log('allCerts', allCerts)
+
+  res.end("Successfully logged all invalid certs");
+}
+
+export const GetAllInvalidBykoCertificatesByCertId = async(req,res) => {
+  const allCerts = await GetAllInvalidProductCertsByCompanyAndCertId(CompanyID, 1)
+
+  console.log('allCerts', allCerts)
+  console.log('count', allCerts.length)
+
+  fs.writeFile('/writefiles/bykoinvalidcerts.txt', allCerts.toString(), function(err) {
+    if(err){
+      return console.error(err)
+    }
   })
-  const validatedCertificates = CertificateValidator({ certificates: convertedCertificates, fscUrl: product.fscUrl, epdUrl: product.epdUrl, vocUrl: product.vocUrl })
-  
-  //If there are not valid certificates on the product, then it should not be in the database
-  if(validatedCertificates.length === 0){
-    return;
-  }
 
-  //map the product category to vistbóks category dictionary
-  const mappedCategory: Array<ConnectedCategory> = []
-  const prodTypeParentCategories = await getMappedCategory(product.prodTypeParent)
-  const prodTypeCategories = await getMappedCategory(product.prodType)
-  prodTypeCategories.map(cat => mappedCategory.push(cat))
-  prodTypeParentCategories.map(cat => mappedCategory.push(cat))
-  
-  //Product needs to fit into at least one of our allowed categories
-  if(mappedCategory.length > 0){
-    //add or edit the product in the database
-    await prisma.product.upsert({
-      where: {
-        productid : product.id
-      },
-      update: {
-        // approved = false
-        title: product.prodName,
-        productid : product.id,
-        sellingcompany: {
-          connect: { id : 1}
-        },
-        categories : {
-          connect: mappedCategory
-        },
-        description : product.longDescription,
-        shortdescription : product.shortDescription,
-        productimageurl : `https://byko.is/${product.prodImage}`,
-        url : product.url,
-        brand : product.brand,
-        updatedAt: new Date(),
-      },
-      create: {
-        title: product.prodName,
-        productid : product.id,
-        sellingcompany: {
-          connect: { id : 1}
-        },
-        categories : {
-          connect: mappedCategory
-        },
-        description : product.longDescription,
-        shortdescription : product.shortDescription,
-        productimageurl : `https://byko.is/${product.prodImage}`,
-        url : product.url,
-        brand : product.brand,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }
-    })
-
-    //create the product certificates for this specific product
-    await CreateProductCertificates(product, validatedCertificates)
-  }
+  res.end("Successfully logged all invalid certs");
 }

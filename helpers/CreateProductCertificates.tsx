@@ -1,21 +1,15 @@
-import { TestControllerProduct, validDateObj } from '../types/testResult'
-import { DatabaseCertificate, DatabseProduct } from '../types/models'
-import { prismaInstance } from '../lib/prisma'
+import { DatabaseCertificate, DatabaseProduct, ValidDateObj } from '../types/models'
+import prismaInstance from '../lib/prisma'
+import { PrismaPromise } from '@prisma/client'
 
 interface certificateObject {
   id: number
 }
 
-export const CreateProductCertificates = async(product : DatabseProduct, validDateCertificates : Array<validDateObj>, productValidatedCertificates: Array<DatabaseCertificate>) => {
-    let certificateObjectList: Array<certificateObject> = [];
-    await Promise.all(productValidatedCertificates.map(async (certificate : DatabaseCertificate) => {
-      if(certificate.name === 'EPD'){
-        //TODO -> TÉKKA HVORT CONNECTEDPRODUCT = NULL VIRKI EKKI ÖRUGGLEGA RÉTT
-        var date = null;
-        if(validDateCertificates[0].message === "Valid") {
-          date = validDateCertificates[0].date
-        }
-        return await prismaInstance.productcertificate.create({
+export const CreateProductCertificates = (product : DatabaseProduct, validDate : Array<ValidDateObj>, productValidatedCertificate: DatabaseCertificate) => {
+      if(productValidatedCertificate.name === 'EPD'){
+
+        return prismaInstance.productcertificate.create({
           data: {
             certificate : {
               connect : { id : 1 }
@@ -24,20 +18,17 @@ export const CreateProductCertificates = async(product : DatabseProduct, validDa
               connect : { productid : product.id },
             },
             fileurl : product.epdUrl,
-            validDate : date
+            validDate : validDate[0].date
           }
-        }).then((prodcert) => {
-          const obj = { id : prodcert.id }
-          certificateObjectList.push(obj)
         })
       }
   
-      if(certificate.name === 'FSC'){
+      else if(productValidatedCertificate.name === 'FSC'){
         var date = null;
-        if(validDateCertificates[1].message === "Valid") {
-          date = validDateCertificates[1].date
+        if(validDate[1].message === "Valid") {
+          date = validDate[1].date
         }
-        return await prismaInstance.productcertificate.create({
+        return prismaInstance.productcertificate.create({
           data: {
             certificate : {
               connect : { id : 2 }
@@ -46,20 +37,17 @@ export const CreateProductCertificates = async(product : DatabseProduct, validDa
               connect : { productid : product.id },
             },
             fileurl : product.fscUrl,
-            validDate : date
+            validDate : validDate[1].date
           }
-        }).then((prodcert) => {
-          const obj = { id : prodcert.id }
-          certificateObjectList.push(obj)
         })
       }
   
-      if(certificate.name === 'VOC'){
+      else if(productValidatedCertificate.name === 'VOC'){
         var date = null;
-        if(validDateCertificates[2].message === "Valid") {
-          date = validDateCertificates[2].date
+        if(validDate[2].message === "Valid") {
+          date = validDate[2].date
         }
-        return await prismaInstance.productcertificate.create({
+        return prismaInstance.productcertificate.create({
           data: {
             certificate : {
               connect : { id : 3 }
@@ -68,16 +56,13 @@ export const CreateProductCertificates = async(product : DatabseProduct, validDa
               connect : { productid : product.id },
             },
             fileurl : product.vocUrl,
-            validDate : date
+            validDate : validDate[2].date
           }
-        }).then((prodcert) => {
-          const obj = { id : prodcert.id }
-          certificateObjectList.push(obj)
         })
       }
   
-      if(certificate.name === 'SV'){
-        return await prismaInstance.productcertificate.create({
+      else if(productValidatedCertificate.name === 'SV'){
+        return prismaInstance.productcertificate.create({
           data: {
             certificate : {
               connect : { id : 4 }
@@ -86,14 +71,11 @@ export const CreateProductCertificates = async(product : DatabseProduct, validDa
               connect : { productid : product.id },
             }
           }
-        }).then((prodcert) => {
-          const obj = { id : prodcert.id }
-          certificateObjectList.push(obj)
         })
       }
   
-      if(certificate.name === 'SV_ALLOWED'){
-        return await prismaInstance.productcertificate.create({
+      if(productValidatedCertificate.name === 'SV_ALLOWED'){
+        return prismaInstance.productcertificate.create({
           data: {
             certificate : {
               connect : { id : 5 }
@@ -102,14 +84,11 @@ export const CreateProductCertificates = async(product : DatabseProduct, validDa
               connect : { productid : product.id },
             }
           }
-        }).then((prodcert) => {
-          const obj = { id : prodcert.id }
-          certificateObjectList.push(obj)
         })
       }
   
-      if(certificate.name === 'BREEAM'){
-        return await prismaInstance.productcertificate.create({
+      else if(productValidatedCertificate.name === 'BREEAM'){
+        return prismaInstance.productcertificate.create({
           data: {
             certificate : {
               connect : { id : 6 }
@@ -118,13 +97,10 @@ export const CreateProductCertificates = async(product : DatabseProduct, validDa
               connect : { productid : product.id },
             }
           }
-        }).then((prodcert) => {
-          const obj = { id : prodcert.id }
-          certificateObjectList.push(obj)
         })
       }
-      if(certificate.name === 'BLENGILL'){
-        return await prismaInstance.productcertificate.create({
+      else if(productValidatedCertificate.name === 'BLENGILL'){
+        return prismaInstance.productcertificate.create({
           data: {
             certificate : {
               connect : { id : 7 }
@@ -133,13 +109,10 @@ export const CreateProductCertificates = async(product : DatabseProduct, validDa
               connect : { productid : product.id },
             }
           }
-        }).then((prodcert) => {
-          const obj = { id : prodcert.id }
-          certificateObjectList.push(obj)
         })
       }
-      if(certificate.name === 'EV'){
-        return await prismaInstance.productcertificate.create({
+      else if(productValidatedCertificate.name === 'EV'){
+        return prismaInstance.productcertificate.create({
           data: {
             certificate : {
               connect : { id : 8 }
@@ -148,13 +121,10 @@ export const CreateProductCertificates = async(product : DatabseProduct, validDa
               connect : { productid : product.id },
             }
           }
-        }).then((prodcert) => {
-          const obj = { id : prodcert.id }
-          certificateObjectList.push(obj)
         })
       }
-      if(certificate.name === 'CE'){
-        return await prismaInstance.productcertificate.create({
+      else if(productValidatedCertificate.name === 'CE'){
+        return prismaInstance.productcertificate.create({
           data: {
             certificate : {
               connect : { id : 9 }
@@ -163,12 +133,19 @@ export const CreateProductCertificates = async(product : DatabseProduct, validDa
               connect : { productid : product.id },
             }
           }
-        }).then((prodcert) => {
-          const obj = { id : prodcert.id }
-          certificateObjectList.push(obj)
         })
       }
-    })).then(() => {
-    })
-    return certificateObjectList
+     else{
+        return prismaInstance.productcertificate.create({
+          data: {
+            certificate : {
+              connect : { id : 10 }
+            },
+            connectedproduct : {
+              connect : { productid : product.id },
+            }
+          }
+        })
+      }
+    
 }

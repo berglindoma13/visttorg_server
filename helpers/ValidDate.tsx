@@ -1,8 +1,8 @@
 const download = require("download");
 const pdf = require('pdf-parse');
 const fs = require("fs");
-import { DatabaseCertificate, DatabseProduct } from '../types/models'
-import { validDateObj } from '../types/testResult'
+import { DatabaseCertificate, DatabaseProduct } from '../types/models'
+import { ValidDateObj } from '../types/models'
 
 const check = ((parsedate : Date) => {
   // check if data extracted from pdf files is valid or not
@@ -10,24 +10,38 @@ const check = ((parsedate : Date) => {
     return {message: "Valid", date: parsedate}
   }
   else if(parsedate.toString() == "Invalid Date"){
-    return {message: "Invalid Date"}
+    return {message: "Invalid Date", date: null}
   }
   else {
-    return {message: "Expired Date"}
+    return {message: "Expired Date", date: null}
   }
 })
 
 // check date on epd/fsc/voc files, takes all validated certificates for product and returns array with all valida dates
-export const ValidDate = async(validatedCertificates : Array<DatabaseCertificate>, product : DatabseProduct) => {
-  var arr = new Array<validDateObj>(3)
+export const ValidDate = async(validatedCertificates : Array<DatabaseCertificate>, product : DatabaseProduct) => {
+  var arr: Array<ValidDateObj> = [{ message: '', date: null }, {message: '', date: null}, {message: '', date: null}]
   await Promise.all(validatedCertificates.map(async(cert) => {
     if (cert.name === "EPD") {
       await download(product.epdUrl, "dist")
       const url = product.epdUrl.split("/").pop()
-      let dataBuffer = fs.readFileSync('dist/' + url); //dist/Sikasil-C%20EPD.pdf
-
+      let dataBuffer = fs.readFileSync('dist/' + url)
       await pdf(dataBuffer).then(async function(data) {
-        const filedate = data.text.split("\n").filter(text=> text.includes("Valid to"))[0].replace("Valid to", ""); 
+
+        // let filedatestring
+        let filedate
+
+        //English
+        const filedatestringEN = data.text.split("\n").filter(text=> text.includes("Valid to"));
+        // const filedatestringDE = data.text.split("\n").filter(text=> text.includes("gültig bis"));
+        
+        filedate = filedatestringEN[0].replace("Valid to", "")
+        // if(!!filedatestringEN[0]){
+        //   filedatestring = filedatestringEN
+        // }else if(!!filedatestringDE[0]){
+        //   filedatestring = filedatestringDE
+        //   filedate = filedatestring[0].replace("gültig bis", "")
+        // }
+
         const parsedate = new Date(filedate)
         const test = check(parsedate)
         arr[0] = test
@@ -49,15 +63,35 @@ export const ValidDate = async(validatedCertificates : Array<DatabaseCertificate
     if (cert.name === "VOC") {
       await download(product.vocUrl, "dist")
       const url = product.vocUrl.split("/").pop()
-      let dataBuffer = fs.readFileSync('dist/' + url); // dist/Soudabond%20Easy%20-%20EMICODE-Lizenz%203879%20-%202.8.17-e.pdf
+      let dataBuffer = fs.readFileSync('dist/' + url);
+      // console.log('databuffer VOC', dataBuffer) // dist/Soudabond%20Easy%20-%20EMICODE-Lizenz%203879%20-%202.8.17-e.pdf
       await pdf(dataBuffer).then(async function(data) {
-        const filedate = data.text.split("\n").filter(text=> text.includes("valid until"))[0].replace("valid until", '')
+        // console.log('data', data)
+        // let filedatestring
+        let filedate
+
+        //English
+        const filedatestringEN = data.text.split("\n").filter(text=> text.includes("Valid until"));
+        // const filedatestringDE = data.text.split("\n").filter(text=> text.includes("gültig bis"));
+
+        filedate = filedatestringEN[0].replace("Valid to", "")
+        // console.log('filterdatestinrgDE', filedatestringDE)
+
+        // if(!!filedatestringEN[0]){
+        //   filedate = filedatestring[0].replace("Valid to", "")
+        // }else if(!!filedatestringDE[0]){
+        //   filedatestring = filedatestringDE
+        //   filedate = filedatestring[0].replace("gültig bis", "")
+        // }
+        
         const parsedate = new Date(filedate)
         const test = check(parsedate)
         arr[2] = test
       })
     }
-  })).catch((err) => console.error(err))
+  })).catch((err) => {
+    // console.error(err)
+  })
   return arr
 }
 

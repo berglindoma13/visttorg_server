@@ -19,23 +19,34 @@ const check = ((parsedate) => {
         return { message: "Valid", date: parsedate };
     }
     else if (parsedate.toString() == "Invalid Date") {
-        return { message: "Invalid Date" };
+        return { message: "Invalid Date", date: null };
     }
     else {
-        return { message: "Expired Date" };
+        return { message: "Expired Date", date: null };
     }
 });
 // check date on epd/fsc/voc files, takes all validated certificates for product and returns array with all valida dates
 const ValidDate = (validatedCertificates, product) => __awaiter(void 0, void 0, void 0, function* () {
-    var arr = new Array(3);
+    var arr = [{ message: '', date: null }, { message: '', date: null }, { message: '', date: null }];
     yield Promise.all(validatedCertificates.map((cert) => __awaiter(void 0, void 0, void 0, function* () {
         if (cert.name === "EPD") {
             yield download(product.epdUrl, "dist");
             const url = product.epdUrl.split("/").pop();
-            let dataBuffer = fs.readFileSync('dist/' + url); //dist/Sikasil-C%20EPD.pdf
+            let dataBuffer = fs.readFileSync('dist/' + url);
             yield pdf(dataBuffer).then(function (data) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    const filedate = data.text.split("\n").filter(text => text.includes("Valid to"))[0].replace("Valid to", "");
+                    // let filedatestring
+                    let filedate;
+                    //English
+                    const filedatestringEN = data.text.split("\n").filter(text => text.includes("Valid to"));
+                    // const filedatestringDE = data.text.split("\n").filter(text=> text.includes("gültig bis"));
+                    filedate = filedatestringEN[0].replace("Valid to", "");
+                    // if(!!filedatestringEN[0]){
+                    //   filedatestring = filedatestringEN
+                    // }else if(!!filedatestringDE[0]){
+                    //   filedatestring = filedatestringDE
+                    //   filedate = filedatestring[0].replace("gültig bis", "")
+                    // }
                     const parsedate = new Date(filedate);
                     const test = check(parsedate);
                     arr[0] = test;
@@ -60,17 +71,33 @@ const ValidDate = (validatedCertificates, product) => __awaiter(void 0, void 0, 
         if (cert.name === "VOC") {
             yield download(product.vocUrl, "dist");
             const url = product.vocUrl.split("/").pop();
-            let dataBuffer = fs.readFileSync('dist/' + url); // dist/Soudabond%20Easy%20-%20EMICODE-Lizenz%203879%20-%202.8.17-e.pdf
+            let dataBuffer = fs.readFileSync('dist/' + url);
+            // console.log('databuffer VOC', dataBuffer) // dist/Soudabond%20Easy%20-%20EMICODE-Lizenz%203879%20-%202.8.17-e.pdf
             yield pdf(dataBuffer).then(function (data) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    const filedate = data.text.split("\n").filter(text => text.includes("valid until"))[0].replace("valid until", '');
+                    // console.log('data', data)
+                    // let filedatestring
+                    let filedate;
+                    //English
+                    const filedatestringEN = data.text.split("\n").filter(text => text.includes("Valid until"));
+                    // const filedatestringDE = data.text.split("\n").filter(text=> text.includes("gültig bis"));
+                    filedate = filedatestringEN[0].replace("Valid to", "");
+                    // console.log('filterdatestinrgDE', filedatestringDE)
+                    // if(!!filedatestringEN[0]){
+                    //   filedate = filedatestring[0].replace("Valid to", "")
+                    // }else if(!!filedatestringDE[0]){
+                    //   filedatestring = filedatestringDE
+                    //   filedate = filedatestring[0].replace("gültig bis", "")
+                    // }
                     const parsedate = new Date(filedate);
                     const test = check(parsedate);
                     arr[2] = test;
                 });
             });
         }
-    }))).catch((err) => console.error(err));
+    }))).catch((err) => {
+        // console.error(err)
+    });
     return arr;
 });
 exports.ValidDate = ValidDate;

@@ -68,6 +68,12 @@ model postlist {
   email String
 }
 
+model vistbokUser {
+  id Int @id @default(autoincrement())
+  username String  @unique
+  password String?
+}
+
 // model attachedFile {
 //   id       Int       @id @default(autoincrement())
 //   connectedproduct product @relation(fields: [id], references: [id])

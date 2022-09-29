@@ -10,5 +10,7 @@ exports.default = {
     'SV': 'Svanurinn',
     'BREEAM': 'BREEAM',
     'Blái engillinn': 'BLENGILL',
-    'BLENGILL': 'Blái engillinn'
+    'BLENGILL': 'Blái engillinn',
+    'Blómið': 'EV',
+    'EV': 'Blómið'
 };

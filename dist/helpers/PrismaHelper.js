@@ -8,12 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetAllProductsByCompanyid = exports.GetUniqueProduct = exports.UpsertProduct = exports.DeleteProductCertificates = exports.DeleteProduct = exports.DeleteAllCertByCompany = exports.DeleteAllProductsByCompany = void 0;
-const prisma_1 = require("../lib/prisma");
+exports.GetAllInvalidProductCertsByCompanyAndCertId = exports.GetAllInvalidProductCertsByCompany = exports.GetAllProductsByCompanyid = exports.GetUniqueProduct = exports.UpsertProduct = exports.DeleteProductCertificates = exports.DeleteProduct = exports.DeleteAllCertByCompany = exports.DeleteAllProductsByCompany = void 0;
+const prisma_1 = __importDefault(require("../lib/prisma"));
 const DeleteAllProductsByCompany = (companyid) => __awaiter(void 0, void 0, void 0, function* () {
     // delete all products with given company id
-    yield prisma_1.prismaInstance.product.deleteMany({
+    return yield prisma_1.default.product.deleteMany({
         where: {
             companyid: companyid
         }
@@ -22,7 +25,7 @@ const DeleteAllProductsByCompany = (companyid) => __awaiter(void 0, void 0, void
 exports.DeleteAllProductsByCompany = DeleteAllProductsByCompany;
 const DeleteAllCertByCompany = (companyid) => __awaiter(void 0, void 0, void 0, function* () {
     // delete all product certificates connected to given company id
-    yield prisma_1.prismaInstance.productcertificate.deleteMany({
+    return yield prisma_1.default.productcertificate.deleteMany({
         where: {
             connectedproduct: {
                 companyid: companyid
@@ -33,7 +36,7 @@ const DeleteAllCertByCompany = (companyid) => __awaiter(void 0, void 0, void 0, 
 exports.DeleteAllCertByCompany = DeleteAllCertByCompany;
 const DeleteProduct = (productid) => __awaiter(void 0, void 0, void 0, function* () {
     // delete product with given product id
-    yield prisma_1.prismaInstance.product.delete({
+    return yield prisma_1.default.product.delete({
         where: {
             productid: productid
         }
@@ -41,16 +44,7 @@ const DeleteProduct = (productid) => __awaiter(void 0, void 0, void 0, function*
 });
 exports.DeleteProduct = DeleteProduct;
 const DeleteProductCertificates = (productid) => __awaiter(void 0, void 0, void 0, function* () {
-    // delete all product certificates of a specific product i.e from product id and company id
-    // await prismaInstance.productcertificate.deleteMany({
-    //   where: {
-    //     connectedproduct: {
-    //       companyid: 2
-    //     },
-    //     productid : id 
-    //   }
-    // })
-    yield prisma_1.prismaInstance.productcertificate.deleteMany({
+    return yield prisma_1.default.productcertificate.deleteMany({
         where: {
             productid: productid
         }
@@ -58,7 +52,7 @@ const DeleteProductCertificates = (productid) => __awaiter(void 0, void 0, void 
 });
 exports.DeleteProductCertificates = DeleteProductCertificates;
 const UpsertProduct = (product, approved, companyid) => __awaiter(void 0, void 0, void 0, function* () {
-    yield prisma_1.prismaInstance.product.upsert({
+    return yield prisma_1.default.product.upsert({
         where: {
             productid: product.id
         },
@@ -70,7 +64,7 @@ const UpsertProduct = (product, approved, companyid) => __awaiter(void 0, void 0
                 connect: { id: companyid }
             },
             categories: {
-                connect: { name: product.fl }
+                connect: typeof product.fl === 'string' ? { name: product.fl } : product.fl
             },
             description: product.longDescription,
             shortdescription: product.shortDescription,
@@ -86,7 +80,7 @@ const UpsertProduct = (product, approved, companyid) => __awaiter(void 0, void 0
                 connect: { id: companyid }
             },
             categories: {
-                connect: { name: product.fl }
+                connect: typeof product.fl === 'string' ? { name: product.fl } : product.fl
             },
             description: product.longDescription,
             shortdescription: product.shortDescription,
@@ -99,9 +93,9 @@ const UpsertProduct = (product, approved, companyid) => __awaiter(void 0, void 0
     });
 });
 exports.UpsertProduct = UpsertProduct;
-const GetUniqueProduct = (productid) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield prisma_1.prismaInstance.product.findUnique({
-        where: { productid: productid },
+const GetUniqueProduct = (productId) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield prisma_1.default.product.findUnique({
+        where: { productid: productId },
         include: { certificates: {
                 include: {
                     certificate: true
@@ -111,8 +105,34 @@ const GetUniqueProduct = (productid) => __awaiter(void 0, void 0, void 0, functi
 });
 exports.GetUniqueProduct = GetUniqueProduct;
 const GetAllProductsByCompanyid = (companyid) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield prisma_1.prismaInstance.product.findMany({
+    return yield prisma_1.default.product.findMany({
         where: { companyid: companyid }
     });
 });
 exports.GetAllProductsByCompanyid = GetAllProductsByCompanyid;
+const GetAllInvalidProductCertsByCompany = (companyid) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield prisma_1.default.productcertificate.findMany({
+        where: {
+            validDate: null,
+            certificateid: {
+                in: [1, 2, 3]
+            },
+            connectedproduct: {
+                companyid: companyid
+            }
+        }
+    });
+});
+exports.GetAllInvalidProductCertsByCompany = GetAllInvalidProductCertsByCompany;
+const GetAllInvalidProductCertsByCompanyAndCertId = (companyid, certId) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield prisma_1.default.productcertificate.findMany({
+        where: {
+            validDate: null,
+            certificateid: certId,
+            connectedproduct: {
+                companyid: companyid
+            }
+        }
+    });
+});
+exports.GetAllInvalidProductCertsByCompanyAndCertId = GetAllInvalidProductCertsByCompanyAndCertId;

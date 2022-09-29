@@ -1,4 +1,4 @@
-export interface sheetProduct {
+export interface SheetProduct {
   nr: string,
   name: string,
   long: string,

@@ -12,159 +12,50 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DeleteAllSheetsCert = exports.DeleteAllSheetsProducts = exports.InsertAllSheetsProducts = void 0;
-const g_sheets_api_1 = __importDefault(require("g-sheets-api"));
-//@ts-ignore
-const file_system_1 = __importDefault(require("file-system"));
-const CertificateValidator_1 = require("../helpers/CertificateValidator");
-const ValidDate_1 = require("../helpers/ValidDate");
-const WriteFile_1 = require("../helpers/WriteFile");
-const CreateProductCertificates_1 = require("../helpers/CreateProductCertificates");
-// import { prismaInstance } from '../../lib/prisma';
+exports.DeleteAllEbsonCert = exports.DeleteAllEbsonProducts = exports.InsertAllEbsonProducts = void 0;
 const PrismaHelper_1 = require("../helpers/PrismaHelper");
-// company id 3, get data from google sheets and insert into database from Ebson
+const ProductHelper_1 = require("../helpers/ProductHelper");
+const prisma_1 = __importDefault(require("../lib/prisma"));
+const certificateIds_1 = require("../mappers/certificates/certificateIds");
+// company id 2, get data from google sheets and insert into database from Ebson
+const CompanyID = 2;
+const SheetID = '1mbdkZvGHbBnj4QeOQdfAIQWQ1uOUQdm5aWYmoV-6yeg';
+const CompanyName = 'Ebson';
 var updatedProducts = [];
 var createdProducts = [];
 var productsNotValid = [];
-const InsertAllSheetsProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const InsertAllEbsonProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // get all data from sheets file
-    getProducts();
-    res.end('All Ebson products inserted');
+    (0, ProductHelper_1.getAllProductsFromGoogleSheets)(SheetID, ProcessForDatabase, CompanyID);
+    res.end(`All ${CompanyName} products inserted`);
 });
-exports.InsertAllSheetsProducts = InsertAllSheetsProducts;
-const DeleteAllSheetsProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    (0, PrismaHelper_1.DeleteAllProductsByCompany)(3);
-    res.end("All Ebson products deleted");
+exports.InsertAllEbsonProducts = InsertAllEbsonProducts;
+const DeleteAllEbsonProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    (0, PrismaHelper_1.DeleteAllProductsByCompany)(CompanyID);
+    res.end(`All ${CompanyName} products deleted`);
 });
-exports.DeleteAllSheetsProducts = DeleteAllSheetsProducts;
-const DeleteAllSheetsCert = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    (0, PrismaHelper_1.DeleteAllCertByCompany)(3);
-    res.end("All Ebson product certificates deleted");
+exports.DeleteAllEbsonProducts = DeleteAllEbsonProducts;
+const DeleteAllEbsonCert = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    (0, PrismaHelper_1.DeleteAllCertByCompany)(CompanyID);
+    res.end(`All ${CompanyName} product certificates deleted`);
 });
-exports.DeleteAllSheetsCert = DeleteAllSheetsCert;
-const WriteAllFiles = () => __awaiter(void 0, void 0, void 0, function* () {
-    if (createdProducts.length > 0) {
-        (0, WriteFile_1.WriteFile)("EbsonCreated", createdProducts);
-    }
-    if (updatedProducts.length > 0) {
-        (0, WriteFile_1.WriteFile)("EbsonUpdated", updatedProducts);
-    }
-    if (productsNotValid.length > 0) {
-        (0, WriteFile_1.WriteFile)("EbsonNotValid", productsNotValid);
-    }
-});
-const productsNoLongerComingInWriteFile = (productsNoLongerInDatabase) => __awaiter(void 0, void 0, void 0, function* () {
-    // write product info of products no longer coming into the database (and send email to company)
-    file_system_1.default.writeFile("writefiles/nolonger.txt", JSON.stringify(productsNoLongerInDatabase));
-    // SendEmail("Products no longer coming in from company")
-});
-// gets all products from online sheets file
-const getProducts = () => {
-    const options = {
-        apiKey: 'AIzaSyAZQk1HLOZhbbIf6DruJMqsK-CBuRPr7Eg',
-        sheetId: '1xyt08puk_-Ox2s-oZESp6iO1sCK8OAQsK1Z9GaovfqQ',
-        returnAllResults: false,
-    };
-    (0, g_sheets_api_1.default)(options, (results) => {
-        const allprod = [];
-        for (var i = 1; i < results.length; i++) {
-            const temp_prod = {
-                id: results[i].nr,
-                prodName: results[i].name,
-                longDescription: results[i].long,
-                shortDescription: results[i].short,
-                fl: results[i].fl,
-                prodImage: results[i].pic,
-                url: results[i].link,
-                brand: results[i].mark,
-                fscUrl: results[i].fsclink,
-                epdUrl: results[i].epdlink,
-                vocUrl: results[i].voclink,
-                ceUrl: results[i].ce,
-                certificates: [
-                    results[i].fsc === 'TRUE' ? { name: "FSC" } : null,
-                    results[i].epd === 'TRUE' ? { name: "EPD" } : null,
-                    results[i].voc === 'TRUE' ? { name: "VOC" } : null,
-                    results[i].sv === 'TRUE' ? { name: "SV_ALLOWED" } : null,
-                    results[i].svans === 'TRUE' ? { name: "SV" } : null,
-                    results[i].breeam === 'TRUE' ? { name: "BREEAM" } : null,
-                    results[i].blue === 'TRUE' ? { name: "BLENGILL" } : null,
-                    results[i].ev === 'TRUE' ? { name: "EV" } : null,
-                    results[i].ce === 'TRUE' ? { name: "CE" } : null
-                ].filter(cert => cert !== null)
-            };
-            allprod.push(temp_prod);
-            // console.log('temp_prod', temp_prod)
-        }
-        // process for database
-        ProcessForDatabase(allprod);
-    }, () => {
-        console.error('ERROR');
-    });
-};
-const UpsertProductInDatabase = (product, approved, create, certChange) => __awaiter(void 0, void 0, void 0, function* () {
-    // get all product certificates from sheets
-    // Object.keys(convertedCertificates).forEach(key => convertedCertificates[key] === undefined && delete convertedCertificates[key]);
-    const validatedCertificates = (0, CertificateValidator_1.CertificateValidator)({ certificates: product.certificates, fscUrl: product.fscUrl, epdUrl: product.epdUrl, vocUrl: product.vocUrl, ceUrl: product.ceUrl });
-    var validDate = [];
-    // no valid certificates for this product
-    if (validatedCertificates.length === 0) {
-        productsNotValid.push(product);
-        return;
-    }
-    if (create === true) {
-        if (validatedCertificates.length !== 0) {
-            if (product.id !== "") {
-                createdProducts.push(product);
-                // check valid date when product is created
-                var validDate = yield (0, ValidDate_1.ValidDate)(validatedCertificates, product);
-            }
-        }
-    }
-    if (certChange === true) {
-        //delete all productcertificates so they wont be duplicated and so they are up to date
-        (0, PrismaHelper_1.DeleteProductCertificates)(product.id);
-        if (validatedCertificates.length !== 0) {
-            if (product.id !== "") {
-                updatedProducts.push(product);
-                // check valid date when the certificates have changed
-                var validDate = yield (0, ValidDate_1.ValidDate)(validatedCertificates, product);
-            }
-        }
-    }
-    // update or create product in database if the product has a productnumber (vörunúmer)
-    if (product.id !== "") {
-        yield (0, PrismaHelper_1.UpsertProduct)(product, approved, 3);
-        if (certChange === true || create === true) {
-            yield (0, CreateProductCertificates_1.CreateProductCertificates)(product, validDate, validatedCertificates);
-        }
-    }
-});
-// check if product list database has any products that are not coming from sheets anymore
-const deleteOldProducts = (incomingProducts) => __awaiter(void 0, void 0, void 0, function* () {
-    // get all current products from this company
-    const currentProducts = yield (0, PrismaHelper_1.GetAllProductsByCompanyid)(3);
-    const productsNoLongerInDatabase = currentProducts.filter(curr_prod => {
-        const matches = incomingProducts.filter(product => { return curr_prod.productid == product.id; });
-        //product was not found in list
-        return matches.length === 0;
-    });
-    productsNoLongerComingInWriteFile(productsNoLongerInDatabase);
-    // deleta prodcut from prisma database
-    productsNoLongerInDatabase.map(product => {
-        (0, PrismaHelper_1.DeleteProduct)(product.productid);
-    });
-});
+exports.DeleteAllEbsonCert = DeleteAllEbsonCert;
 const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, function* () {
     // check if any product in the list is in database but not coming in from company api anymore
-    deleteOldProducts(products);
-    products.map((product) => __awaiter(void 0, void 0, void 0, function* () {
+    (0, ProductHelper_1.deleteOldProducts)(products, CompanyID);
+    console.log('products', products);
+    //Reset global lists
+    updatedProducts = [];
+    createdProducts = [];
+    productsNotValid = [];
+    const allProductPromises = products.map((product) => __awaiter(void 0, void 0, void 0, function* () {
+        const productWithProps = { approved: false, certChange: false, create: false, product: null, productState: 1, validDate: null, validatedCertificates: [] };
         const prod = yield (0, PrismaHelper_1.GetUniqueProduct)(product.id);
         var approved = false;
-        // var create = false
+        var created = false;
+        var certChange = false;
         if (prod !== null) {
             approved = !!prod.approved ? prod.approved : false;
-            var certChange = false;
             prod.certificates.map((cert) => {
                 if (cert.certificateid == 1) {
                     // epd file url is not the same
@@ -190,11 +81,112 @@ const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, funct
             });
         }
         else {
-            var create = true;
-            var certChange = true;
+            created = true;
+            //var certChange = true;
         }
-        UpsertProductInDatabase(product, approved, create, certChange);
+        productWithProps.approved = approved;
+        productWithProps.certChange = certChange;
+        productWithProps.create = created;
+        productWithProps.product = product;
+        const productInfo = yield (0, ProductHelper_1.VerifyProduct)(product, created, certChange);
+        productWithProps.productState = productInfo.productState;
+        productWithProps.validDate = productInfo.validDate;
+        productWithProps.validatedCertificates = productInfo.validatedCertificates;
+        if (productInfo.productState === 1) {
+            productsNotValid.push(product);
+        }
+        else if (productInfo.productState === 2) {
+            createdProducts.push(product);
+        }
+        else if (productInfo.productState === 3) {
+            updatedProducts.push(product);
+        }
+        return productWithProps;
     }));
-    // write all appropriate files
-    WriteAllFiles();
+    Promise.all(allProductPromises).then((productsWithProps) => __awaiter(void 0, void 0, void 0, function* () {
+        const filteredArray = productsWithProps.filter(prod => prod.productState !== 1);
+        yield prisma_1.default.$transaction(filteredArray.map(productWithProps => {
+            return prisma_1.default.product.upsert({
+                where: {
+                    productid: productWithProps.product.id
+                },
+                update: {
+                    approved: productWithProps.approved,
+                    title: productWithProps.product.prodName,
+                    productid: productWithProps.product.id,
+                    sellingcompany: {
+                        connect: { id: CompanyID }
+                    },
+                    categories: {
+                        connect: typeof productWithProps.product.fl === 'string' ? { name: productWithProps.product.fl } : productWithProps.product.fl
+                    },
+                    description: productWithProps.product.longDescription,
+                    shortdescription: productWithProps.product.shortDescription,
+                    productimageurl: productWithProps.product.prodImage,
+                    url: productWithProps.product.url,
+                    brand: productWithProps.product.brand,
+                    updatedAt: new Date()
+                },
+                create: {
+                    title: productWithProps.product.prodName,
+                    productid: productWithProps.product.id,
+                    sellingcompany: {
+                        connect: { id: CompanyID }
+                    },
+                    categories: {
+                        connect: typeof productWithProps.product.fl === 'string' ? { name: productWithProps.product.fl } : productWithProps.product.fl
+                    },
+                    description: productWithProps.product.longDescription,
+                    shortdescription: productWithProps.product.shortDescription,
+                    productimageurl: productWithProps.product.prodImage,
+                    url: productWithProps.product.url,
+                    brand: productWithProps.product.brand,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                }
+            });
+        }));
+        const allCertificates = filteredArray.map(prod => {
+            return prod.validatedCertificates.map(cert => {
+                let fileurl = '';
+                let validdate = null;
+                if (cert.name === 'EPD') {
+                    fileurl = prod.product.epdUrl;
+                    validdate = prod.validDate[0].date;
+                }
+                else if (cert.name === 'FSC') {
+                    fileurl = prod.product.fscUrl;
+                    validdate = prod.validDate[1].date;
+                }
+                else if (cert.name === 'VOC') {
+                    fileurl = prod.product.vocUrl;
+                    validdate = prod.validDate[2].date;
+                }
+                const certItem = {
+                    name: cert.name,
+                    fileurl: fileurl,
+                    validDate: validdate,
+                    productId: prod.product.id
+                };
+                return certItem;
+            });
+        }).flat();
+        yield prisma_1.default.$transaction(allCertificates.map(cert => {
+            return prisma_1.default.productcertificate.create({
+                data: {
+                    certificate: {
+                        connect: { id: certificateIds_1.certIdFinder[cert.name] }
+                    },
+                    connectedproduct: {
+                        connect: { productid: cert.productId },
+                    },
+                    fileurl: cert.fileurl,
+                    validDate: cert.validDate
+                }
+            });
+        }));
+    })).then(() => {
+        // write all appropriate files
+        (0, ProductHelper_1.WriteAllFiles)(createdProducts, updatedProducts, productsNotValid, CompanyName);
+    });
 });

@@ -29,9 +29,9 @@ export const CertificateValidator = ({ certificates, epdUrl, fscUrl, vocUrl, ceU
       case 'SV':
         ValidCertificates.push({ name: 'SV'})
         break;
-      case 'BREEAM':
-        ValidCertificates.push({ name: 'BREEAM'})
-        break;
+      // case 'BREEAM':
+      //   if(!!epdUrl || !!vocUrl || !!fscUrl){ValidCertificates.push({ name: 'BREEAM'})}
+      //   break;
       case 'BLENGILL':
         ValidCertificates.push({ name: 'BLENGILL'})
         break;

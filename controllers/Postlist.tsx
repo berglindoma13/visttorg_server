@@ -1,5 +1,5 @@
 import { validateEmail } from '../utils/emailValidation'
-import { prismaInstance } from '../lib/prisma'
+import prismaInstance from '../lib/prisma'
 
 export const Postlist = async (req: any, res: any): Promise<void> => {
 

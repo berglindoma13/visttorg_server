@@ -1,17 +1,22 @@
 import { PrismaClient } from '@prisma/client'
 
+const prismaClientPropertyName = `__prevent-name-collision__prisma`
+type GlobalThisWithPrismaClient = typeof globalThis & {
+  [prismaClientPropertyName]: PrismaClient
+}
 
-declare module NodeJS {
-  interface Global {
-    prisma: PrismaClient;
+const getPrismaClient = () => {
+  if (process.env.NODE_ENV === `production`) {
+    return new PrismaClient()
+  } else {
+    const newGlobalThis = globalThis as GlobalThisWithPrismaClient
+    if (!newGlobalThis[prismaClientPropertyName]) {
+      newGlobalThis[prismaClientPropertyName] = new PrismaClient()
+    }
+    return newGlobalThis[prismaClientPropertyName]
   }
 }
 
-// Prevent multiple instances of Prisma Client in development
-declare const global: NodeJS.Global
+const prismaInstance = getPrismaClient()
 
-const prismaInstance = global.prisma || new PrismaClient()
-
-if (process.env.NODE_ENV === 'development') { global.prisma = prismaInstance }
-
-export { prismaInstance }
+export default prismaInstance

@@ -14,7 +14,6 @@ const port = process.env.PORT;
 var whitelist = ['http://localhost:3000', 'https://vistbokserver.herokuapp.com', 'https://visttorg-primary.vercel.app']
 var corsOptions = {
   origin: function (origin, callback) {
-    console.log('origin', origin)
     if (whitelist.indexOf(origin) !== -1  || !origin) {
       callback(null, true)
     } else {

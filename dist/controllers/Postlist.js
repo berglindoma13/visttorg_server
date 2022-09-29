@@ -8,10 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Postlist = void 0;
 const emailValidation_1 = require("../utils/emailValidation");
-const prisma_1 = require("../lib/prisma");
+const prisma_1 = __importDefault(require("../lib/prisma"));
 const Postlist = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { postlistEmail = '', } = req.body;
     if (!postlistEmail) {
@@ -20,7 +23,7 @@ const Postlist = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!(0, emailValidation_1.validateEmail)(postlistEmail)) {
         return res.status(400).send('Netfang ekki gilt');
     }
-    yield prisma_1.prismaInstance.postlist.create({
+    yield prisma_1.default.postlist.create({
         data: {
             email: postlistEmail
         }

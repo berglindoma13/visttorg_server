@@ -1,0 +1,1 @@
+[{"id":3157,"certificateid":1,"fileurl":"https://dnk.sika.com/content/dam/dms/dk01/c/Sikasil-C%20EPD.pdf","productid":"10012345","validDate":null},{"id":3158,"certificateid":3,"fileurl":"https://www.schomburg.com/de/de/dateien/aquafin-2km-plus-lizenzerteilung-emicode/AQUAFIN-2KM-PLUS%20GEV%20Lizenz%20D.pdf","productid":"10012345","validDate":null}]

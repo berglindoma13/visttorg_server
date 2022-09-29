@@ -1,181 +1,62 @@
 import reader from 'g-sheets-api';
-//@ts-ignore
-import fs from'file-system';
-import { DatabaseCertificate, DatabseProduct } from '../types/models'
-import { CertificateValidator } from '../helpers/CertificateValidator'
-import { validDateObj } from '../types/testResult'
-import { SendEmail } from '../helpers/SendEmail'
-import { ValidDate } from '../helpers/ValidDate'
+import { DatabaseProduct, DatabaseProductCertificate, ProductWithPropsProps } from '../types/models'
 import { Request, Response } from 'express';
-import { WriteFile } from '../helpers/WriteFile'
-import { CreateProductCertificates } from '../helpers/CreateProductCertificates'
-// import { prismaInstance } from '../../lib/prisma';
 import { DeleteAllProductsByCompany,
         DeleteAllCertByCompany,
-        DeleteProduct, 
-        DeleteProductCertificates,
-        UpsertProduct,
-        GetUniqueProduct,
-        GetAllProductsByCompanyid } from '../helpers/PrismaHelper'
-import { sheetProduct } from '../types/sheets';
-import { product } from '@prisma/client';
+        GetUniqueProduct
+      } from '../helpers/PrismaHelper'
+import { SheetProduct } from '../types/sheets';
+import { deleteOldProducts, WriteAllFiles, VerifyProduct, getAllProductsFromGoogleSheets } from '../helpers/ProductHelper';
+import prismaInstance from '../lib/prisma';
+import { certIdFinder } from '../mappers/certificates/certificateIds';
 
-// company id 3, get data from google sheets and insert into database from Ebson
+// company id 2, get data from google sheets and insert into database from Ebson
+const CompanyID = 2
+const SheetID = '1mbdkZvGHbBnj4QeOQdfAIQWQ1uOUQdm5aWYmoV-6yeg'
+const CompanyName = 'Ebson'
 
-var updatedProducts: Array<DatabseProduct> = [];
-var createdProducts: Array<DatabseProduct> = [];
-var productsNotValid: Array<DatabseProduct> = [];
+var updatedProducts: Array<DatabaseProduct> = [];
+var createdProducts: Array<DatabaseProduct> = [];
+var productsNotValid: Array<DatabaseProduct> = [];
 
-export const InsertAllSheetsProducts = async(req: Request,res: Response) => {
+export const InsertAllEbsonProducts = async(req: Request,res: Response) => {
     // get all data from sheets file
-    getProducts();
-    res.end('All Ebson products inserted')
+    getAllProductsFromGoogleSheets(SheetID, ProcessForDatabase, CompanyID);
+    res.end(`All ${CompanyName} products inserted`)
 }
 
-export const DeleteAllSheetsProducts = async(req: Request, res: Response) => {
-  DeleteAllProductsByCompany(3)
-  res.end("All Ebson products deleted");
+export const DeleteAllEbsonProducts = async(req: Request, res: Response) => {
+  DeleteAllProductsByCompany(CompanyID)
+  res.end(`All ${CompanyName} products deleted`);
 }
 
-export const DeleteAllSheetsCert = async(req: Request, res: Response) => {
-  DeleteAllCertByCompany(3)
-  res.end("All Ebson product certificates deleted");
+export const DeleteAllEbsonCert = async(req: Request, res: Response) => {
+  DeleteAllCertByCompany(CompanyID)
+  res.end(`All ${CompanyName} product certificates deleted`);
 }
 
-const WriteAllFiles = async() => {
-  if (createdProducts.length > 0) {
-    WriteFile("EbsonCreated", createdProducts);
-  }
-  if (updatedProducts.length > 0) {
-    WriteFile("EbsonUpdated", updatedProducts);
-  }
-  if (productsNotValid.length > 0) {
-    WriteFile("EbsonNotValid", productsNotValid);
-  }
-}
-
-const productsNoLongerComingInWriteFile = async(productsNoLongerInDatabase: Array<product>) => {
-  // write product info of products no longer coming into the database (and send email to company)
-  fs.writeFile("writefiles/nolonger.txt", JSON.stringify(productsNoLongerInDatabase))
-  // SendEmail("Products no longer coming in from company")
-}
-
-// gets all products from online sheets file
-const getProducts = () => {
-  const options = {
-    apiKey: 'AIzaSyAZQk1HLOZhbbIf6DruJMqsK-CBuRPr7Eg', //google api key in testProject console
-    sheetId: '1xyt08puk_-Ox2s-oZESp6iO1sCK8OAQsK1Z9GaovfqQ', //1SFHaI8ZqPUrQU3LLgCsrLBUtk4vzyl6_FQ02nm6XehI // 1mbdkZvGHbBnj4QeOQdfAIQWQ1uOUQdm5aWYmoV
-    returnAllResults: false,
-  };
-
-  reader(options, (results: Array<sheetProduct>) => {
-    const allprod : Array<DatabseProduct> = [];
-    for (var i=1; i< results.length; i++) {
-      const temp_prod : DatabseProduct = {
-          id: results[i].nr,
-          prodName: results[i].name,
-          longDescription: results[i].long,
-          shortDescription: results[i].short,
-          fl: results[i].fl,
-          prodImage: results[i].pic,
-          url: results[i].link,
-          brand: results[i].mark,
-          fscUrl: results[i].fsclink,
-          epdUrl: results[i].epdlink,
-          vocUrl: results[i].voclink,
-          ceUrl: results[i].ce,
-          certificates: [
-              results[i].fsc === 'TRUE' ? {name: "FSC"} : null,
-              results[i].epd  === 'TRUE' ? { name: "EPD"} : null,
-              results[i].voc  === 'TRUE' ? { name: "VOC"} : null,
-              results[i].sv  === 'TRUE' ? { name: "SV_ALLOWED"} : null,
-              results[i].svans  === 'TRUE' ? { name: "SV" } : null,
-              results[i].breeam  === 'TRUE' ? { name: "BREEAM" } : null,
-              results[i].blue  === 'TRUE' ? { name: "BLENGILL" } : null,
-              results[i].ev  === 'TRUE' ? { name: "EV" } : null,
-              results[i].ce  === 'TRUE' ? { name: "CE" } : null
-          ].filter(cert => cert !== null)
-      }
-      allprod.push(temp_prod)
-
-      // console.log('temp_prod', temp_prod)
-    }
-    // process for database
-    ProcessForDatabase(allprod);
-  }, () => {
-    console.error('ERROR')
-  });
-}
-
-const UpsertProductInDatabase = async(product : DatabseProduct, approved : boolean, create : boolean, certChange : boolean) => {
-  // get all product certificates from sheets
-
-  // Object.keys(convertedCertificates).forEach(key => convertedCertificates[key] === undefined && delete convertedCertificates[key]);
-  const validatedCertificates = CertificateValidator({ certificates: product.certificates, fscUrl: product.fscUrl, epdUrl: product.epdUrl, vocUrl: product.vocUrl, ceUrl: product.ceUrl })
-  
-  var validDate: validDateObj[] = []
-  // no valid certificates for this product
-  if(validatedCertificates.length === 0){
-    productsNotValid.push(product)
-    return;
-  }
-
-  if(create === true) {
-    if (validatedCertificates.length !== 0) {
-      if (product.id !== "") {
-        createdProducts.push(product)
-        // check valid date when product is created
-        var validDate = await ValidDate(validatedCertificates, product)
-      }
-    }
-  }
-  if(certChange === true) {
-    //delete all productcertificates so they wont be duplicated and so they are up to date
-    DeleteProductCertificates(product.id)
-    if(validatedCertificates.length !== 0 ) {
-      if (product.id !== "") {
-        updatedProducts.push(product)
-        // check valid date when the certificates have changed
-        var validDate = await ValidDate(validatedCertificates, product)
-      }
-    }
-  }
-  // update or create product in database if the product has a productnumber (vörunúmer)
-  if(product.id !== "") {
-    await UpsertProduct(product, approved, 3)
-    if(certChange === true || create === true) {
-      await CreateProductCertificates(product, validDate, validatedCertificates)
-    }
-  }
-}
-
-// check if product list database has any products that are not coming from sheets anymore
-const deleteOldProducts = async(incomingProducts : Array<DatabseProduct>) => {
-  // get all current products from this company
-  const currentProducts = await GetAllProductsByCompanyid(3)
-  const productsNoLongerInDatabase = currentProducts.filter(curr_prod => {
-    const matches = incomingProducts.filter(product => { return curr_prod.productid == product.id })
-    //product was not found in list
-    return matches.length === 0
-  })
-  productsNoLongerComingInWriteFile(productsNoLongerInDatabase)
-  // deleta prodcut from prisma database
-  productsNoLongerInDatabase.map(product => {
-    DeleteProduct(product.productid)
-  })
-}
-
-const ProcessForDatabase = async(products : Array<DatabseProduct>) => {
+const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
   // check if any product in the list is in database but not coming in from company api anymore
-  deleteOldProducts(products)
+  deleteOldProducts(products, CompanyID)
 
-  products.map(async(product) => {
+  console.log('products', products)
+
+  //Reset global lists
+  updatedProducts = [];
+  createdProducts = [];
+  productsNotValid = []
+
+
+  const allProductPromises = products.map(async(product) => {
+    const productWithProps:ProductWithPropsProps = { approved: false, certChange: false, create: false, product: null, productState: 1, validDate: null, validatedCertificates:[]}
     const prod = await GetUniqueProduct(product.id)
+
     var approved = false;
-    // var create = false
+    var created = false
+    var certChange = false
+
     if (prod !== null){
       approved = !!prod.approved ? prod.approved : false;
-      var certChange : boolean = false;
       prod.certificates.map((cert) => {
         if (cert.certificateid == 1) {
           // epd file url is not the same
@@ -201,11 +82,127 @@ const ProcessForDatabase = async(products : Array<DatabseProduct>) => {
       })
     }
     else {
-      var create = true;
-      var certChange = true;
+      created = true;
+      //var certChange = true;
     }
-    UpsertProductInDatabase(product, approved, create, certChange)
+    
+    productWithProps.approved = approved
+    productWithProps.certChange = certChange
+    productWithProps.create = created
+    productWithProps.product = product
+
+    const productInfo = await VerifyProduct(product, created,  certChange)
+
+    productWithProps.productState = productInfo.productState
+    productWithProps.validDate = productInfo.validDate
+    productWithProps.validatedCertificates = productInfo.validatedCertificates
+
+    if(productInfo.productState === 1){
+      productsNotValid.push(product)
+    }else if(productInfo.productState === 2){
+      createdProducts.push(product)
+    }
+    else if(productInfo.productState === 3){
+      updatedProducts.push(product)
+    }
+
+    return productWithProps
   })
-  // write all appropriate files
-  WriteAllFiles()
+  
+  Promise.all(allProductPromises).then(async(productsWithProps) => {
+
+    const filteredArray = productsWithProps.filter(prod => prod.productState !== 1)
+
+    await prismaInstance.$transaction(
+      filteredArray.map(productWithProps => {
+
+        return prismaInstance.product.upsert({
+          where: {
+            productid : productWithProps.product.id
+          },
+          update: {
+              approved: productWithProps.approved,
+              title: productWithProps.product.prodName,
+              productid : productWithProps.product.id,
+              sellingcompany: {
+                  connect: { id : CompanyID}
+              },
+              categories : {
+                connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl            
+              },
+              description : productWithProps.product.longDescription,
+              shortdescription : productWithProps.product.shortDescription,
+              productimageurl : productWithProps.product.prodImage,
+              url : productWithProps.product.url,
+              brand : productWithProps.product.brand,
+              updatedAt: new Date()
+          },
+          create: {
+              title: productWithProps.product.prodName,
+              productid : productWithProps.product.id,
+              sellingcompany: {
+                  connect: { id : CompanyID}
+              },
+              categories : {
+                connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl
+              },
+              description : productWithProps.product.longDescription,
+              shortdescription : productWithProps.product.shortDescription,
+              productimageurl : productWithProps.product.prodImage,
+              url : productWithProps.product.url,
+              brand : productWithProps.product.brand,
+              createdAt: new Date(),
+              updatedAt: new Date()
+          }
+        })
+
+      })
+    )
+
+    const allCertificates: Array<DatabaseProductCertificate> = filteredArray.map(prod => {
+      return prod.validatedCertificates.map(cert => {
+        let fileurl = ''
+        let validdate = null
+        if(cert.name === 'EPD'){
+          fileurl = prod.product.epdUrl
+          validdate = prod.validDate[0].date
+        }
+        else if(cert.name === 'FSC'){
+          fileurl = prod.product.fscUrl
+          validdate = prod.validDate[1].date
+        }
+        else if(cert.name === 'VOC'){
+          fileurl = prod.product.vocUrl
+          validdate = prod.validDate[2].date
+        }
+        const certItem: DatabaseProductCertificate = { 
+          name: cert.name,
+          fileurl: fileurl,
+          validDate: validdate,
+          productId: prod.product.id
+        }
+        return certItem
+      })
+    }).flat()
+
+    await prismaInstance.$transaction(
+      allCertificates.map(cert => {
+        return prismaInstance.productcertificate.create({
+          data: {
+            certificate : {
+              connect : { id : certIdFinder[cert.name] }
+            },
+            connectedproduct : {
+              connect : { productid : cert.productId },
+            },
+            fileurl : cert.fileurl,
+            validDate : cert.validDate
+          }
+        })
+      })
+    ) 
+  }).then(() => {
+    // write all appropriate files
+    WriteAllFiles(createdProducts, updatedProducts, productsNotValid, CompanyName)
+  });
 }

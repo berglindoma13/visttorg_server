@@ -1,0 +1,816 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title></title>
+
+    <script src="/Scripts/GenralFunctions.js" type="text/javascript"></script>
+    <script src="/Scripts/Lock.js" type="text/javascript"></script>
+    <link href="/Content/Site.css" rel="stylesheet" type="text/css" />
+    <script src="/Scripts/jquery-1.4.4.min.js" type="text/javascript"></script>
+    <script src="/Scripts/jscroller2-1.61.js" type="text/javascript"></script>
+
+    
+    <link rel="stylesheet" type="text/css" href="/DXR.axd?r=1_4,0_3371,0_3368,0_3263,0_3266,2_2,2_1,1_3,2_0-KrAVc" /><link rel="stylesheet" type="text/css" href="/DXR.axd?r=1_2,0_3274,4_2,0_3277,5_1,0_3338,0_3269,0_3272-KrAVc" />
+    <link href="/App_Themes/Youthful/Editors/styles.css" rel="stylesheet" type="text/css" />
+    <link href="/App_Themes/Youthful/GridView/styles.css" rel="stylesheet" type="text/css" />
+    <link href="/App_Themes/Youthful/Web/styles.css" rel="stylesheet" type="text/css" />
+    <script id="dxis_1325114043" src="/DXR.axd?r=1_42,1_75,1_68,1_65,14_17,14_12,2_27,14_0,1_41,14_2,1_73,1_58,1_60,14_10,1_74,1_76,14_14,1_79,14_15,1_80,14_16,1_48,4_11,4_7,4_8,4_10,14_8,2_34,2_41,5_5,5_4,1_52,1_66,3_8,3_7,14_7,2_40,2_37,1_46,1_54,2_28,14_1,2_30,2_36,2_33,2_31,2_42,14_4,14_9,2_38,2_39-GrAVc" type="text/javascript"></script><script id="dxss_1105786746" type="text/javascript">
+<!--
+ASPxHtmlEditorDialogSR={PasteFromWord:'Paste from Word',InsertImage:'Insert Image',ChangeImage:'Change Image',InsertLink:'Insert Link',ChangeLink:'Change Link',InsertTable:'Insert Table...',ChangeTable:'Table Properties...',ChangeTableCell:'Cell Properties...',ChangeTableColumn:'Column Properties...',ChangeTableRow:'Row Properties...'}
+//-->
+</script><script id="dxss_205051334" type="text/javascript">
+<!--
+(function(){var a = ({'longTime':'HH:mm:ss','currency':'£','longDate':'dd MMMM yyyy','currNegPattern':1,'shortTime':'HH:mm','shortDate':'dd/MM/yyyy','monthDay':'d MMMM'});for(var b in a) __aspxCultureInfo[b] = a[b];})();
+//-->
+</script>
+
+    <!-- JavaScript -->
+    <script type="text/javascript">
+        //<![CDATA[
+        // Zeigt wenn nötig ein Popup für eine EcoEpdException an.
+        function showException() {
+        }
+        function navigateToGeneralErrorPage() {
+            window.location.href = '/Errors/Index';
+        }
+
+        function LoadNewVendorLogo() {
+            $.ajax({
+                type: "post",
+                cache: false,
+                url: '/Home/GetRandomizedCompanyLogo',
+                data: {},
+                success: function(result) {
+                    SetNewVendorImage(result.imgUrl);
+                },
+                fail: function(result) {
+                    //resultText = "Error";
+                }
+            });
+        }
+
+        function SetNewVendorImage(imgPath) {
+            $("#ibu-vendor-logo-area").html(imgPath != null && imgPath.length > 0 ? "<img src=\"" + imgPath + "\" />" : "");
+            $("#ibu-vendor-logo-area").fadeIn(800);
+        }
+
+        var MemberCompanyImageInterval = null;
+        function StartMemberCompanyInterval() {
+            MemberCompanyImageInterval = window.setInterval(function () {
+                $("#ibu-vendor-logo-area").delay(50).fadeOut(800,
+                    "swing",
+                    function () {
+                        LoadNewVendorLogo();
+                    });
+            }, 6000);
+        }
+
+        $(document).ready(function () {
+            //window.setTimeout(function () {
+            //    refreshMembershipLogo();
+            //}, 4000); // nach 4 Sekunden starten
+
+            window.setTimeout(function() {
+                $("#ibu-vendor-logo-area").delay(50).fadeOut(800, "swing", function() {
+                    LoadNewVendorLogo();
+                });
+            }, 500);
+            StartMemberCompanyInterval();
+        });
+
+        function refreshMembershipLogo() {
+            var divLogoContainer = $("#membershipLogoDiv");
+            if (divLogoContainer && divLogoContainer.length > 0 && typeof (MembershipLogoCallbackPanel) != "undefined") {
+                divLogoContainer.delay(50).fadeOut(800, "swing", function () {
+                    MembershipLogoCallbackPanel.PerformCallback();
+                });
+            }
+
+            window.setTimeout(function() {
+                refreshMembershipLogo();
+            }, 8000); // nach 8 Sekunden neu laden
+        }
+
+        function OnBeginMembershipLogoCallback(s, e) {
+        }
+
+        function OnEndMembershipLogoCallback(s, e) {
+            var divLogoContainer = $("#membershipLogoDiv");
+            if (divLogoContainer && divLogoContainer.length > 0) {
+                divLogoContainer.fadeIn(800, "swing");
+            }
+        }
+
+        var cmdUrlLockControllerSetLock = '/Lock/SetLock';
+        var cmdUrlLockControllerClearLock = '/Lock/ClearLock';
+        var bIsLockTimeEnabled = false;
+        var oLockInterval = 30000;
+
+        var selectedEngineeringPropertyId = '';
+        var bSelectCompanyPopupDialogIsOpening = false;
+        var bStartCallBackOfEngineeringPropertyTableContentRowGridView = false;
+        //-->
+    </script>
+    
+    
+
+    
+    
+
+    
+    <script type="text/javascript">
+        //<![CDATA[
+    $(document).ready(function () {
+            sessionExpiring();
+        });
+
+    function sessionExpiring() {
+var iTimeoutMilliseconds = 28770000;
+logoutTimer = setTimeout(logoutOnSessionExpires, iTimeoutMilliseconds);
+    }
+
+    function logoutOnSessionExpires() {
+        window.location.href = '/Home/SessionTimeOut';
+    }
+    //-->
+    </script>
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+
+    
+    
+    <link href="/Content/Error.css" rel="stylesheet" type="text/css" />
+
+
+
+</head>
+<body id="bodytag" onload="setTimeout('showException()', 200);">
+    <div id="scrollviewer">
+        <div id="scrollviewercontent">
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="content">
+    <div id="wrapper">
+        <div id="center">
+                          
+
+<div id="errorbackground">
+    <div id="errorcontent">
+        <h2>Error!</h2>
+        
+        <p>
+
+        </p>
+
+        <br />
+        <p>
+            Use this link to navigate to the start page.
+            <a href="/">Startpage</a>
+        </p>               
+    </div>
+</div>
+
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="MessageBoxPopupWS" name="MessageBoxPopupWS" value="0:0:-1:-10000:-10000:0:500px:50px:1" /><div id="MessageBoxPopup_PW-1" style="position:absolute;left:0px;top:0px;z-index:10000;visibility:hidden;display:none;">
+	<table id="MessageBoxPopup_PWST-1" cellspacing="0" cellpadding="0" style="border-collapse:separate;position:relative;">
+		<tr>
+			<td class="dxpcControl_Youthful" onmousedown="aspxPWMDown(event,&#39;MessageBoxPopup&#39;,-1,false)" onmousemove="aspxPWMMove(event,&#39;MessageBoxPopup&#39;,-1)" height="50" width="400" style="cursor:default;"><table id="MessageBoxPopup_CLW-1" cellspacing="0" cellpadding="0" width="400" style="border-collapse:separate;">
+				<tr>
+					<td id="MessageBoxPopup_PWH-1" class="dxpcHeader_Youthful" onmousedown="aspxPWDGMDown(event,&#39;MessageBoxPopup&#39;,-1)" style="background-image:url(/DXR.axd?r=0_3362-KrAVc);background-repeat:repeat-x;cursor:move;padding-left:12px;padding-right:2px;padding-top:2px;padding-bottom:2px;"><table cellspacing="0" cellpadding="0" width="100%" style="border-collapse:separate;">
+						<tr>
+							<td class="dxpc" width="100%"></td><td style="padding-left:4px;"><table cellspacing="0" cellpadding="0" style="border-collapse:separate;">
+								<tr>
+									<td id="MessageBoxPopup_HCB-1" class="dxpcCloseButton_Youthful" onclick="aspxPWCBClick(event, &#39;MessageBoxPopup&#39;,-1)" onmousedown="return aspxPWCBMDown(event);" style="cursor:pointer;"><img id="MessageBoxPopup_HCB-1Img" class="dxWeb_pcCloseButton_Youthful" src="/DXR.axd?r=1_5-irAVc" alt="[Close]" title="" /></td>
+								</tr>
+							</table></td>
+						</tr>
+					</table></td>
+				</tr><tr>
+					<td id="MessageBoxPopup_PWC-1" class="dxpcContent_Youthful"><div id="MessageBoxPopup_CSD-1" class="dxpcContentPaddings_Youthful">
+						<div>
+    <div id="messageBoxText">
+        dsfsdfsdfsdd
+    </div>
+    <div id="MessageBoxButtonsRow">
+        <div id="MessageBoxButtonsDiv">
+            <div id="MessageBoxButtonDiv1" class="MessageBoxButton">
+<table cellspacing="0" cellpadding="0" id="MessageBoxButton1" width="100" style="border-collapse:separate;">
+	<tr>
+		<td id="MessageBoxButton1_B" class="dxbButton_Youthful" align="center"><div id="MessageBoxButton1_CD" class="dxb">
+			<span>&nbsp;</span>
+		</div></td><td width="0%"><input value="" onfocus="aspxBGotFocus(&#39;MessageBoxButton1&#39;)" type="button" border="0" style="padding:0px;" /></td>
+	</tr>
+</table><script id="dxss_223224863" type="text/javascript">
+<!--
+aspxAddHoverItems('MessageBoxButton1',[[['dxbButtonHover_Youthful'],[''],['B'],['','TC'],[['']],['Img']]]);
+aspxAddPressedItems('MessageBoxButton1',[[['dxbButtonPressed_Youthful'],[''],['B'],['','TC'],[['']],['Img']]]);
+aspxAddDisabledItems('MessageBoxButton1',[[['dxbDisabled_Youthful'],[''],['B'],['','TC'],[['']],['Img']]]);
+
+var dxo = new MVCxClientButton('MessageBoxButton1');
+window['MessageBoxButton1'] = dxo;
+dxo.renderIFrameForPopupElements = true;
+dxo.clientEnabled = false;
+aspxAddSelectedItems('MessageBoxButton1',[[['dxbf'],[''],['CD']]]);
+dxo.useSubmitBehavior = false;
+dxo.isTextEmpty = true;
+dxo.InlineInitialize();
+
+//-->
+</script>            </div>
+            <div id="MessageBoxButtonDiv2" class="MessageBoxButton">
+<table cellspacing="0" cellpadding="0" id="MessageBoxButton2" width="100" style="border-collapse:separate;">
+	<tr>
+		<td id="MessageBoxButton2_B" class="dxbButton_Youthful" align="center"><div id="MessageBoxButton2_CD" class="dxb">
+			<span>&nbsp;</span>
+		</div></td><td width="0%"><input value="" onfocus="aspxBGotFocus(&#39;MessageBoxButton2&#39;)" type="button" border="0" style="padding:0px;" /></td>
+	</tr>
+</table><script id="dxss_1160331615" type="text/javascript">
+<!--
+aspxAddHoverItems('MessageBoxButton2',[[['dxbButtonHover_Youthful'],[''],['B'],['','TC'],[['']],['Img']]]);
+aspxAddPressedItems('MessageBoxButton2',[[['dxbButtonPressed_Youthful'],[''],['B'],['','TC'],[['']],['Img']]]);
+aspxAddDisabledItems('MessageBoxButton2',[[['dxbDisabled_Youthful'],[''],['B'],['','TC'],[['']],['Img']]]);
+
+var dxo = new MVCxClientButton('MessageBoxButton2');
+window['MessageBoxButton2'] = dxo;
+dxo.renderIFrameForPopupElements = true;
+dxo.clientEnabled = false;
+aspxAddSelectedItems('MessageBoxButton2',[[['dxbf'],[''],['CD']]]);
+dxo.useSubmitBehavior = false;
+dxo.isTextEmpty = true;
+dxo.InlineInitialize();
+
+//-->
+</script>            </div>
+            <div id="MessageBoxButtonDiv3" class="MessageBoxButton">
+<table cellspacing="0" cellpadding="0" id="MessageBoxButton3" width="100" style="border-collapse:separate;">
+	<tr>
+		<td id="MessageBoxButton3_B" class="dxbButton_Youthful" align="center"><div id="MessageBoxButton3_CD" class="dxb">
+			<span>&nbsp;</span>
+		</div></td><td width="0%"><input value="" onfocus="aspxBGotFocus(&#39;MessageBoxButton3&#39;)" type="button" border="0" style="padding:0px;" /></td>
+	</tr>
+</table><script id="dxss_1823112417" type="text/javascript">
+<!--
+aspxAddHoverItems('MessageBoxButton3',[[['dxbButtonHover_Youthful'],[''],['B'],['','TC'],[['']],['Img']]]);
+aspxAddPressedItems('MessageBoxButton3',[[['dxbButtonPressed_Youthful'],[''],['B'],['','TC'],[['']],['Img']]]);
+aspxAddDisabledItems('MessageBoxButton3',[[['dxbDisabled_Youthful'],[''],['B'],['','TC'],[['']],['Img']]]);
+
+var dxo = new MVCxClientButton('MessageBoxButton3');
+window['MessageBoxButton3'] = dxo;
+dxo.renderIFrameForPopupElements = true;
+dxo.clientEnabled = false;
+aspxAddSelectedItems('MessageBoxButton3',[[['dxbf'],[''],['CD']]]);
+dxo.useSubmitBehavior = false;
+dxo.isTextEmpty = true;
+dxo.InlineInitialize();
+
+//-->
+</script>            </div>
+        </div>
+    </div>
+</div>
+
+
+					</div></td>
+				</tr>
+			</table></td><td id="ail1081500383" style="background:url('/DXR.axd?r=1_25-irAVc') no-repeat left top;//background:none;"><script id="dxss_599783568" type="text/javascript">
+<!--
+
+    _aspxEnsureAlphaImageLoaderApplierRegistered();    
+    _aspxAddAlphaImageLoaderTarget("ail1081500383", "/DXR.axd?r=1_25-irAVc");
+
+//-->
+</script></td>
+		</tr><tr>
+			<td id="ail853795773" style="background:url('/DXR.axd?r=1_24-irAVc') no-repeat left top;//background:none;"><script id="dxss_1410912886" type="text/javascript">
+<!--
+
+    _aspxEnsureAlphaImageLoaderApplierRegistered();    
+    _aspxAddAlphaImageLoaderTarget("ail853795773", "/DXR.axd?r=1_24-irAVc");
+
+//-->
+</script></td><td id="ail1086999332" style="background:url('/DXR.axd?r=1_26-irAVc') no-repeat left top;//background:none;"><div>
+
+			</div><script id="dxss_2092091544" type="text/javascript">
+<!--
+
+    _aspxEnsureAlphaImageLoaderApplierRegistered();    
+    _aspxAddAlphaImageLoaderTarget("ail1086999332", "/DXR.axd?r=1_26-irAVc");
+
+//-->
+</script></td>
+		</tr>
+	</table>
+</div><iframe id="MessageBoxPopup_DXPWIF-1" src="javascript:false" scrolling="no" frameborder="0" style="position:absolute;display:none;z-index:9999;filter:progid:DXImageTransform.Microsoft.Alpha(Style=0, Opacity=0);">
+
+</iframe><div id="MessageBoxPopup_DXPWMB-1" class="dxpcModalBackground_Youthful" style="position:absolute;visibility:hidden;left:0px;top:0px;z-index:9999;">
+
+</div><script id="dxss_799232207" type="text/javascript">
+<!--
+aspxAddHoverItems('MessageBoxPopup',[[['dxpcCloseButtonHover_Youthful'],[''],['HCB-1'],,[['']],['Img']]]);
+
+var dxo = new MVCxClientPopupControl('MessageBoxPopup');
+window['MessageBoxPopup'] = dxo;
+dxo.renderIFrameForPopupElements = true;
+dxo.allowResize=true;
+dxo.popupHorizontalAlign='WindowCenter';
+dxo.popupVerticalAlign='WindowCenter';
+dxo.allowDragging=true;
+dxo.width=500;
+dxo.height=50;
+dxo.minHeight=50;
+dxo.minWidth=400;
+dxo.maxHeight=400;
+dxo.maxWidth=400;
+dxo.InlineInitialize();
+
+//-->
+</script>
+
+            <div id="head">
+                <center>
+                    <table border="0" style="width: 100%; max-height: 100px; min-height: 100px; height: 100px;
+                        padding-left: 1px;">
+                        <tr>
+                            <td style="width: 100px; vertical-align: top; text-align: center;">
+                                <img src="/Content/images/logo/IBU_Logo_RGB.jpg" style="height: 100px;" alt="" />
+                            </td>
+                            <td style="width: 50px; vertical-align: bottom; text-align: center;">
+                            </td>
+                            <td style="width: 650px; vertical-align: middle; text-align: center;">
+                                <p style="color:red; font-weight: bold; font-size: 14px; display: none;">
+                                    <span style="font-size: 20px; margin-bottom: 3px;"><u>Important note</u>:</span>
+                                    <br />
+                                    <span></span>
+                                </p>
+                            </td>
+                            
+                            <td style="vertical-align: middle; text-align: center;">
+                                    <div class="ibu-vendor-logo-div" id="ibu-vendor-logo-area">
+
+                                    </div>
+                            </td>
+                            <td style="width: 220px; vertical-align: top; text-align: right;">
+                                <img src="/Content/images/logo/epd_klein.png" style="height: 100px;" alt="" />
+                            </td>
+                            <td style="width: 50px; vertical-align: top; text-align: center;"></td>
+                        </tr>
+                    </table>
+                </center>
+
+                
+
+            </div>
+            <div id="head2">
+                
+    <center>
+    <div style="width: 100%; max-height: 30px; min-height: 30px; height: 30px; padding-left: 10px; border:0 none;">
+    </div>
+</center>
+
+
+                <div id="languageselectioncontainer">
+                    <table>
+                        <tr>
+                            <td width="100px;" align="right">
+                                &nbsp;
+                            </td>
+                            <td width="50px;" align="right">
+    <div class="languageselection"><a href="../Settings/SetLanguage?code=de-DE"><img src="../Content/images/flags/de-DE.png" alt="de-DE" title="German" /></a> </div>
+    <div class="languageselection"><a href="../Settings/SetLanguage?code=en-GB"><img src="../Content/images/flags/en-GB.png" alt="en-GB" title="English" /></a> </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div id="foot">
+                <center>
+                    <b>Deutschland:&nbsp;</b> Institut Bauen und Umwelt e.V. (IBU),&nbsp; Hegelplatz 1,
+                    &nbsp; 10117 Berlin,&nbsp; Tel.: +49-(0)30-3087748-0,&nbsp; +49-(0)30-3087748-29,&nbsp; info@ibu-epd.com,
+                    &nbsp;<a href="/Home/Imprint" style="color:white;font-weight:bold;">Imprint</a>,
+                    &nbsp;<a href="/Home/PrivacyPolicy" style="color:white;font-weight:bold;">Privacy policy</a>
+                </center>
+            </div>
+        </div>
+    </div>
+    <!-- Definition der Popups -->
+    <input type="hidden" id="popupEcoEpdExceptionControlWS" name="popupEcoEpdExceptionControlWS" value="0:0:-1:-10000:-10000:0:400px:50px:1" /><div id="popupEcoEpdExceptionControl_PW-1" style="position:absolute;left:0px;top:0px;z-index:10000;visibility:hidden;display:none;">
+	<table id="popupEcoEpdExceptionControl_PWST-1" cellspacing="0" cellpadding="0" style="border-collapse:separate;position:relative;">
+		<tr>
+			<td class="dxpcControl_Youthful" onmousedown="aspxPWMDown(event,&#39;popupEcoEpdExceptionControl&#39;,-1,false)" onmousemove="aspxPWMMove(event,&#39;popupEcoEpdExceptionControl&#39;,-1)" height="50" width="400" style="cursor:default;"><table id="popupEcoEpdExceptionControl_CLW-1" cellspacing="0" cellpadding="0" width="400" style="border-collapse:separate;">
+				<tr>
+					<td id="popupEcoEpdExceptionControl_PWH-1" class="dxpcHeader_Youthful" onmousedown="aspxPWDGMDown(event,&#39;popupEcoEpdExceptionControl&#39;,-1)" style="background-image:url(/DXR.axd?r=0_3362-KrAVc);background-repeat:repeat-x;cursor:move;padding-left:12px;padding-right:2px;padding-top:2px;padding-bottom:2px;"><table cellspacing="0" cellpadding="0" width="100%" style="border-collapse:separate;">
+						<tr>
+							<td class="dxpc" width="100%">Error!</td><td style="padding-left:4px;"><table cellspacing="0" cellpadding="0" style="border-collapse:separate;">
+								<tr>
+									<td id="popupEcoEpdExceptionControl_HCB-1" class="dxpcCloseButton_Youthful" onclick="aspxPWCBClick(event, &#39;popupEcoEpdExceptionControl&#39;,-1)" onmousedown="return aspxPWCBMDown(event);" style="cursor:pointer;"><img id="popupEcoEpdExceptionControl_HCB-1Img" class="dxWeb_pcCloseButton_Youthful" src="/DXR.axd?r=1_5-irAVc" alt="[Close]" title="" /></td>
+								</tr>
+							</table></td>
+						</tr>
+					</table></td>
+				</tr><tr>
+					<td id="popupEcoEpdExceptionControl_PWC-1" class="dxpcContent_Youthful"><div id="popupEcoEpdExceptionControl_CSD-1" class="dxpcContentPaddings_Youthful">
+						
+
+					</div></td>
+				</tr>
+			</table></td><td id="ail2091066755" style="background:url('/DXR.axd?r=1_25-irAVc') no-repeat left top;//background:none;"><script id="dxss_1334593312" type="text/javascript">
+<!--
+
+    _aspxEnsureAlphaImageLoaderApplierRegistered();    
+    _aspxAddAlphaImageLoaderTarget("ail2091066755", "/DXR.axd?r=1_25-irAVc");
+
+//-->
+</script></td>
+		</tr><tr>
+			<td id="ail645901608" style="background:url('/DXR.axd?r=1_24-irAVc') no-repeat left top;//background:none;"><script id="dxss_1051796091" type="text/javascript">
+<!--
+
+    _aspxEnsureAlphaImageLoaderApplierRegistered();    
+    _aspxAddAlphaImageLoaderTarget("ail645901608", "/DXR.axd?r=1_24-irAVc");
+
+//-->
+</script></td><td id="ail1928567397" style="background:url('/DXR.axd?r=1_26-irAVc') no-repeat left top;//background:none;"><div>
+
+			</div><script id="dxss_377114365" type="text/javascript">
+<!--
+
+    _aspxEnsureAlphaImageLoaderApplierRegistered();    
+    _aspxAddAlphaImageLoaderTarget("ail1928567397", "/DXR.axd?r=1_26-irAVc");
+
+//-->
+</script></td>
+		</tr>
+	</table>
+</div><iframe id="popupEcoEpdExceptionControl_DXPWIF-1" src="javascript:false" scrolling="no" frameborder="0" style="position:absolute;display:none;z-index:9999;filter:progid:DXImageTransform.Microsoft.Alpha(Style=0, Opacity=0);">
+
+</iframe><div id="popupEcoEpdExceptionControl_DXPWMB-1" class="dxpcModalBackground_Youthful" style="position:absolute;visibility:hidden;left:0px;top:0px;z-index:9999;">
+
+</div><script id="dxss_815318403" type="text/javascript">
+<!--
+aspxAddHoverItems('popupEcoEpdExceptionControl',[[['dxpcCloseButtonHover_Youthful'],[''],['HCB-1'],,[['']],['Img']]]);
+
+var dxo = new MVCxClientPopupControl('popupEcoEpdExceptionControl');
+window['popupEcoEpdExceptionControl'] = dxo;
+dxo.renderIFrameForPopupElements = true;
+dxo.allowResize=true;
+dxo.popupHorizontalAlign='WindowCenter';
+dxo.popupVerticalAlign='WindowCenter';
+dxo.allowDragging=true;
+dxo.width=400;
+dxo.height=50;
+dxo.minHeight=50;
+dxo.minWidth=200;
+dxo.maxHeight=300;
+dxo.maxWidth=600;
+dxo.InlineInitialize();
+
+//-->
+</script>
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+</body>
+</html>
