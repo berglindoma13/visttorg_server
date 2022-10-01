@@ -6,7 +6,11 @@ import { Login } from '../controllers/loginController';
 import { DeleteAllTengiCert, DeleteAllTengiProducts, GetAllTengiCategories, InsertAllTengiProducts } from '../controllers/TengiController';
 import { DeleteAllSHelgasonCert, DeleteAllSHelgasonProducts, InsertAllSHelgasonProducts } from '../controllers/ShelgasonController';
 import { DeleteAllSerefniCert, DeleteAllSerefniProducts, InsertAllSerefniProducts } from '../controllers/SerefniController';
-import { InsertAllTestProducts } from '../controllers/testController';
+// import { InsertAllTestProducts } from '../controllers/testController';
+import { DeleteAllSmithNorlandCert, DeleteAllSmithNorlandProducts, GetAllSmithNorlandCategories, InsertAllSmithNorlandProducts } from '../controllers/SmithNorlandController';
+import fs from 'fs'
+import { DatabaseCategory } from '../types/models';
+import { UpsertAllCategories } from '../helpers/PrismaHelper';
 
 export const allRoutes = Router();
 
@@ -43,7 +47,13 @@ allRoutes.get('/api/serefni', InsertAllSerefniProducts)
 allRoutes.get('/api/serefni/deletecert', DeleteAllSerefniCert)
 allRoutes.get('/api/serefni/deleteproducts', DeleteAllSerefniProducts)
 
-allRoutes.get('/api/test', InsertAllTestProducts);
+//Smith&Norland ROUTES - API
+allRoutes.get('/api/smithnorland', InsertAllSmithNorlandProducts)
+allRoutes.get('/api/smithnorland/getallcategories', GetAllSmithNorlandCategories)
+allRoutes.get('/api/smithnorland/deletecert', DeleteAllSmithNorlandCert)
+allRoutes.get('/api/smithnorland/deleteproducts', DeleteAllSmithNorlandProducts)
+
+// allRoutes.get('/api/test', InsertAllTestProducts);
 // allRoutes.get('/api/deletesheets', DeleteAllSheetsProducts);
 // allRoutes.get('/api/deletesheetscertificates', DeleteAllSheetsCert);
 
@@ -51,6 +61,19 @@ allRoutes.get('/api/test', InsertAllTestProducts);
 // companyRoutes.get('/api/testnewindatabase', ProcessNewInDatabase)
 
 // app.post('/api/product/add', fileUpload)
+
+allRoutes.get('/updatecategories', (req, res) => {
+  fs.readFile('writefiles/CurrentCategoryTemplate.json', (err, data) => {
+    if (err) throw err;
+    let datastring: string = data.toString()
+    let categories = JSON.parse(datastring);
+
+    UpsertAllCategories(categories)
+
+    res.send('succesfully updated categories')
+    
+});
+})
 
 //add to postlist
 allRoutes.post('/api/postlist', Postlist)

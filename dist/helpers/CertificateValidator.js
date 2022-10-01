@@ -35,6 +35,9 @@ const CertificateValidator = ({ certificates, epdUrl, fscUrl, vocUrl, ceUrl }) =
             case 'EV':
                 ValidCertificates.push({ name: 'EV' });
                 break;
+            case 'ENERGY':
+                ValidCertificates.push({ name: 'ENERGY' });
+                break;
             // case 'CE':
             //     if(!!ceUrl){ValidCertificates.push({ name: 'CE'})}
             //     break;

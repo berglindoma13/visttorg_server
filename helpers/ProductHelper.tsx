@@ -1,6 +1,6 @@
-import { DatabaseProduct, DatabaseProductCertificate, ValidDateObj } from "../types/models";
+import { ConnectedCategory, DatabaseProduct, DatabaseProductCertificate, ValidDateObj } from "../types/models";
 import { CertificateValidator } from "./CertificateValidator";
-import { DeleteProductCertificates, GetAllProductsByCompanyid, UpsertProduct } from "./PrismaHelper";
+import { DeleteProductCertificates, GetAllProductsByCompanyid } from "./PrismaHelper";
 import { ValidDate } from "./ValidDate";
 import { product } from '@prisma/client';
 import fs from'file-system';
@@ -12,7 +12,8 @@ import { SheetProduct } from "../types/sheets";
 //states for product state
 //1 = not valid
 //2 = created
-//3 = updated
+//3 = certificate updated
+//4 = valid product, no certificate change, not created
 
 export const VerifyProduct = async(product : DatabaseProduct, create : boolean, certChange : boolean) => {   
    const validatedCertificates = CertificateValidator({ certificates: product.certificates, fscUrl: product.fscUrl, epdUrl: product.epdUrl, vocUrl: product.vocUrl, ceUrl: product.ceUrl })
@@ -57,6 +58,8 @@ export const VerifyProduct = async(product : DatabaseProduct, create : boolean, 
       }
    }
 
+   productState = 4
+
    return { productState, validDate, validatedCertificates }
  }
 
@@ -84,9 +87,7 @@ export const deleteOldProducts = async(products : Array<DatabaseProduct>, compan
   await prismaInstance.$transaction(
     productsNoLongerInDatabase.map(product => {
       return prismaInstance.product.delete({
-        where: {
-          productid: product.productid
-        }
+        where : { productIdentifier: { productid : product.productid, companyid: companyId }},
       })
     })
   )
@@ -114,13 +115,18 @@ export const getAllProductsFromGoogleSheets = (sheetId: string, callBack: any, c
 
   reader(options, (results: Array<SheetProduct>) => {
     const allprod : Array<DatabaseProduct> = [];
+    
     for (var i=1; i< results.length; i++) {
+      const allCat = results[i].fl.split(',')
+      const mappedCategories: Array<ConnectedCategory> = allCat.map(cat => { return { name: cat } })
+  
       const temp_prod : DatabaseProduct = {
           id: results[i].nr !== ''  ? `${companyID}${results[i].nr}` : results[i].nr,
           prodName: results[i].name,
           longDescription: results[i].long,
           shortDescription: results[i].short,
-          fl: results[i].fl,
+          fl:mappedCategories,
+          subFl: [],
           prodImage: results[i].pic,
           url: results[i].link,
           brand: results[i].mark,
@@ -144,7 +150,7 @@ export const getAllProductsFromGoogleSheets = (sheetId: string, callBack: any, c
     }
     // process for database
     callBack(allprod);
-  }, () => {
-    console.error('ERROR')
+  }, (error) => {
+    console.error('ERROR', error)
   });
 }

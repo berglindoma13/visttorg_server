@@ -1,117 +1,64 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetAllInvalidProductCertsByCompanyAndCertId = exports.GetAllInvalidProductCertsByCompany = exports.GetAllProductsByCompanyid = exports.GetUniqueProduct = exports.UpsertProduct = exports.DeleteProductCertificates = exports.DeleteProduct = exports.DeleteAllCertByCompany = exports.DeleteAllProductsByCompany = void 0;
+exports.UpsertAllCategories = exports.GetAllInvalidProductCertsByCompanyAndCertId = exports.GetAllInvalidProductCertsByCompany = exports.GetAllProductsByCompanyid = exports.GetUniqueProduct = exports.DeleteProductCertificates = exports.DeleteProduct = exports.DeleteAllCertByCompany = exports.DeleteAllProductsByCompany = void 0;
 const prisma_1 = __importDefault(require("../lib/prisma"));
-const DeleteAllProductsByCompany = (companyid) => __awaiter(void 0, void 0, void 0, function* () {
+const DeleteAllProductsByCompany = async (companyid) => {
     // delete all products with given company id
-    return yield prisma_1.default.product.deleteMany({
+    return await prisma_1.default.product.deleteMany({
         where: {
             companyid: companyid
         }
     });
-});
+};
 exports.DeleteAllProductsByCompany = DeleteAllProductsByCompany;
-const DeleteAllCertByCompany = (companyid) => __awaiter(void 0, void 0, void 0, function* () {
+const DeleteAllCertByCompany = async (companyid) => {
     // delete all product certificates connected to given company id
-    return yield prisma_1.default.productcertificate.deleteMany({
+    return await prisma_1.default.productcertificate.deleteMany({
         where: {
             connectedproduct: {
                 companyid: companyid
             }
         }
     });
-});
+};
 exports.DeleteAllCertByCompany = DeleteAllCertByCompany;
-const DeleteProduct = (productid) => __awaiter(void 0, void 0, void 0, function* () {
+const DeleteProduct = async (productId, companyId) => {
     // delete product with given product id
-    return yield prisma_1.default.product.delete({
-        where: {
-            productid: productid
-        }
+    return await prisma_1.default.product.delete({
+        where: { productIdentifier: { productid: productId, companyid: companyId } },
     });
-});
+};
 exports.DeleteProduct = DeleteProduct;
-const DeleteProductCertificates = (productid) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield prisma_1.default.productcertificate.deleteMany({
+const DeleteProductCertificates = async (productid) => {
+    return await prisma_1.default.productcertificate.deleteMany({
         where: {
             productid: productid
         }
     });
-});
+};
 exports.DeleteProductCertificates = DeleteProductCertificates;
-const UpsertProduct = (product, approved, companyid) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield prisma_1.default.product.upsert({
-        where: {
-            productid: product.id
-        },
-        update: {
-            approved: approved,
-            title: product.prodName,
-            productid: product.id,
-            sellingcompany: {
-                connect: { id: companyid }
-            },
-            categories: {
-                connect: typeof product.fl === 'string' ? { name: product.fl } : product.fl
-            },
-            description: product.longDescription,
-            shortdescription: product.shortDescription,
-            productimageurl: product.prodImage,
-            url: product.url,
-            brand: product.brand,
-            updatedAt: new Date()
-        },
-        create: {
-            title: product.prodName,
-            productid: product.id,
-            sellingcompany: {
-                connect: { id: companyid }
-            },
-            categories: {
-                connect: typeof product.fl === 'string' ? { name: product.fl } : product.fl
-            },
-            description: product.longDescription,
-            shortdescription: product.shortDescription,
-            productimageurl: product.prodImage,
-            url: product.url,
-            brand: product.brand,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        }
-    });
-});
-exports.UpsertProduct = UpsertProduct;
-const GetUniqueProduct = (productId) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield prisma_1.default.product.findUnique({
-        where: { productid: productId },
+const GetUniqueProduct = async (productId, companyId) => {
+    return await prisma_1.default.product.findUnique({
+        where: { productIdentifier: { productid: productId, companyid: companyId } },
         include: { certificates: {
                 include: {
                     certificate: true
                 }
             } }
     });
-});
+};
 exports.GetUniqueProduct = GetUniqueProduct;
-const GetAllProductsByCompanyid = (companyid) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield prisma_1.default.product.findMany({
+const GetAllProductsByCompanyid = async (companyid) => {
+    return await prisma_1.default.product.findMany({
         where: { companyid: companyid }
     });
-});
+};
 exports.GetAllProductsByCompanyid = GetAllProductsByCompanyid;
-const GetAllInvalidProductCertsByCompany = (companyid) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield prisma_1.default.productcertificate.findMany({
+const GetAllInvalidProductCertsByCompany = async (companyid) => {
+    return await prisma_1.default.productcertificate.findMany({
         where: {
             validDate: null,
             certificateid: {
@@ -122,10 +69,10 @@ const GetAllInvalidProductCertsByCompany = (companyid) => __awaiter(void 0, void
             }
         }
     });
-});
+};
 exports.GetAllInvalidProductCertsByCompany = GetAllInvalidProductCertsByCompany;
-const GetAllInvalidProductCertsByCompanyAndCertId = (companyid, certId) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield prisma_1.default.productcertificate.findMany({
+const GetAllInvalidProductCertsByCompanyAndCertId = async (companyid, certId) => {
+    return await prisma_1.default.productcertificate.findMany({
         where: {
             validDate: null,
             certificateid: certId,
@@ -134,5 +81,40 @@ const GetAllInvalidProductCertsByCompanyAndCertId = (companyid, certId) => __awa
             }
         }
     });
-});
+};
 exports.GetAllInvalidProductCertsByCompanyAndCertId = GetAllInvalidProductCertsByCompanyAndCertId;
+const UpsertAllCategories = async (categories) => {
+    const allSubCats = categories.map(cat => {
+        return cat.subCategories.map(subcat => { return { ...subcat, parent: cat.name }; });
+    }).flat();
+    await prisma_1.default.$transaction(categories.map(cat => {
+        return prisma_1.default.category.upsert({
+            where: {
+                name: cat.name
+            },
+            update: {
+                name: cat.name
+            },
+            create: {
+                name: cat.name,
+            }
+        });
+    }));
+    await prisma_1.default.$transaction(allSubCats.map(subcat => {
+        const id = { 'name': subcat.name, 'parentCategoryName': subcat.parent };
+        return prisma_1.default.subCategory.upsert({
+            where: {
+                subCatIdentifier: id
+            },
+            update: {
+                name: subcat.name,
+                parentCategoryName: subcat.parent
+            },
+            create: {
+                name: subcat.name,
+                parentCategoryName: subcat.parent
+            }
+        });
+    }));
+};
+exports.UpsertAllCategories = UpsertAllCategories;

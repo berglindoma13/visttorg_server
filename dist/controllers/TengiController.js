@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -27,12 +18,13 @@ const CompanyID = 3;
 var updatedProducts = [];
 var createdProducts = [];
 var productsNotValid = [];
-const convertTengiProductToDatabaseProduct = (product) => __awaiter(void 0, void 0, void 0, function* () {
+const convertTengiProductToDatabaseProduct = async (product) => {
     //map the product category to vistbóks category dictionary
     const prodCategories = product.StandardFields.Categories.map(cat => {
         return cat.Name;
     });
-    const mappedCategories = yield (0, MapCategories_1.getMappedCategory)(prodCategories, tengi_1.default);
+    const mappedCategories = (0, MapCategories_1.getMappedCategory)(prodCategories, tengi_1.default);
+    const mappedSubCategories = (0, MapCategories_1.getMappedCategorySub)(prodCategories, tengi_1.default);
     //Map certificates and validate them before adding to database 
     //TODO WHEN THE FIELD IS ADDED TO THE API
     // const convertedCertificates: Array<string> = product.certificates.map(certificate => { return BykoCertificateMapper[certificate.cert] })
@@ -42,6 +34,7 @@ const convertTengiProductToDatabaseProduct = (product) => __awaiter(void 0, void
         longDescription: product.StandardFields.Description,
         shortDescription: product.StandardFields.ShortDescription,
         fl: mappedCategories,
+        subFl: mappedSubCategories,
         prodImage: product.Images[0].Url,
         url: product.CustomFields.ProductUrl,
         brand: product.StandardFields.Brands[0].Name,
@@ -54,52 +47,53 @@ const convertTengiProductToDatabaseProduct = (product) => __awaiter(void 0, void
             { name: "SV_ALLOWED" },
         ].filter(cert => cert !== null)
     };
+    // console.log('convertedProduct', convertedProduct)
     return convertedProduct;
-});
-const InsertAllTengiProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const tengiData = yield requestTengiApi();
+};
+const InsertAllTengiProducts = async (req, res) => {
+    const tengiData = await requestTengiApi();
     //Check if it comes back undefined, then there was an error retreiving the data
     if (!!tengiData) {
         //process all data and insert into database - first convert to databaseProduct Array
         const allConvertedTengiProducts = [];
         for (var i = 0; i < tengiData.Data.length; i++) {
-            const convertedProduct = yield convertTengiProductToDatabaseProduct(tengiData.Data[i]);
+            const convertedProduct = await convertTengiProductToDatabaseProduct(tengiData.Data[i]);
             //here is a single product
             allConvertedTengiProducts.push(convertedProduct);
         }
-        yield ProcessForDatabase(allConvertedTengiProducts);
+        await ProcessForDatabase(allConvertedTengiProducts);
         return res.end("Successful import");
     }
     else {
         return res.end("Tengi response was invalid");
     }
-});
+};
 exports.InsertAllTengiProducts = InsertAllTengiProducts;
-const GetAllTengiCategories = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const Data = yield requestTengiApi();
+const GetAllTengiCategories = async (req, res) => {
+    const Data = await requestTengiApi();
     if (!!Data) {
-        yield ListCategories(Data);
+        await ListCategories(Data);
         //TODO return categories
         res.end("Successfully listed categories and imported into file");
     }
     else {
         res.end("Failed to list categories");
     }
-});
+};
 exports.GetAllTengiCategories = GetAllTengiCategories;
-const DeleteAllTengiProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const DeleteAllTengiProducts = async (req, res) => {
     // delete all products with company id 3
     (0, PrismaHelper_1.DeleteAllProductsByCompany)(CompanyID);
     res.end("All Tengi products deleted");
-});
+};
 exports.DeleteAllTengiProducts = DeleteAllTengiProducts;
-const DeleteAllTengiCert = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const DeleteAllTengiCert = async (req, res) => {
     // delete all product certificates connected to company id 3
     (0, PrismaHelper_1.DeleteAllCertByCompany)(CompanyID);
     res.end("all product certificates deleted for Tengi");
-});
+};
 exports.DeleteAllTengiCert = DeleteAllTengiCert;
-const requestTengiApi = () => __awaiter(void 0, void 0, void 0, function* () {
+const requestTengiApi = async () => {
     return axios_1.default.get(TengiAPI).then(response => {
         if (response.status === 200) {
             const data = response;
@@ -109,8 +103,8 @@ const requestTengiApi = () => __awaiter(void 0, void 0, void 0, function* () {
             console.log(`Error occured : ${response.status} - ${response.statusText}`);
         }
     });
-});
-const ListCategories = (data) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const ListCategories = async (data) => {
     const prodtypelist = data.Data.map(product => {
         return product.StandardFields.Categories.map(cat => {
             return cat.Name;
@@ -124,17 +118,17 @@ const ListCategories = (data) => __awaiter(void 0, void 0, void 0, function* () 
             return console.error(err);
         }
     });
-});
-const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const ProcessForDatabase = async (products) => {
     // check if any product in the list is in database but not coming in from company api anymore
     (0, ProductHelper_1.deleteOldProducts)(products, CompanyID);
     //Reset global lists
     updatedProducts = [];
     createdProducts = [];
     productsNotValid = [];
-    const allProductPromises = products.map((product) => __awaiter(void 0, void 0, void 0, function* () {
+    const allProductPromises = products.map(async (product) => {
         const productWithProps = { approved: false, certChange: false, create: false, product: null, productState: 1, validDate: null, validatedCertificates: [] };
-        const prod = yield (0, PrismaHelper_1.GetUniqueProduct)(product.id);
+        const prod = await (0, PrismaHelper_1.GetUniqueProduct)(product.id, CompanyID);
         var approved = false;
         var created = false;
         var certChange = false;
@@ -172,8 +166,7 @@ const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, funct
         productWithProps.certChange = certChange;
         productWithProps.create = created;
         productWithProps.product = product;
-        const productInfo = yield (0, ProductHelper_1.VerifyProduct)(product, created, certChange);
-        console.log('productInfo', productInfo);
+        const productInfo = await (0, ProductHelper_1.VerifyProduct)(product, created, certChange);
         productWithProps.productState = productInfo.productState;
         productWithProps.validDate = productInfo.validDate;
         productWithProps.validatedCertificates = productInfo.validatedCertificates;
@@ -187,13 +180,13 @@ const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, funct
             updatedProducts.push(product);
         }
         return productWithProps;
-    }));
-    return Promise.all(allProductPromises).then((productsWithProps) => __awaiter(void 0, void 0, void 0, function* () {
+    });
+    return Promise.all(allProductPromises).then(async (productsWithProps) => {
         const filteredArray = productsWithProps.filter(prod => prod.productState !== 1);
-        yield prisma_1.default.$transaction(filteredArray.map(productWithProps => {
+        await prisma_1.default.$transaction(filteredArray.map(productWithProps => {
             return prisma_1.default.product.upsert({
                 where: {
-                    productid: productWithProps.product.id
+                    productIdentifier: { productid: productWithProps.product.id, companyid: CompanyID }
                 },
                 update: {
                     approved: productWithProps.approved,
@@ -204,6 +197,9 @@ const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, funct
                     },
                     categories: {
                         connect: typeof productWithProps.product.fl === 'string' ? { name: productWithProps.product.fl } : productWithProps.product.fl
+                    },
+                    subCategories: {
+                        connect: productWithProps.product.subFl
                     },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
@@ -221,6 +217,9 @@ const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, funct
                     categories: {
                         connect: typeof productWithProps.product.fl === 'string' ? { name: productWithProps.product.fl } : productWithProps.product.fl
                     },
+                    subCategories: {
+                        connect: productWithProps.product.subFl
+                    },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
                     productimageurl: productWithProps.product.prodImage,
@@ -231,7 +230,6 @@ const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, funct
                 }
             });
         }));
-        console.log('filteredArray', filteredArray);
         const allCertificates = filteredArray.map(prod => {
             return prod.validatedCertificates.map(cert => {
                 let fileurl = '';
@@ -257,23 +255,24 @@ const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, funct
                 return certItem;
             });
         }).flat();
-        console.log('allCertificates', allCertificates);
-        yield prisma_1.default.$transaction(allCertificates.map(cert => {
+        await prisma_1.default.$transaction(allCertificates.map(cert => {
             return prisma_1.default.productcertificate.create({
                 data: {
                     certificate: {
                         connect: { id: certificateIds_1.certIdFinder[cert.name] }
                     },
                     connectedproduct: {
-                        connect: { productid: cert.productId },
+                        connect: {
+                            productIdentifier: { productid: cert.productId, companyid: CompanyID }
+                        },
                     },
                     fileurl: cert.fileurl,
                     validDate: cert.validDate
                 }
             });
         }));
-    })).then(() => {
+    }).then(() => {
         // write all appropriate files
         (0, ProductHelper_1.WriteAllFiles)(createdProducts, updatedProducts, productsNotValid, 'Tengi');
     });
-});
+};

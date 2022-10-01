@@ -10,5 +10,6 @@ exports.certIdFinder = {
     'BREEAM': 6,
     'BLENGILL': 7,
     'EV': 8,
-    'CE': 9
+    'CE': 9,
+    'ENERGY': 10
 };

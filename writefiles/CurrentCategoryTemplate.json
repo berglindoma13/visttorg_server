@@ -1,0 +1,410 @@
+[
+  {
+
+    "name": "Baðherbergi",
+    "subCategories": [
+      {
+        "name":"Hreinlætistæki"
+      },
+      {
+        "name":"Niðurföll"
+      },
+      {
+        "name":"Gler og speglar"
+      },
+      {
+        "name":"Múrefni"
+      }
+    ]
+  },
+  {
+
+    "name": "Eldhús",
+    "subCategories": [
+      {
+        "name":"Innréttingar"
+      },
+      {
+        "name":"Eldhúsvaskar"
+      },
+      {
+        "name":"Blöndunartæki"
+      },
+      {
+        "name":"Heimilistæki"
+      }
+    ]
+  },
+  {
+
+    "name": "Málningarvörur",
+    "subCategories": [
+      {
+        "name":"Innimálning"
+      },
+      {
+        "name":"Útimálning"
+      },
+      {
+        "name":"Viðarvörn og pallaolía"
+      },
+      {
+        "name":"Málningargrunnar"
+      },
+      {
+        "name":"Þakmálning"
+      },
+      {
+        "name":"Kítti og þéttiefni"
+      },
+      {
+        "name":"Lökk"
+      },
+      {
+        "name":"Spartl"
+      }
+    ]
+  },
+  {
+
+    "name": "Gólfefni",
+    "subCategories": [
+      {
+        "name":"Parket"
+      },
+      {
+        "name":"Flísar og listar"
+      },
+      {
+        "name":"Múrefni"
+      },
+      {
+        "name":"Kítti og frauð"
+      },
+      {
+        "name":"Undirlag"
+      },
+      {
+        "name":"Viðarolíur"
+      },
+      {
+        "name":"Viðarlökk"
+      },
+      {
+        "name":"Frostþolnar flísar"
+      }
+    ]
+  },
+  {
+
+    "name": "Loft og veggja efni",
+    "subCategories": [
+      {
+        "name":"Gifsplötur"
+      },
+      {
+        "name":"Loftaþiljur"
+      },
+      {
+        "name":"Veggfóður"
+      },
+      {
+        "name":"Vegglistar"
+      },
+      {
+        "name":"Veggklæðningar"
+      }
+    ]
+  },
+  {
+
+    "name": "Pallaefni",
+    "subCategories": [
+      {
+        "name":"Pallaolía"
+      },
+      {
+        "name":"Pallaklæðning"
+      },
+      {
+        "name":"Veggklæðning"
+      },
+      {
+        "name":"Staurar"
+      },
+      {
+        "name":"Skjólveggir"
+      },
+      {
+        "name":"Grindarefni"
+      }
+    ]
+  },
+  {
+
+    "name": "Gluggar og Hurðir",
+    "subCategories": [
+      {
+        "name":"Gluggar"
+      },
+      {
+        "name":"Innihurðir"
+      },
+      {
+        "name":"Útihurðir"
+      },
+      {
+        "name":"Bílskúrshurðir"
+      },
+      {
+        "name":"Stálhurðir"
+      }
+    ]
+  },
+  {
+
+    "name": "Plast og plastdúkar",
+    "subCategories": [
+      {
+        "name":"Einangrunarplast"
+      },
+      {
+        "name":"Rakasperruplas"
+      },
+      {
+        "name":"Byggingaplast"
+      }
+    ]
+  },
+  {
+    "name": "Ljós og raflagnaefni",
+    "subCategories": [
+      {
+        "name":"Inniljós"
+      },
+      {
+        "name":"Útiljós"
+      },
+      {
+        "name":"Veggljós"
+      },
+      {
+        "name":"Loftljós"
+      },
+      {
+        "name":"Strengir"
+      },
+      {
+        "name":"Barkar"
+      },
+      {
+        "name":"Rofar og tenglar"
+      },
+      {
+        "name":"Innréttingalýsing"
+      }
+    ]
+  },
+  {
+
+    "name": "Pípulagnir",
+    "subCategories": [
+      {
+        "name":"Álplast lagnir"
+      },
+      {
+        "name":"Gólfhiti"
+      },
+      {
+        "name":"Frárennsli"
+      },
+      {
+        "name":"Festingar"
+      }
+    ]
+  },
+  {
+
+    "name": "Einagrun",
+    "subCategories": [
+      {
+        "name":"Þéttull"
+      },
+      {
+        "name":"Léttull"
+      },
+      {
+        "name":"Stokkaeinangrun"
+      },
+      {
+        "name":"Ímúr/Múrplata"
+      },
+      {
+        "name":"Sökkulplötur"
+      },
+      {
+        "name":"Veggplötur"
+      }
+    ]
+  },
+  {
+
+    "name": "Múrefni",
+    "subCategories": [
+      {
+        "name":"Múrblöndunarefni"
+      },
+      {
+        "name":"Múrblöndur"
+      },
+      {
+        "name":"Flotefni"
+      },
+      {
+        "name":"Útimúr"
+      },
+      {
+        "name":"Innimúr"
+      },
+      {
+        "name":"Hraðþornandi múr"
+      },
+      {
+        "name":"Staurasteypa"
+      }
+    ]
+  },
+  {
+
+    "name": "Innréttingar",
+    "subCategories": [
+      {
+        "name":"Borðplötur"
+      },
+      {
+        "name":"Eldhúsinnréttingar"
+      },
+      {
+        "name":"Baðinnréttingar"
+      },
+      {
+        "name":"Fataskápar"
+      },
+      {
+        "name":"Aðrar innréttingar"
+      }
+    ]
+  },
+  {
+
+    "name": "Húsgögn",
+    "subCategories": [
+      {
+        "name":"Stólar"
+      },
+      {
+        "name":"Borð"
+      },
+      {
+        "name":"Sófar"
+      },
+      {
+        "name":"Rúm"
+      },
+      {
+        "name":"Skrifstofuhúsgögn"
+      }
+    ]
+  },
+  {
+
+    "name": "Loftræsting",
+    "subCategories": [
+      {
+        "name":"Loftræstisamstæður"
+      },
+      {
+        "name":"Plastbarkar"
+      }
+    ]
+  },
+  {
+
+    "name": "Burðarvirki",
+    "subCategories": [
+      {
+        "name":"Timburburðarbitar"
+      },
+      {
+        "name":"Kambstál"
+      }
+    ]
+  },
+  {
+
+    "name": "Þakefni og rennur",
+    "subCategories": [
+      {
+        "name":"Þakrennur"
+      },
+      {
+        "name":"Þak- og vindpappar"
+      },
+      {
+        "name":"Þakdúkar"
+      },
+      {
+        "name":"Þakskífur"
+      },
+      {
+        "name":"Þaktúður og -niðurföll"
+      }
+    ]
+  },
+  {
+
+    "name": "Heimilistæki",
+    "subCategories": [
+      {
+        "name":"Eldunartæki"
+      },
+      {
+        "name":"Uppþvottavélar"
+      },
+      {
+        "name":"Þvottavélar og þurrkarar"
+      },
+      {
+        "name":"Kæli- og frystitæki"
+      },
+      {
+        "name":"Háfar og viftur"
+      }
+    ]
+  },
+  {
+
+    "name": "Timbur",
+    "subCategories": [
+      {
+        "name":"Plötur"
+      },
+      {
+        "name":"Mótaviður"
+      },
+      {
+        "name":"Pallaefni"
+      },
+      {
+        "name":"Byggingatimbur"
+      }
+    ]
+  },
+  {
+
+    "name": "Utanhúss",
+    "subCategories": [
+      
+    ]
+  }
+]

@@ -1,5 +1,5 @@
 import prismaInstance from "../lib/prisma";
-import { DatabaseProduct } from "../types/models";
+import { DatabaseCategory, DatabaseProduct, DatabaseSubCategory } from "../types/models";
 
 export const DeleteAllProductsByCompany = async(companyid : number) => {
     // delete all products with given company id
@@ -21,12 +21,10 @@ export const DeleteAllCertByCompany = async(companyid : number) => {
     })
 }
 
-export const DeleteProduct = async(productid : string) => {
+export const DeleteProduct = async(productId : string, companyId: number) => {
     // delete product with given product id
    return await prismaInstance.product.delete({
-      where: {
-        productid: productid
-      }
+      where : { productIdentifier: { productid : productId, companyid: companyId }},
     })
 }
 
@@ -38,51 +36,9 @@ export const DeleteProductCertificates = async(productid : string) => {
     })
 }
 
-export const UpsertProduct = async(product : DatabaseProduct, approved : boolean, companyid : number) => {
-  return await prismaInstance.product.upsert({
-    where: {
-      productid : product.id
-    },
-    update: {
-        approved: approved,
-        title: product.prodName,
-        productid : product.id,
-        sellingcompany: {
-            connect: { id : companyid}
-        },
-        categories : {
-          connect: typeof product.fl === 'string' ? { name : product.fl} : product.fl            
-        },
-        description : product.longDescription,
-        shortdescription : product.shortDescription,
-        productimageurl : product.prodImage,
-        url : product.url,
-        brand : product.brand,
-        updatedAt: new Date()
-    },
-    create: {
-        title: product.prodName,
-        productid : product.id,
-        sellingcompany: {
-            connect: { id : companyid}
-        },
-        categories : {
-          connect: typeof product.fl === 'string' ? { name : product.fl} : product.fl
-        },
-        description : product.longDescription,
-        shortdescription : product.shortDescription,
-        productimageurl : product.prodImage,
-        url : product.url,
-        brand : product.brand,
-        createdAt: new Date(),
-        updatedAt: new Date()
-    }
-  })
-}
-
-export const GetUniqueProduct = async(productId : string) => {
+export const GetUniqueProduct = async(productId : string, companyId: number) => {
     return await prismaInstance.product.findUnique({
-      where : {productid: productId},
+      where : { productIdentifier: { productid : productId, companyid: companyId }},
       include : {certificates: {
         include: {
           certificate : true
@@ -121,4 +77,46 @@ export const GetAllInvalidProductCertsByCompanyAndCertId = async(companyid: numb
       }
     }
   })
+}
+
+export const UpsertAllCategories = async(categories: Array<DatabaseCategory>) => {
+  const allSubCats = categories.map(cat => {
+    return cat.subCategories.map(subcat => { return  { ...subcat, parent: cat.name }})
+  }).flat()
+
+  await prismaInstance.$transaction(
+    categories.map(cat => {
+      return prismaInstance.category.upsert({
+        where: {
+          name: cat.name
+        },
+        update: {
+         name: cat.name
+        },
+        create: {
+          name: cat.name,
+        }
+      })
+    })
+  )
+
+  await prismaInstance.$transaction(
+    allSubCats.map(subcat => {
+      const id = { 'name': subcat.name, 'parentCategoryName': subcat.parent}
+      return prismaInstance.subCategory.upsert({
+        where : { 
+          subCatIdentifier: id
+        },
+        update: {
+          name: subcat.name,
+          parentCategoryName: subcat.parent
+        },
+        create: {
+          name: subcat.name,
+          parentCategoryName: subcat.parent
+        }
+      })
+    })
+  )
+  
 }

@@ -46,7 +46,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
   const allProductPromises = products.map(async(product) => {
     const productWithProps:ProductWithPropsProps = { approved: false, certChange: false, create: false, product: null, productState: 1, validDate: null, validatedCertificates:[]}
-    const prod = await GetUniqueProduct(product.id)
+    const prod = await GetUniqueProduct(product.id, CompanyID)
 
     var approved = false;
     var created = false
@@ -115,7 +115,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
         return prismaInstance.product.upsert({
           where: {
-            productid : productWithProps.product.id
+            productIdentifier : { productid: productWithProps.product.id, companyid: CompanyID}
           },
           update: {
               approved: productWithProps.approved,
@@ -190,7 +190,9 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               connect : { id : certIdFinder[cert.name] }
             },
             connectedproduct : {
-              connect : { productid : cert.productId },
+              connect : { 
+                productIdentifier : { productid: cert.productId, companyid: CompanyID}
+              },
             },
             fileurl : cert.fileurl,
             validDate : cert.validDate

@@ -1,19 +1,13 @@
 import axios from 'axios'
-import { ConnectedCategory, DatabaseProduct, DatabaseProductCertificate, ProductWithPropsProps } from '../types/models'
-import { CertificateValidator } from '../helpers/CertificateValidator'
-import { ValidDate } from '../helpers/ValidDate'
+import { DatabaseProduct, DatabaseProductCertificate, ProductWithPropsProps } from '../types/models'
 import fs from 'fs'
-import { CreateProductCertificates } from '../helpers/CreateProductCertificates'
 import { DeleteAllProductsByCompany,
         DeleteAllCertByCompany,
-        DeleteProduct, 
-        DeleteProductCertificates,
-        UpsertProduct,
         GetUniqueProduct,
-        GetAllProductsByCompanyid } from '../helpers/PrismaHelper'
+ } from '../helpers/PrismaHelper'
 import { TengiProduct, TengiResponse } from '../types/tengi'
 import { Request, Response } from 'express';
-import { getMappedCategory } from '../helpers/MapCategories'
+import { getMappedCategory, getMappedCategorySub } from '../helpers/MapCategories'
 import TengiCategoryMapper from '../mappers/categories/tengi'
 import { deleteOldProducts, VerifyProduct, WriteAllFiles } from '../helpers/ProductHelper'
 import prismaInstance from '../lib/prisma'
@@ -35,7 +29,8 @@ const convertTengiProductToDatabaseProduct = async(product: TengiProduct) => {
   const prodCategories = product.StandardFields.Categories.map(cat => {
     return cat.Name
   })
-  const mappedCategories = await getMappedCategory(prodCategories, TengiCategoryMapper)
+  const mappedCategories = getMappedCategory(prodCategories, TengiCategoryMapper)
+  const mappedSubCategories = getMappedCategorySub(prodCategories, TengiCategoryMapper)
 
   //Map certificates and validate them before adding to database 
   //TODO WHEN THE FIELD IS ADDED TO THE API
@@ -47,6 +42,7 @@ const convertTengiProductToDatabaseProduct = async(product: TengiProduct) => {
     longDescription: product.StandardFields.Description,
     shortDescription: product.StandardFields.ShortDescription,
     fl: mappedCategories,
+    subFl: mappedSubCategories,
     prodImage: product.Images[0].Url, // TODO - FIX THIS WHEN WE HAVE THE OPTION OF MULTIPLE IMAGES
     url: product.CustomFields.ProductUrl,
     brand: product.StandardFields.Brands[0].Name,
@@ -59,6 +55,8 @@ const convertTengiProductToDatabaseProduct = async(product: TengiProduct) => {
       { name: "SV_ALLOWED"},
     ].filter(cert => cert !== null)
   }
+
+  // console.log('convertedProduct', convertedProduct)
 
   return convertedProduct
 }
@@ -152,7 +150,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
   const allProductPromises = products.map(async(product) => {
     const productWithProps:ProductWithPropsProps = { approved: false, certChange: false, create: false, product: null, productState: 1, validDate: null, validatedCertificates:[]}
-    const prod = await GetUniqueProduct(product.id)
+    const prod = await GetUniqueProduct(product.id, CompanyID)
 
     var approved = false;
     var created = false
@@ -195,7 +193,6 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
     productWithProps.product = product
 
     const productInfo = await VerifyProduct(product, created,  certChange)
-    console.log('productInfo', productInfo)
 
     productWithProps.productState = productInfo.productState
     productWithProps.validDate = productInfo.validDate
@@ -222,7 +219,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
         return prismaInstance.product.upsert({
           where: {
-            productid : productWithProps.product.id
+            productIdentifier : { productid: productWithProps.product.id, companyid: CompanyID}
           },
           update: {
               approved: productWithProps.approved,
@@ -233,6 +230,9 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               },
               categories : {
                 connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl            
+              },
+              subCategories: {
+                connect: productWithProps.product.subFl
               },
               description : productWithProps.product.longDescription,
               shortdescription : productWithProps.product.shortDescription,
@@ -250,6 +250,9 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               categories : {
                 connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl
               },
+              subCategories:{
+                connect: productWithProps.product.subFl            
+              },
               description : productWithProps.product.longDescription,
               shortdescription : productWithProps.product.shortDescription,
               productimageurl : productWithProps.product.prodImage,
@@ -262,8 +265,6 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
       })
     )
-
-    console.log('filteredArray', filteredArray)
 
     const allCertificates: Array<DatabaseProductCertificate> = filteredArray.map(prod => {
       return prod.validatedCertificates.map(cert => {
@@ -291,8 +292,6 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
       })
     }).flat()
 
-    console.log('allCertificates', allCertificates)
-
     await prismaInstance.$transaction(
       allCertificates.map(cert => {
         return prismaInstance.productcertificate.create({
@@ -301,7 +300,9 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               connect : { id : certIdFinder[cert.name] }
             },
             connectedproduct : {
-              connect : { productid : cert.productId },
+              connect : { 
+                productIdentifier: { productid: cert.productId, companyid: CompanyID }
+              },
             },
             fileurl : cert.fileurl,
             validDate : cert.validDate
