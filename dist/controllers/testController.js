@@ -89,7 +89,7 @@ const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, funct
         productWithProps.create = created;
         productWithProps.product = product;
         const productInfo = yield (0, ProductHelper_1.VerifyProduct)(product, created, certChange);
-        console.log('productInfo', productInfo);
+        // console.log('productInfo', productInfo)
         productWithProps.productState = productInfo.productState;
         productWithProps.validDate = productInfo.validDate;
         productWithProps.validatedCertificates = productInfo.validatedCertificates;
@@ -187,7 +187,7 @@ const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, funct
                 }
             });
         }));
-        console.log('prismaCertificates', prismaCertificates);
+        // console.log('prismaCertificates', prismaCertificates)
         const invalidPrismaCerts = prismaCertificates.filter(pcert => {
             let found = false;
             certsWithFilesAndNotValidDate.map(ncert => {
@@ -197,7 +197,7 @@ const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, funct
             });
             return found;
         });
-        console.log('invalidPrismaCerts', invalidPrismaCerts);
+        // console.log('invalidPrismaCerts', invalidPrismaCerts)
         invalidCertificates = invalidPrismaCerts;
     })).then(() => {
         // write all appropriate files

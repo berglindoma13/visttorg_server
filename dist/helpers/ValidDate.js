@@ -35,19 +35,33 @@ const ValidDate = (validatedCertificates, product) => __awaiter(void 0, void 0, 
             let dataBuffer = fs.readFileSync('dist/' + url);
             yield pdf(dataBuffer).then(function (data) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    // let filedatestring
-                    let filedate;
+                    let filedatestring;
+                    // let filedate
                     //English
                     const filedatestringEN = data.text.split("\n").filter(text => text.includes("Valid to"));
                     // const filedatestringDE = data.text.split("\n").filter(text=> text.includes("gültig bis"));
-                    filedate = filedatestringEN[0].replace("Valid to", "");
+                    // new format to test
+                    const datastring = data.text.split("\n");
+                    var dateOfFile = "";
+                    const filedatestringDIFFERENT = datastring.map((text, index) => {
+                        if (text.includes("validity period")) {
+                            dateOfFile = datastring[index + 1];
+                        }
+                    });
+                    // filedate = filedatestringEN[0].replace("Valid to", "")
                     // if(!!filedatestringEN[0]){
                     //   filedatestring = filedatestringEN
                     // }else if(!!filedatestringDE[0]){
                     //   filedatestring = filedatestringDE
                     //   filedate = filedatestring[0].replace("gültig bis", "")
                     // }
-                    const parsedate = new Date(filedate);
+                    if (!!filedatestringEN[0]) {
+                        filedatestring = filedatestringEN[0].replace("Valid to", "");
+                    }
+                    else if (dateOfFile !== "") {
+                        filedatestring = dateOfFile.replace(/[(,).]/g, " ");
+                    }
+                    const parsedate = new Date(filedatestring);
                     const test = check(parsedate);
                     arr[0] = test;
                 });
@@ -69,13 +83,14 @@ const ValidDate = (validatedCertificates, product) => __awaiter(void 0, void 0, 
             });
         }
         if (cert.name === "VOC") {
+            // console.log('VOC VOC VOC VOC --------------------------', product.vocUrl)
             yield download(product.vocUrl, "dist");
             const url = product.vocUrl.split("/").pop();
             let dataBuffer = fs.readFileSync('dist/' + url);
             // console.log('databuffer VOC', dataBuffer) // dist/Soudabond%20Easy%20-%20EMICODE-Lizenz%203879%20-%202.8.17-e.pdf
             yield pdf(dataBuffer).then(function (data) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    // console.log('data', data)
+                    // console.log('DATA VOC', data)
                     // let filedatestring
                     let filedate;
                     //English

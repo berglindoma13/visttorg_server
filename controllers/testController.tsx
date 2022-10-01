@@ -93,7 +93,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
     const productInfo = await VerifyProduct(product, created,  certChange)
 
-    console.log('productInfo', productInfo)
+    // console.log('productInfo', productInfo)
 
     productWithProps.productState = productInfo.productState
     productWithProps.validDate = productInfo.validDate
@@ -206,7 +206,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
       })
     ) 
 
-    console.log('prismaCertificates', prismaCertificates)
+    // console.log('prismaCertificates', prismaCertificates)
 
     const invalidPrismaCerts = prismaCertificates.filter(pcert => {
       let found = false
@@ -219,7 +219,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
       return found
     })
 
-    console.log('invalidPrismaCerts', invalidPrismaCerts)
+    // console.log('invalidPrismaCerts', invalidPrismaCerts)
     invalidCertificates = invalidPrismaCerts
 
   }).then(() => {
