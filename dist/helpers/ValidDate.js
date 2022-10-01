@@ -32,20 +32,33 @@ const ValidDate = (validatedCertificates, product) => __awaiter(void 0, void 0, 
         if (cert.name === "EPD") {
             yield download(product.epdUrl, "dist");
             const url = product.epdUrl.split("/").pop();
+            // var temp = url.replace('.pdf', "") + ".pd"
+            // console.log('temp', temp)
             let dataBuffer = fs.readFileSync('dist/' + url);
             yield pdf(dataBuffer).then(function (data) {
                 return __awaiter(this, void 0, void 0, function* () {
                     let filedatestring;
                     // let filedate
+                    // console.log('bla', data.text)
                     //English
                     const filedatestringEN = data.text.split("\n").filter(text => text.includes("Valid to"));
                     // const filedatestringDE = data.text.split("\n").filter(text=> text.includes("gültig bis"));
-                    // new format to test
-                    const datastring = data.text.split("\n");
-                    var dateOfFile = "";
-                    const filedatestringDIFFERENT = datastring.map((text, index) => {
+                    // new file format
+                    const datastringFormA = data.text.split("\n");
+                    var dateOfFileA = "";
+                    const filedatestringFromA = datastringFormA.map((text, index) => {
                         if (text.includes("validity period")) {
-                            dateOfFile = datastring[index + 1];
+                            dateOfFileA = datastringFormA[index + 1];
+                        }
+                    });
+                    // Another file format
+                    const filedatestringFromB = data.text.split("\n").filter(text => text.includes("Validity date"));
+                    // Another new file format
+                    const datastringFormC = data.text.split("\n");
+                    var dateOfFileC;
+                    const filedatestringFormC = datastringFormC.map((text, index) => {
+                        if (text.includes("expiry date")) {
+                            dateOfFileC = datastringFormC[index + 1];
                         }
                     });
                     // filedate = filedatestringEN[0].replace("Valid to", "")
@@ -54,14 +67,24 @@ const ValidDate = (validatedCertificates, product) => __awaiter(void 0, void 0, 
                     // }else if(!!filedatestringDE[0]){
                     //   filedatestring = filedatestringDE
                     //   filedate = filedatestring[0].replace("gültig bis", "")
-                    // }
+                    // } 
                     if (!!filedatestringEN[0]) {
                         filedatestring = filedatestringEN[0].replace("Valid to", "");
                     }
-                    else if (dateOfFile !== "") {
-                        filedatestring = dateOfFile.replace(/[(,).]/g, " ");
+                    else if (dateOfFileA !== "") {
+                        filedatestring = dateOfFileA.replace(/[(,).]/g, " ");
+                    }
+                    else if (!!filedatestringFromB[0]) {
+                        filedatestring = filedatestringFromB[0].replace("Validity date: ", "");
+                    }
+                    else if (dateOfFileC !== "") {
+                        // date is reversed
+                        const swap = ([item0, item1, rest]) => [item1, item0, rest];
+                        const dateOfFileSwapedC = swap(dateOfFileC.split("-")).join("-");
+                        filedatestring = dateOfFileSwapedC;
                     }
                     const parsedate = new Date(filedatestring);
+                    console.log('data', parsedate);
                     const test = check(parsedate);
                     arr[0] = test;
                 });

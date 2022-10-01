@@ -24,22 +24,35 @@ export const ValidDate = async(validatedCertificates : Array<DatabaseCertificate
     if (cert.name === "EPD") {
       await download(product.epdUrl, "dist")
       const url = product.epdUrl.split("/").pop()
+      // var temp = url.replace('.pdf', "") + ".pd"
+      // console.log('temp', temp)
       let dataBuffer = fs.readFileSync('dist/' + url)
       await pdf(dataBuffer).then(async function(data) {
-
         let filedatestring
         // let filedate
-
+                
         //English
         const filedatestringEN = data.text.split("\n").filter(text=> text.includes("Valid to"));
         // const filedatestringDE = data.text.split("\n").filter(text=> text.includes("gültig bis"));
 
-        // new format to test
-        const datastring = data.text.split("\n");
-        var dateOfFile  = "";
-        const filedatestringDIFFERENT = datastring.map((text, index) => {
+        // new file format
+        const datastringFormA = data.text.split("\n");
+        var dateOfFileA  = "";
+        const filedatestringFromA = datastringFormA.map((text, index) => {
           if(text.includes("validity period")) {
-            dateOfFile=datastring[index+1]
+            dateOfFileA=datastringFormA[index+1]
+          }
+        });
+
+        // Another file format
+        const filedatestringFromB = data.text.split("\n").filter(text=> text.includes("Validity date"));
+
+        // Another new file format
+        const datastringFormC = data.text.split("\n");
+        var dateOfFileC;
+        const filedatestringFormC = datastringFormC.map((text, index) => {
+          if(text.includes("expiry date")) {
+            dateOfFileC=datastringFormC[index+1]
           }
         });
 
@@ -49,15 +62,24 @@ export const ValidDate = async(validatedCertificates : Array<DatabaseCertificate
         // }else if(!!filedatestringDE[0]){
         //   filedatestring = filedatestringDE
         //   filedate = filedatestring[0].replace("gültig bis", "")
-        // }
+        // } 
+
 
         if(!!filedatestringEN[0]){
           filedatestring = filedatestringEN[0].replace("Valid to", "")
-        }else if(dateOfFile !== ""){
-          filedatestring = dateOfFile.replace(/[(,).]/g, " ")
+        }else if(dateOfFileA !== ""){
+          filedatestring = dateOfFileA.replace(/[(,).]/g, " ")
+        }else if(!!filedatestringFromB[0]){
+          filedatestring = filedatestringFromB[0].replace("Validity date: ", "")
+        }else if(dateOfFileC !== ""){
+          // date is reversed
+          const swap = ([item0, item1, rest]) => [item1, item0, rest]; 
+          const dateOfFileSwapedC = swap(dateOfFileC.split("-")).join("-")
+          filedatestring = dateOfFileSwapedC
         }
 
         const parsedate = new Date(filedatestring)
+        console.log('data', parsedate)
         const test = check(parsedate)
         arr[0] = test
       })
@@ -76,7 +98,6 @@ export const ValidDate = async(validatedCertificates : Array<DatabaseCertificate
       })
     }
     if (cert.name === "VOC") {
-      // console.log('VOC VOC VOC VOC --------------------------', product.vocUrl)
       await download(product.vocUrl, "dist")
       const url = product.vocUrl.split("/").pop()
       let dataBuffer = fs.readFileSync('dist/' + url);
