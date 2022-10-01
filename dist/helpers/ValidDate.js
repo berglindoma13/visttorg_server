@@ -23,6 +23,8 @@ const ValidDate = async (validatedCertificates, product) => {
         if (cert.name === "EPD") {
             await download(product.epdUrl, "dist");
             const url = product.epdUrl.split("/").pop();
+            // var temp = url.replace('.pdf', "") + ".pd"
+            // console.log('temp', temp)
             let dataBuffer = fs.readFileSync('dist/' + url);
             await pdf(dataBuffer).then(async function (data) {
                 let filedatestring;
