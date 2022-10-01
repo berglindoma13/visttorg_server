@@ -24,6 +24,7 @@ const ValidDate = async (validatedCertificates, product) => {
             await download(product.epdUrl, "dist");
             const url = product.epdUrl.split("/").pop();
             let dataBuffer = fs.readFileSync('dist/' + url);
+<<<<<<< HEAD
             await pdf(dataBuffer).then(async function (data) {
                 // let filedatestring
                 let filedate;
@@ -40,6 +41,40 @@ const ValidDate = async (validatedCertificates, product) => {
                 const parsedate = new Date(filedate);
                 const test = check(parsedate);
                 arr[0] = test;
+=======
+            yield pdf(dataBuffer).then(function (data) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    let filedatestring;
+                    // let filedate
+                    //English
+                    const filedatestringEN = data.text.split("\n").filter(text => text.includes("Valid to"));
+                    // const filedatestringDE = data.text.split("\n").filter(text=> text.includes("gültig bis"));
+                    // new format to test
+                    const datastring = data.text.split("\n");
+                    var dateOfFile = "";
+                    const filedatestringDIFFERENT = datastring.map((text, index) => {
+                        if (text.includes("validity period")) {
+                            dateOfFile = datastring[index + 1];
+                        }
+                    });
+                    // filedate = filedatestringEN[0].replace("Valid to", "")
+                    // if(!!filedatestringEN[0]){
+                    //   filedatestring = filedatestringEN
+                    // }else if(!!filedatestringDE[0]){
+                    //   filedatestring = filedatestringDE
+                    //   filedate = filedatestring[0].replace("gültig bis", "")
+                    // }
+                    if (!!filedatestringEN[0]) {
+                        filedatestring = filedatestringEN[0].replace("Valid to", "");
+                    }
+                    else if (dateOfFile !== "") {
+                        filedatestring = dateOfFile.replace(/[(,).]/g, " ");
+                    }
+                    const parsedate = new Date(filedatestring);
+                    const test = check(parsedate);
+                    arr[0] = test;
+                });
+>>>>>>> 3f5a9d17bcb7bf946b352ada5e7d9fb5130a94b9
             });
         }
         if (cert.name === "FSC") {
@@ -56,6 +91,7 @@ const ValidDate = async (validatedCertificates, product) => {
             });
         }
         if (cert.name === "VOC") {
+<<<<<<< HEAD
             await download(product.vocUrl, "dist");
             const url = product.vocUrl.split("/").pop();
             let dataBuffer = fs.readFileSync('dist/' + url);
@@ -78,6 +114,33 @@ const ValidDate = async (validatedCertificates, product) => {
                 const parsedate = new Date(filedate);
                 const test = check(parsedate);
                 arr[2] = test;
+=======
+            // console.log('VOC VOC VOC VOC --------------------------', product.vocUrl)
+            yield download(product.vocUrl, "dist");
+            const url = product.vocUrl.split("/").pop();
+            let dataBuffer = fs.readFileSync('dist/' + url);
+            // console.log('databuffer VOC', dataBuffer) // dist/Soudabond%20Easy%20-%20EMICODE-Lizenz%203879%20-%202.8.17-e.pdf
+            yield pdf(dataBuffer).then(function (data) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    // console.log('DATA VOC', data)
+                    // let filedatestring
+                    let filedate;
+                    //English
+                    const filedatestringEN = data.text.split("\n").filter(text => text.includes("Valid until"));
+                    // const filedatestringDE = data.text.split("\n").filter(text=> text.includes("gültig bis"));
+                    filedate = filedatestringEN[0].replace("Valid to", "");
+                    // console.log('filterdatestinrgDE', filedatestringDE)
+                    // if(!!filedatestringEN[0]){
+                    //   filedate = filedatestring[0].replace("Valid to", "")
+                    // }else if(!!filedatestringDE[0]){
+                    //   filedatestring = filedatestringDE
+                    //   filedate = filedatestring[0].replace("gültig bis", "")
+                    // }
+                    const parsedate = new Date(filedate);
+                    const test = check(parsedate);
+                    arr[2] = test;
+                });
+>>>>>>> 3f5a9d17bcb7bf946b352ada5e7d9fb5130a94b9
             });
         }
     })).catch((err) => {
