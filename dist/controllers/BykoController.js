@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -21,20 +12,26 @@ const PrismaHelper_1 = require("../helpers/PrismaHelper");
 const ProductHelper_1 = require("../helpers/ProductHelper");
 const prisma_1 = __importDefault(require("../lib/prisma"));
 const certificateIds_1 = require("../mappers/certificates/certificateIds");
+const MapCategories_1 = require("../helpers/MapCategories");
 // BYKO COMPANY ID = 1
 const BykoAPI = "https://byko.is/umhverfisvottadar?password=cert4env";
 const CompanyID = 1;
 var updatedProducts = [];
 var createdProducts = [];
 var productsNotValid = [];
-const convertBykoProductToDatabaseProduct = (product) => __awaiter(void 0, void 0, void 0, function* () {
+const convertBykoProductToDatabaseProduct = async (product) => {
     //map the product category to vistbóks category dictionary
     // TODO - FIX TO USE THE GENERIC MAPPING FUNCTION - SIMPLIFY
     const mappedCategory = [];
-    const prodTypeParentCategories = yield getMappedCategory(product.prodTypeParent);
-    const prodTypeCategories = yield getMappedCategory(product.prodType);
+    const prodTypeParentCategories = (0, MapCategories_1.getMappedCategory)(product.prodTypeParent.split(';'), byko_1.default);
+    const prodTypeCategories = (0, MapCategories_1.getMappedCategory)(product.prodType.split(';'), byko_1.default);
     prodTypeCategories.map(cat => mappedCategory.push(cat));
     prodTypeParentCategories.map(cat => mappedCategory.push(cat));
+    const mappedSubCategory = [];
+    const prodTypeParentSubCategories = (0, MapCategories_1.getMappedCategorySub)(product.prodTypeParent.split(';'), byko_1.default);
+    const prodTypeSubCategories = (0, MapCategories_1.getMappedCategorySub)(product.prodType.split(';'), byko_1.default);
+    prodTypeParentSubCategories.map(cat => mappedSubCategory.push(cat));
+    prodTypeSubCategories.map(cat => mappedSubCategory.push(cat));
     //Map certificates and validate them before adding to database
     const convertedCertificates = product.certificates.map(certificate => { return byko_2.default[certificate.cert]; });
     const convertedProduct = {
@@ -43,6 +40,7 @@ const convertBykoProductToDatabaseProduct = (product) => __awaiter(void 0, void 
         longDescription: product.longDescription,
         shortDescription: product.shortDescription,
         fl: mappedCategory,
+        subFl: mappedSubCategory,
         prodImage: `https://byko.is${product.prodImage}`,
         url: product.url,
         brand: product.brand,
@@ -64,45 +62,45 @@ const convertBykoProductToDatabaseProduct = (product) => __awaiter(void 0, void 
         ].filter(cert => cert !== null)
     };
     return convertedProduct;
-});
-const InsertAllBykoProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const bykoData = yield requestBykoApi(1);
+};
+const InsertAllBykoProducts = async (req, res) => {
+    const bykoData = await requestBykoApi(1);
     //Check if it comes back undefined, then there was an error retreiving the data
     if (!!bykoData) {
         //process all data and insert into database - first convert to databaseProduct Array
         const allConvertedBykoProducts = [];
         for (var i = 0; i < bykoData.productList.length; i++) {
-            const convertedProduct = yield convertBykoProductToDatabaseProduct(bykoData.productList[i]);
+            const convertedProduct = await convertBykoProductToDatabaseProduct(bykoData.productList[i]);
             //here is a single product
             allConvertedBykoProducts.push(convertedProduct);
         }
-        yield ProcessForDatabase(allConvertedBykoProducts);
+        await ProcessForDatabase(allConvertedBykoProducts);
         return res.end("Successful import");
     }
     else {
         return res.end("Byko response was invalid");
     }
-});
+};
 exports.InsertAllBykoProducts = InsertAllBykoProducts;
-const GetAllCategories = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const bykoData = yield requestBykoApi(1);
+const GetAllCategories = async (req, res) => {
+    const bykoData = await requestBykoApi(1);
     if (!!bykoData) {
-        yield ListCategories(bykoData);
+        await ListCategories(bykoData);
         //TODO return categories
         res.end("Successfully listed categories and imported into file");
     }
     else {
         res.end("Failed to list categories");
     }
-});
+};
 exports.GetAllCategories = GetAllCategories;
-const DeleteAllProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, PrismaHelper_1.DeleteAllCertByCompany)(1);
-    yield (0, PrismaHelper_1.DeleteAllProductsByCompany)(1);
+const DeleteAllProducts = async (req, res) => {
+    await (0, PrismaHelper_1.DeleteAllCertByCompany)(1);
+    await (0, PrismaHelper_1.DeleteAllProductsByCompany)(1);
     res.end("All deleted");
-});
+};
 exports.DeleteAllProducts = DeleteAllProducts;
-const requestBykoApi = (pageNr) => __awaiter(void 0, void 0, void 0, function* () {
+const requestBykoApi = async (pageNr) => {
     return axios_1.default.get(`${BykoAPI}&PageNum=${pageNr}`).then(response => {
         if (response.status === 200) {
             const data = response.data;
@@ -112,17 +110,17 @@ const requestBykoApi = (pageNr) => __awaiter(void 0, void 0, void 0, function* (
             console.error(`Error occured : ${response.status} - ${response.statusText}`);
         }
     });
-});
-const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const ProcessForDatabase = async (products) => {
     // check if any product in the list is in database but not coming in from company api anymore
     (0, ProductHelper_1.deleteOldProducts)(products, CompanyID);
     //Reset global lists
     updatedProducts = [];
     createdProducts = [];
     productsNotValid = [];
-    const allProductPromises = products.map((product) => __awaiter(void 0, void 0, void 0, function* () {
+    const allProductPromises = products.map(async (product) => {
         const productWithProps = { approved: false, certChange: false, create: false, product: null, productState: 1, validDate: null, validatedCertificates: [] };
-        const prod = yield (0, PrismaHelper_1.GetUniqueProduct)(product.id);
+        const prod = await (0, PrismaHelper_1.GetUniqueProduct)(product.id, CompanyID);
         var approved = false;
         var created = false;
         var certChange = false;
@@ -160,7 +158,7 @@ const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, funct
         productWithProps.certChange = certChange;
         productWithProps.create = created;
         productWithProps.product = product;
-        const productInfo = yield (0, ProductHelper_1.VerifyProduct)(product, created, certChange);
+        const productInfo = await (0, ProductHelper_1.VerifyProduct)(product, created, certChange);
         productWithProps.productState = productInfo.productState;
         productWithProps.validDate = productInfo.validDate;
         productWithProps.validatedCertificates = productInfo.validatedCertificates;
@@ -174,13 +172,13 @@ const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, funct
             updatedProducts.push(product);
         }
         return productWithProps;
-    }));
-    Promise.all(allProductPromises).then((productsWithProps) => __awaiter(void 0, void 0, void 0, function* () {
+    });
+    return Promise.all(allProductPromises).then(async (productsWithProps) => {
         const filteredArray = productsWithProps.filter(prod => prod.productState !== 1);
-        yield prisma_1.default.$transaction(filteredArray.map(productWithProps => {
+        await prisma_1.default.$transaction(filteredArray.map(productWithProps => {
             return prisma_1.default.product.upsert({
                 where: {
-                    productid: productWithProps.product.id
+                    productIdentifier: { productid: productWithProps.product.id, companyid: CompanyID }
                 },
                 update: {
                     approved: productWithProps.approved,
@@ -191,6 +189,9 @@ const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, funct
                     },
                     categories: {
                         connect: typeof productWithProps.product.fl === 'string' ? { name: productWithProps.product.fl } : productWithProps.product.fl
+                    },
+                    subCategories: {
+                        connect: productWithProps.product.subFl
                     },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
@@ -207,6 +208,9 @@ const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, funct
                     },
                     categories: {
                         connect: typeof productWithProps.product.fl === 'string' ? { name: productWithProps.product.fl } : productWithProps.product.fl
+                    },
+                    subCategories: {
+                        connect: productWithProps.product.subFl
                     },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
@@ -243,70 +247,50 @@ const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, funct
                 return certItem;
             });
         }).flat();
-        yield prisma_1.default.$transaction(allCertificates.map(cert => {
+        await prisma_1.default.$transaction(allCertificates.map(cert => {
             return prisma_1.default.productcertificate.create({
                 data: {
                     certificate: {
                         connect: { id: certificateIds_1.certIdFinder[cert.name] }
                     },
                     connectedproduct: {
-                        connect: { productid: cert.productId },
+                        connect: {
+                            productIdentifier: { productid: cert.productId, companyid: CompanyID }
+                        },
                     },
                     fileurl: cert.fileurl,
                     validDate: cert.validDate
                 }
             });
         }));
-    })).then(() => {
+    }).then(() => {
         // write all appropriate files
-        (0, ProductHelper_1.WriteAllFiles)(createdProducts, updatedProducts, productsNotValid, 'Byko');
-    });
-});
-const ListCategories = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    const filteredProdType = data.productList.filter(product => product.prodTypeParent != 'Fatnaður');
-    const prodtypelist = filteredProdType.map(product => product.prodType);
-    //Ferðavörur,Útileguvörur,Fatnaður
-    const parentprodtypelist = filteredProdType.map(product => product.prodTypeParent);
-    const uniqueArrayProdType = prodtypelist.filter(function (item, pos) {
-        return prodtypelist.indexOf(item) == pos;
-    });
-    const uniqueArrayParentProdType = parentprodtypelist.filter(function (item, pos) {
-        return parentprodtypelist.indexOf(item) == pos;
-    });
-    fs_1.default.writeFile('prodtypes.txt', uniqueArrayProdType.toString(), function (err) {
-        if (err) {
-            return console.error(err);
-        }
-    });
-    fs_1.default.writeFile('parentprodtypes.txt', uniqueArrayParentProdType.toString(), function (err) {
-        if (err) {
-            return console.error(err);
-        }
-    });
-});
-const getMappedCategory = (category) => {
-    const matchedCategory = [];
-    const categoryList = category.split(';');
-    return new Promise((resolve, reject) => {
-        for (const cat in byko_1.default) {
-            for (const productCategory in categoryList) {
-                //@ts-ignore
-                if (byko_1.default[cat].includes(categoryList[productCategory])) {
-                    matchedCategory.push({ name: cat });
-                }
-            }
-        }
-        resolve(matchedCategory);
+        (0, ProductHelper_1.WriteAllFiles)(createdProducts, updatedProducts, productsNotValid, 'Tengi');
     });
 };
-const GetAllInvalidBykoCertificates = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const allCerts = yield (0, PrismaHelper_1.GetAllInvalidProductCertsByCompany)(CompanyID);
+const ListCategories = async (data) => {
+    const filteredProdType = data.productList.filter(product => product.prodTypeParent != 'Fatnaður');
+    const prodtypelist = filteredProdType.map(product => product.prodType);
+    const parentprodtypelist = filteredProdType.map(product => product.prodTypeParent);
+    const combined = prodtypelist.concat(parentprodtypelist);
+    const uniqueArrayProdType = combined.filter(function (item, pos) {
+        return combined.indexOf(item) == pos;
+    });
+    const combinedWithReplace = uniqueArrayProdType.toString().replaceAll(';', ',');
+    fs_1.default.writeFile('writefiles/BykoCategories.txt', combinedWithReplace, function (err) {
+        if (err) {
+            return console.error(err);
+        }
+    });
+};
+const GetAllInvalidBykoCertificates = async (req, res) => {
+    const allCerts = await (0, PrismaHelper_1.GetAllInvalidProductCertsByCompany)(CompanyID);
     console.log('allCerts', allCerts);
     res.end("Successfully logged all invalid certs");
-});
+};
 exports.GetAllInvalidBykoCertificates = GetAllInvalidBykoCertificates;
-const GetAllInvalidBykoCertificatesByCertId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const allCerts = yield (0, PrismaHelper_1.GetAllInvalidProductCertsByCompanyAndCertId)(CompanyID, 1);
+const GetAllInvalidBykoCertificatesByCertId = async (req, res) => {
+    const allCerts = await (0, PrismaHelper_1.GetAllInvalidProductCertsByCompanyAndCertId)(CompanyID, 1);
     console.log('allCerts', allCerts);
     console.log('count', allCerts.length);
     fs_1.default.writeFile('/writefiles/bykoinvalidcerts.txt', allCerts.toString(), function (err) {
@@ -315,5 +299,5 @@ const GetAllInvalidBykoCertificatesByCertId = (req, res) => __awaiter(void 0, vo
         }
     });
     res.end("Successfully logged all invalid certs");
-});
+};
 exports.GetAllInvalidBykoCertificatesByCertId = GetAllInvalidBykoCertificatesByCertId;

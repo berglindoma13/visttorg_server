@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -23,8 +14,9 @@ const g_sheets_api_1 = __importDefault(require("g-sheets-api"));
 //states for product state
 //1 = not valid
 //2 = created
-//3 = updated
-const VerifyProduct = (product, create, certChange) => __awaiter(void 0, void 0, void 0, function* () {
+//3 = certificate updated
+//4 = valid product, no certificate change, not created
+const VerifyProduct = async (product, create, certChange) => {
     const validatedCertificates = (0, CertificateValidator_1.CertificateValidator)({ certificates: product.certificates, fscUrl: product.fscUrl, epdUrl: product.epdUrl, vocUrl: product.vocUrl, ceUrl: product.ceUrl });
     var validDate = [{ message: '', date: null }, { message: '', date: null }, { message: '', date: null }];
     const foundCertWithFiles = validatedCertificates.filter(cert => cert.name === 'EPD' || cert.name === 'FSC' || cert.name === 'VOC').length > 0;
@@ -38,7 +30,7 @@ const VerifyProduct = (product, create, certChange) => __awaiter(void 0, void 0,
             productState = 2;
             // check valid date when product is created
             if (foundCertWithFiles) {
-                validDate = yield (0, ValidDate_1.ValidDate)(validatedCertificates, product);
+                validDate = await (0, ValidDate_1.ValidDate)(validatedCertificates, product);
                 if (validDate.filter(dat => !!dat.date).length > 0) {
                     validatedCertificates.push({ name: 'BREEAM' });
                 }
@@ -53,7 +45,7 @@ const VerifyProduct = (product, create, certChange) => __awaiter(void 0, void 0,
                 productState = 3;
                 // check valid date when the certificates have changed
                 if (foundCertWithFiles) {
-                    validDate = yield (0, ValidDate_1.ValidDate)(validatedCertificates, product);
+                    validDate = await (0, ValidDate_1.ValidDate)(validatedCertificates, product);
                     if (validDate.filter(dat => !!dat.date).length > 0) {
                         validatedCertificates.push({ name: 'BREEAM' });
                     }
@@ -61,13 +53,14 @@ const VerifyProduct = (product, create, certChange) => __awaiter(void 0, void 0,
             }
         }
     }
+    productState = 4;
     return { productState, validDate, validatedCertificates };
-});
+};
 exports.VerifyProduct = VerifyProduct;
 // check if product list database has any products that are not coming from sheets anymore
-const deleteOldProducts = (products, companyId) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteOldProducts = async (products, companyId) => {
     // get all current products from this company
-    const currentProducts = yield (0, PrismaHelper_1.GetAllProductsByCompanyid)(companyId);
+    const currentProducts = await (0, PrismaHelper_1.GetAllProductsByCompanyid)(companyId);
     const productsNoLongerInDatabase = currentProducts.filter(curr_prod => {
         const matches = products.filter(product => { return curr_prod.productid == product.id; });
         //product was not found in list
@@ -75,34 +68,32 @@ const deleteOldProducts = (products, companyId) => __awaiter(void 0, void 0, voi
     });
     (0, exports.productsNoLongerComingInWriteFile)(productsNoLongerInDatabase);
     // deleta prodcut from prisma database
-    yield prisma_1.default.$transaction(productsNoLongerInDatabase.map(product => {
+    await prisma_1.default.$transaction(productsNoLongerInDatabase.map(product => {
         return prisma_1.default.productcertificate.deleteMany({
             where: {
                 productid: product.productid
             }
         });
     }));
-    yield prisma_1.default.$transaction(productsNoLongerInDatabase.map(product => {
+    await prisma_1.default.$transaction(productsNoLongerInDatabase.map(product => {
         return prisma_1.default.product.delete({
-            where: {
-                productid: product.productid
-            }
+            where: { productIdentifier: { productid: product.productid, companyid: companyId } },
         });
     }));
-});
+};
 exports.deleteOldProducts = deleteOldProducts;
-const productsNoLongerComingInWriteFile = (productsNoLongerInDatabase) => __awaiter(void 0, void 0, void 0, function* () {
+const productsNoLongerComingInWriteFile = async (productsNoLongerInDatabase) => {
     // write product info of products no longer coming into the database (and send email to company)
     file_system_1.default.writeFile("writefiles/nolonger.txt", JSON.stringify(productsNoLongerInDatabase));
     // SendEmail("Products no longer coming in from company")
-});
+};
 exports.productsNoLongerComingInWriteFile = productsNoLongerComingInWriteFile;
-const WriteAllFiles = (createdProducts, updatedProducts, productsNotValid, companyName, invalidCertificates) => __awaiter(void 0, void 0, void 0, function* () {
+const WriteAllFiles = async (createdProducts, updatedProducts, productsNotValid, companyName, invalidCertificates) => {
     (0, WriteFile_1.WriteFile)(`${companyName}Created`, createdProducts);
     (0, WriteFile_1.WriteFile)(`${companyName}Updated`, updatedProducts);
     (0, WriteFile_1.WriteFile)(`${companyName}NotValid`, productsNotValid);
     !!invalidCertificates && (0, WriteFile_1.WriteFile)(`${companyName}InvalidProductCertificates`, invalidCertificates);
-});
+};
 exports.WriteAllFiles = WriteAllFiles;
 const getAllProductsFromGoogleSheets = (sheetId, callBack, companyID) => {
     const options = {
@@ -113,12 +104,15 @@ const getAllProductsFromGoogleSheets = (sheetId, callBack, companyID) => {
     (0, g_sheets_api_1.default)(options, (results) => {
         const allprod = [];
         for (var i = 1; i < results.length; i++) {
+            const allCat = results[i].fl.split(',');
+            const mappedCategories = allCat.map(cat => { return { name: cat }; });
             const temp_prod = {
                 id: results[i].nr !== '' ? `${companyID}${results[i].nr}` : results[i].nr,
                 prodName: results[i].name,
                 longDescription: results[i].long,
                 shortDescription: results[i].short,
-                fl: results[i].fl,
+                fl: mappedCategories,
+                subFl: [],
                 prodImage: results[i].pic,
                 url: results[i].link,
                 brand: results[i].mark,
@@ -142,8 +136,8 @@ const getAllProductsFromGoogleSheets = (sheetId, callBack, companyID) => {
         }
         // process for database
         callBack(allprod);
-    }, () => {
-        console.error('ERROR');
+    }, (error) => {
+        console.error('ERROR', error);
     });
 };
 exports.getAllProductsFromGoogleSheets = getAllProductsFromGoogleSheets;

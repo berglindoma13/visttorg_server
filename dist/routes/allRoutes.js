@@ -1,4 +1,7 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.allRoutes = void 0;
 const express_1 = require("express");
@@ -9,7 +12,10 @@ const loginController_1 = require("../controllers/loginController");
 const TengiController_1 = require("../controllers/TengiController");
 const ShelgasonController_1 = require("../controllers/ShelgasonController");
 const SerefniController_1 = require("../controllers/SerefniController");
-const testController_1 = require("../controllers/testController");
+// import { InsertAllTestProducts } from '../controllers/testController';
+const SmithNorlandController_1 = require("../controllers/SmithNorlandController");
+const fs_1 = __importDefault(require("fs"));
+const PrismaHelper_1 = require("../helpers/PrismaHelper");
 exports.allRoutes = (0, express_1.Router)();
 //ALMENNT
 exports.allRoutes.get('/', (req, res) => {
@@ -38,11 +44,26 @@ exports.allRoutes.get('/api/shelgason/deleteproducts', ShelgasonController_1.Del
 exports.allRoutes.get('/api/serefni', SerefniController_1.InsertAllSerefniProducts);
 exports.allRoutes.get('/api/serefni/deletecert', SerefniController_1.DeleteAllSerefniCert);
 exports.allRoutes.get('/api/serefni/deleteproducts', SerefniController_1.DeleteAllSerefniProducts);
-exports.allRoutes.get('/api/test', testController_1.InsertAllTestProducts);
+//Smith&Norland ROUTES - API
+exports.allRoutes.get('/api/smithnorland', SmithNorlandController_1.InsertAllSmithNorlandProducts);
+exports.allRoutes.get('/api/smithnorland/getallcategories', SmithNorlandController_1.GetAllSmithNorlandCategories);
+exports.allRoutes.get('/api/smithnorland/deletecert', SmithNorlandController_1.DeleteAllSmithNorlandCert);
+exports.allRoutes.get('/api/smithnorland/deleteproducts', SmithNorlandController_1.DeleteAllSmithNorlandProducts);
+// allRoutes.get('/api/test', InsertAllTestProducts);
 // allRoutes.get('/api/deletesheets', DeleteAllSheetsProducts);
 // allRoutes.get('/api/deletesheetscertificates', DeleteAllSheetsCert);
 // companyRoutes.get('/api/testnewindatabase', ProcessNewInDatabase)
 // app.post('/api/product/add', fileUpload)
+exports.allRoutes.get('/updatecategories', (req, res) => {
+    fs_1.default.readFile('writefiles/CurrentCategoryTemplate.json', (err, data) => {
+        if (err)
+            throw err;
+        let datastring = data.toString();
+        let categories = JSON.parse(datastring);
+        (0, PrismaHelper_1.UpsertAllCategories)(categories);
+        res.send('succesfully updated categories');
+    });
+});
 //add to postlist
 exports.allRoutes.post('/api/postlist', Postlist_1.Postlist);
 // allRoutes.get('/api/sendmail', SendEmail)

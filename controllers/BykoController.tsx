@@ -3,7 +3,7 @@ import { BykoProduct, BykoResponseData } from '../types/byko'
 import axios from 'axios'
 import fs from 'fs'
 import BykoCategoryMapper from '../mappers/categories/byko'
-import { DatabaseProduct, ConnectedCategory, ProductWithPropsProps, DatabaseProductCertificate } from '../types/models'
+import { DatabaseProduct, ConnectedCategory, ProductWithPropsProps, DatabaseProductCertificate, ConnectedSubCategory } from '../types/models'
 import BykoCertificateMapper from '../mappers/certificates/byko'
 import { DeleteAllProductsByCompany,
   DeleteAllCertByCompany,
@@ -14,6 +14,7 @@ import { DeleteAllProductsByCompany,
 import { deleteOldProducts, VerifyProduct, WriteAllFiles } from '../helpers/ProductHelper';
 import prismaInstance from '../lib/prisma';
 import { certIdFinder } from '../mappers/certificates/certificateIds';
+import { getMappedCategory, getMappedCategorySub } from '../helpers/MapCategories';
  
 // BYKO COMPANY ID = 1
 
@@ -29,10 +30,16 @@ const convertBykoProductToDatabaseProduct = async(product: BykoProduct) => {
   //map the product category to vistbóks category dictionary
   // TODO - FIX TO USE THE GENERIC MAPPING FUNCTION - SIMPLIFY
   const mappedCategory: Array<ConnectedCategory> = []
-  const prodTypeParentCategories = await getMappedCategory(product.prodTypeParent)
-  const prodTypeCategories = await getMappedCategory(product.prodType)
+  const prodTypeParentCategories = getMappedCategory(product.prodTypeParent.split(';'), BykoCategoryMapper)
+  const prodTypeCategories = getMappedCategory(product.prodType.split(';'), BykoCategoryMapper)
   prodTypeCategories.map(cat => mappedCategory.push(cat))
   prodTypeParentCategories.map(cat => mappedCategory.push(cat))
+
+  const mappedSubCategory: Array<ConnectedSubCategory> = []
+  const prodTypeParentSubCategories = getMappedCategorySub(product.prodTypeParent.split(';'), BykoCategoryMapper)
+  const prodTypeSubCategories = getMappedCategorySub(product.prodType.split(';'), BykoCategoryMapper)
+  prodTypeParentSubCategories.map(cat => mappedSubCategory.push(cat))
+  prodTypeSubCategories.map(cat => mappedSubCategory.push(cat))
 
   //Map certificates and validate them before adding to database
   const convertedCertificates: Array<string> = product.certificates.map(certificate => { return BykoCertificateMapper[certificate.cert] })
@@ -43,6 +50,7 @@ const convertBykoProductToDatabaseProduct = async(product: BykoProduct) => {
     longDescription: product.longDescription,
     shortDescription: product.shortDescription,
     fl: mappedCategory,
+    subFl: mappedSubCategory,
     prodImage: `https://byko.is${product.prodImage}`,
     url: product.url,
     brand: product.brand,
@@ -130,7 +138,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
   const allProductPromises = products.map(async(product) => {
     const productWithProps:ProductWithPropsProps = { approved: false, certChange: false, create: false, product: null, productState: 1, validDate: null, validatedCertificates:[]}
-    const prod = await GetUniqueProduct(product.id)
+    const prod = await GetUniqueProduct(product.id, CompanyID)
 
     var approved = false;
     var created = false
@@ -190,7 +198,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
     return productWithProps
   })
   
-  Promise.all(allProductPromises).then(async(productsWithProps) => {
+  return Promise.all(allProductPromises).then(async(productsWithProps) => {
 
     const filteredArray = productsWithProps.filter(prod => prod.productState !== 1)
 
@@ -199,7 +207,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
         return prismaInstance.product.upsert({
           where: {
-            productid : productWithProps.product.id
+            productIdentifier : { productid: productWithProps.product.id, companyid: CompanyID}
           },
           update: {
               approved: productWithProps.approved,
@@ -210,6 +218,9 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               },
               categories : {
                 connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl            
+              },
+              subCategories: {
+                connect: productWithProps.product.subFl
               },
               description : productWithProps.product.longDescription,
               shortdescription : productWithProps.product.shortDescription,
@@ -226,6 +237,9 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               },
               categories : {
                 connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl
+              },
+              subCategories:{
+                connect: productWithProps.product.subFl            
               },
               description : productWithProps.product.longDescription,
               shortdescription : productWithProps.product.shortDescription,
@@ -266,7 +280,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
       })
     }).flat()
 
-     await prismaInstance.$transaction(
+    await prismaInstance.$transaction(
       allCertificates.map(cert => {
         return prismaInstance.productcertificate.create({
           data: {
@@ -274,7 +288,9 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               connect : { id : certIdFinder[cert.name] }
             },
             connectedproduct : {
-              connect : { productid : cert.productId },
+              connect : { 
+                productIdentifier: { productid: cert.productId, companyid: CompanyID }
+              },
             },
             fileurl : cert.fileurl,
             validDate : cert.validDate
@@ -284,50 +300,29 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
     ) 
   }).then(() => {
     // write all appropriate files
-    WriteAllFiles(createdProducts, updatedProducts, productsNotValid, 'Byko')
+    WriteAllFiles(createdProducts, updatedProducts, productsNotValid, 'Tengi')
   });
 }
 
 const ListCategories = async(data : BykoResponseData) => {
   const filteredProdType = data.productList.filter(product => product.prodTypeParent != 'Fatnaður')
   const prodtypelist = filteredProdType.map(product => product.prodType)
-
-  //Ferðavörur,Útileguvörur,Fatnaður
-
   const parentprodtypelist = filteredProdType.map(product => product.prodTypeParent)
-  const uniqueArrayProdType = prodtypelist.filter(function(item, pos) {
-    return prodtypelist.indexOf(item) == pos
+
+  const combined = prodtypelist.concat(parentprodtypelist)
+
+  const uniqueArrayProdType = combined.filter(function(item, pos) {
+    return combined.indexOf(item) == pos
   })
-  const uniqueArrayParentProdType = parentprodtypelist.filter(function(item, pos) {
-    return parentprodtypelist.indexOf(item) == pos;
-  })
-  fs.writeFile('prodtypes.txt', uniqueArrayProdType.toString(), function(err) {
-    if(err){
-      return console.error(err)
-    }
-  })
-  fs.writeFile('parentprodtypes.txt', uniqueArrayParentProdType.toString(), function(err) {
+
+  const combinedWithReplace = uniqueArrayProdType.toString().replaceAll(';', ',')
+
+  fs.writeFile('writefiles/BykoCategories.txt', combinedWithReplace, function(err) {
     if(err){
       return console.error(err)
     }
   })
 
-}
-
-const getMappedCategory = (category: string) => {
-  const matchedCategory: Array<ConnectedCategory> = []
-  const categoryList: Array<string> = category.split(';')
-  return new Promise((resolve : (value: Array<ConnectedCategory>) => void, reject) => {
-    for (const cat in BykoCategoryMapper) {
-      for(const productCategory in categoryList){
-        //@ts-ignore
-        if(BykoCategoryMapper[cat].includes(categoryList[productCategory])){
-          matchedCategory.push({name: cat})
-        }
-      }
-    }
-    resolve(matchedCategory)
-  })
 }
 
 export const GetAllInvalidBykoCertificates = async(req, res) => {

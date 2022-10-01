@@ -8,6 +8,7 @@ export interface DatabaseProduct {
   longDescription: string,
   shortDescription: string,
   fl: string | Array<ConnectedCategory>,
+  subFl: Array<ConnectedSubCategory>,
   prodImage: string,
   url: string,
   brand: string,
@@ -20,6 +21,15 @@ export interface DatabaseProduct {
 
 export interface ConnectedCategory {
   name: string
+}
+
+export interface ConnectedSubCategory {
+  subCatIdentifier: bla
+}
+
+interface bla {
+  name: string
+  parentCategoryName: string
 }
 
 export interface ProductWithPropsProps {
@@ -43,4 +53,24 @@ export interface DatabaseProductCertificate {
   name: string
   fileurl: string
   productId: string
+}
+
+export interface DatabaseCategory {
+  name: string
+  subCategories?: Array<DatabaseSubCategory>
+}
+
+export interface DatabaseSubCategory {
+  name: string
+}
+
+export interface CategoryMapperItem {
+  name: string
+  items: Array<string>
+  subCategories: Array<SubCategoryMapperItem>
+}
+
+interface SubCategoryMapperItem {
+  name: string
+  items: Array<string>
 }

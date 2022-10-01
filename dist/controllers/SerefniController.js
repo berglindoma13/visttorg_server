@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -23,32 +14,32 @@ const CompanyName = 'Sérefni';
 var updatedProducts = [];
 var createdProducts = [];
 var productsNotValid = [];
-const InsertAllSerefniProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const InsertAllSerefniProducts = async (req, res) => {
     // get all data from sheets file
     (0, ProductHelper_1.getAllProductsFromGoogleSheets)(SheetID, ProcessForDatabase, CompanyID);
     res.end(`All ${CompanyName} products inserted`);
-});
+};
 exports.InsertAllSerefniProducts = InsertAllSerefniProducts;
-const DeleteAllSerefniProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const DeleteAllSerefniProducts = async (req, res) => {
     (0, PrismaHelper_1.DeleteAllProductsByCompany)(CompanyID);
     res.end(`All ${CompanyName} products deleted`);
-});
+};
 exports.DeleteAllSerefniProducts = DeleteAllSerefniProducts;
-const DeleteAllSerefniCert = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const DeleteAllSerefniCert = async (req, res) => {
     (0, PrismaHelper_1.DeleteAllCertByCompany)(CompanyID);
     res.end(`All ${CompanyName} product certificates deleted`);
-});
+};
 exports.DeleteAllSerefniCert = DeleteAllSerefniCert;
-const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, function* () {
+const ProcessForDatabase = async (products) => {
     // check if any product in the list is in database but not coming in from company api anymore
     (0, ProductHelper_1.deleteOldProducts)(products, CompanyID);
     //Reset global lists
     updatedProducts = [];
     createdProducts = [];
     productsNotValid = [];
-    const allProductPromises = products.map((product) => __awaiter(void 0, void 0, void 0, function* () {
+    const allProductPromises = products.map(async (product) => {
         const productWithProps = { approved: false, certChange: false, create: false, product: null, productState: 1, validDate: null, validatedCertificates: [] };
-        const prod = yield (0, PrismaHelper_1.GetUniqueProduct)(product.id);
+        const prod = await (0, PrismaHelper_1.GetUniqueProduct)(product.id, CompanyID);
         var approved = false;
         var created = false;
         var certChange = false;
@@ -86,7 +77,7 @@ const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, funct
         productWithProps.certChange = certChange;
         productWithProps.create = created;
         productWithProps.product = product;
-        const productInfo = yield (0, ProductHelper_1.VerifyProduct)(product, created, certChange);
+        const productInfo = await (0, ProductHelper_1.VerifyProduct)(product, created, certChange);
         productWithProps.productState = productInfo.productState;
         productWithProps.validDate = productInfo.validDate;
         productWithProps.validatedCertificates = productInfo.validatedCertificates;
@@ -100,13 +91,13 @@ const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, funct
             updatedProducts.push(product);
         }
         return productWithProps;
-    }));
-    Promise.all(allProductPromises).then((productsWithProps) => __awaiter(void 0, void 0, void 0, function* () {
+    });
+    Promise.all(allProductPromises).then(async (productsWithProps) => {
         const filteredArray = productsWithProps.filter(prod => prod.productState !== 1);
-        yield prisma_1.default.$transaction(filteredArray.map(productWithProps => {
+        await prisma_1.default.$transaction(filteredArray.map(productWithProps => {
             return prisma_1.default.product.upsert({
                 where: {
-                    productid: productWithProps.product.id
+                    productIdentifier: { productid: productWithProps.product.id, companyid: CompanyID }
                 },
                 update: {
                     approved: productWithProps.approved,
@@ -169,22 +160,24 @@ const ProcessForDatabase = (products) => __awaiter(void 0, void 0, void 0, funct
                 return certItem;
             });
         }).flat();
-        yield prisma_1.default.$transaction(allCertificates.map(cert => {
+        await prisma_1.default.$transaction(allCertificates.map(cert => {
             return prisma_1.default.productcertificate.create({
                 data: {
                     certificate: {
                         connect: { id: certificateIds_1.certIdFinder[cert.name] }
                     },
                     connectedproduct: {
-                        connect: { productid: cert.productId },
+                        connect: {
+                            productIdentifier: { productid: cert.productId, companyid: CompanyID }
+                        },
                     },
                     fileurl: cert.fileurl,
                     validDate: cert.validDate
                 }
             });
         }));
-    })).then(() => {
+    }).then(() => {
         // write all appropriate files
         (0, ProductHelper_1.WriteAllFiles)(createdProducts, updatedProducts, productsNotValid, CompanyName);
     });
-});
+};

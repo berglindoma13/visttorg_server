@@ -36,6 +36,37 @@ export const Login = (req, res) => {
     return res.status(200).send(JSON.stringify(token))
   }
   else{
-    return res.status(500).send('usernotfound')
+    return res.status(500).send('user not found')
+  }
+};
+
+/* Register function */
+export const Register = (req, res) => {
+
+  const { username, password } = req.body
+
+  // check if user already exists
+  const foundUser = prismaInstance.vistbokUser.findUnique({
+    where: {
+      username: username
+    }
+  })
+
+  //user was found
+  if(!!foundUser){
+    
+    return res.status(500).send('user already exists')
+  }
+  //user was not found - create
+  else{
+    
+    prismaInstance.vistbokUser.create({
+      data:{
+        username: username,
+        password: password
+      }
+    })
+    
+    return res.status(200).send('user created')
   }
 };
