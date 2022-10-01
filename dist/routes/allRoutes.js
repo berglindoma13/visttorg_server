@@ -31,19 +31,23 @@ exports.allRoutes.get('/api/byko/invalidcerts/epd', BykoController_1.GetAllInval
 exports.allRoutes.get('/api/ebson', EbsonController_1.InsertAllEbsonProducts);
 exports.allRoutes.get('/api/ebson/deletecert', EbsonController_1.DeleteAllEbsonCert);
 exports.allRoutes.get('/api/ebson/deleteproducts', EbsonController_1.DeleteAllEbsonProducts);
+exports.allRoutes.get('/api/ebson/invalidcerts', EbsonController_1.GetAllInvalidEbsonCertificates);
 //TENGI ROUTES - API
 exports.allRoutes.get('/api/tengi', TengiController_1.InsertAllTengiProducts);
 exports.allRoutes.get('/api/tengi/getallcategories', TengiController_1.GetAllTengiCategories);
 exports.allRoutes.get('/api/tengi/deletecert', TengiController_1.DeleteAllTengiCert);
 exports.allRoutes.get('/api/tengi/deleteproducts', TengiController_1.DeleteAllTengiProducts);
+exports.allRoutes.get('/api/tengi/invalidcerts', TengiController_1.GetAllInvalidTengiCertificates);
 //S.Helgason ROUTES - API
 exports.allRoutes.get('/api/shelgason', ShelgasonController_1.InsertAllSHelgasonProducts);
 exports.allRoutes.get('/api/shelgason/deletecert', ShelgasonController_1.DeleteAllSHelgasonCert);
 exports.allRoutes.get('/api/shelgason/deleteproducts', ShelgasonController_1.DeleteAllSHelgasonProducts);
+exports.allRoutes.get('/api/shelgason/invalidcerts', ShelgasonController_1.GetAllInvalidSHelgasonCertificates);
 //Sérefni ROUTES - API
 exports.allRoutes.get('/api/serefni', SerefniController_1.InsertAllSerefniProducts);
 exports.allRoutes.get('/api/serefni/deletecert', SerefniController_1.DeleteAllSerefniCert);
 exports.allRoutes.get('/api/serefni/deleteproducts', SerefniController_1.DeleteAllSerefniProducts);
+exports.allRoutes.get('/api/serefni/invalidcerts', SerefniController_1.GetAllInvalidSerefniCertificates);
 //Smith&Norland ROUTES - API
 exports.allRoutes.get('/api/smithnorland', SmithNorlandController_1.InsertAllSmithNorlandProducts);
 exports.allRoutes.get('/api/smithnorland/getallcategories', SmithNorlandController_1.GetAllSmithNorlandCategories);

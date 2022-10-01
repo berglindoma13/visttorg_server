@@ -222,6 +222,7 @@ const ProcessForDatabase = async (products) => {
                 }
             });
         }));
+        await (0, PrismaHelper_1.DeleteAllCertByCompany)(CompanyID);
         const allCertificates = filteredArray.map(prod => {
             return prod.validatedCertificates.map(cert => {
                 let fileurl = '';
@@ -285,7 +286,18 @@ const ListCategories = async (data) => {
 };
 const GetAllInvalidBykoCertificates = async (req, res) => {
     const allCerts = await (0, PrismaHelper_1.GetAllInvalidProductCertsByCompany)(CompanyID);
-    console.log('allCerts', allCerts);
+    const mapped = allCerts.map(cert => {
+        return {
+            productid: cert.productid,
+            certfileurl: cert.fileurl,
+            validDate: cert.validDate
+        };
+    });
+    fs_1.default.writeFile('writefiles/bykoinvalidcerts.json', JSON.stringify(mapped), function (err) {
+        if (err) {
+            return console.error(err);
+        }
+    });
     res.end("Successfully logged all invalid certs");
 };
 exports.GetAllInvalidBykoCertificates = GetAllInvalidBykoCertificates;

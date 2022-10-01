@@ -1,1 +1,1 @@
-[{"id":"","prodName":"","longDescription":"","shortDescription":"","fl":"","subFl":[],"prodImage":"","url":"","brand":"","fscUrl":"","epdUrl":"","vocUrl":"","ceUrl":"","certificates":[]}]
+[{"id":"","prodName":"","longDescription":"","shortDescription":"","fl":[{"name":""}],"subFl":[],"prodImage":"","url":"","brand":"","fscUrl":"","epdUrl":"","vocUrl":"","ceUrl":"","certificates":[]}]

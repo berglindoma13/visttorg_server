@@ -4,6 +4,7 @@ import fs from 'fs'
 import { DeleteAllProductsByCompany,
         DeleteAllCertByCompany,
         GetUniqueProduct,
+        GetAllInvalidProductCertsByCompany,
  } from '../helpers/PrismaHelper'
 import { TengiProduct, TengiResponse } from '../types/tengi'
 import { Request, Response } from 'express';
@@ -266,6 +267,8 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
       })
     )
 
+    await DeleteAllCertByCompany(CompanyID)
+
     const allCertificates: Array<DatabaseProductCertificate> = filteredArray.map(prod => {
       return prod.validatedCertificates.map(cert => {
         let fileurl = ''
@@ -314,4 +317,24 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
     // write all appropriate files
     WriteAllFiles(createdProducts, updatedProducts, productsNotValid, 'Tengi')
   });
+}
+
+export const GetAllInvalidTengiCertificates = async(req, res) => {
+  const allCerts = await GetAllInvalidProductCertsByCompany(CompanyID)
+
+  const mapped = allCerts.map(cert => {
+    return {
+      productid: cert.productid,
+      certfileurl: cert.fileurl,
+      validDate: cert.validDate
+    }
+  })
+
+  fs.writeFile('writefiles/TengiInvalidcerts.json', JSON.stringify(mapped) , function(err) {
+    if(err){
+      return console.error(err)
+    }
+  })
+
+  res.end("Successfully logged all invalid certs");
 }

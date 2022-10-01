@@ -3,9 +3,10 @@ import { DatabaseProduct, DatabaseProductCertificate, ProductWithPropsProps } fr
 import { Request, Response } from 'express';
 import { DeleteAllProductsByCompany,
         DeleteAllCertByCompany,
-        GetUniqueProduct
+        GetUniqueProduct,
+        GetAllInvalidProductCertsByCompany
       } from '../helpers/PrismaHelper'
-import { SheetProduct } from '../types/sheets';
+import fs from 'fs'
 import { deleteOldProducts, WriteAllFiles, VerifyProduct, getAllProductsFromGoogleSheets } from '../helpers/ProductHelper';
 import prismaInstance from '../lib/prisma';
 import { certIdFinder } from '../mappers/certificates/certificateIds';
@@ -156,6 +157,8 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
       })
     )
 
+    await DeleteAllCertByCompany(CompanyID)
+
     const allCertificates: Array<DatabaseProductCertificate> = filteredArray.map(prod => {
       return prod.validatedCertificates.map(cert => {
         let fileurl = ''
@@ -204,4 +207,24 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
     // write all appropriate files
     WriteAllFiles(createdProducts, updatedProducts, productsNotValid, CompanyName)
   });
+}
+
+export const GetAllInvalidSerefniCertificates = async(req, res) => {
+  const allCerts = await GetAllInvalidProductCertsByCompany(CompanyID)
+
+  const mapped = allCerts.map(cert => {
+    return {
+      productid: cert.productid,
+      certfileurl: cert.fileurl,
+      validDate: cert.validDate
+    }
+  })
+
+  fs.writeFile('writefiles/SerefniInvalidcerts.json', JSON.stringify(mapped) , function(err) {
+    if(err){
+      return console.error(err)
+    }
+  })
+
+  res.end("Successfully logged all invalid certs");
 }

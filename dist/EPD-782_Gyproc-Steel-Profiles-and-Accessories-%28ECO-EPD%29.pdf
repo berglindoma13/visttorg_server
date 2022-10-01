@@ -122,10 +122,10 @@
 
         </div>
 <div class="search-autocomplete js-form-wrapper form-wrapper" data-drupal-selector="edit-search-autocomplete" id="edit-search-autocomplete"><ul id="sgdk-search-autocomplete-results" class="search-autocomplete__dropdown" data-drupal-selector="edit-dropdown"></ul>
-<div data-drupal-selector="edit-actions" class="form-actions js-form-wrapper form-wrapper" id="edit-actions--3"><input data-drupal-selector="edit-submit" type="submit" id="edit-submit--2" name="op" value="Se alle resultater" class="button js-form-submit form-submit" />
+<div data-drupal-selector="edit-actions" class="form-actions js-form-wrapper form-wrapper" id="edit-actions"><input data-drupal-selector="edit-submit" type="submit" id="edit-submit" name="op" value="Se alle resultater" class="button js-form-submit form-submit" />
 </div>
 </div>
-<input autocomplete="off" data-drupal-selector="form-ter6hbf-ua2ikzlg-wrnhbek4wkjgzvbm0-l163eoz0" type="hidden" name="form_build_id" value="form-ter6hBf-Ua2iKZlg-WrnHBEK4wkjgZVBm0-l163eOz0" />
+<input autocomplete="off" data-drupal-selector="form-retqdtktb7uxxaye-n1csfpejitgfjily8tsofjgzl0" type="hidden" name="form_build_id" value="form-rEtQdTktB7UXXAye_N1CSfPejItGfJIlY8tsOfJgzL0" />
 <input data-drupal-selector="edit-saint-gobain-dk-search-autocomplete-search" type="hidden" name="form_id" value="saint_gobain_dk_search_autocomplete_search" />
 
 </form>
@@ -2286,7 +2286,7 @@ byggeindustrien siden 1917.</div>
 <div data-drupal-selector="edit-actions" class="form-actions webform-actions js-form-wrapper form-wrapper" id="edit-actions"><input class="webform-button--submit button button--primary js-form-submit form-submit" data-drupal-selector="edit-actions-submit" type="submit" id="edit-actions-submit" name="op" value="Send" />
 
 </div>
-<input autocomplete="off" data-drupal-selector="form-pm61wmdyumsu9zc-vm0vsug0yjkqiamnviesdkxosy8" type="hidden" name="form_build_id" value="form-PM61wmDyuMSU9Zc_vM0VsuG0YJKqIamnvieSdkxosy8" />
+<input autocomplete="off" data-drupal-selector="form-yqwsb2g9yaynokdxjhv4fed-g76vioi5kipwbqhvd9g" type="hidden" name="form_build_id" value="form-yQwsb2g9yAyNoKdxJhV4Fed_g76VIoi5KIPWbQHvd9g" />
 <input data-drupal-selector="edit-webform-submission-ergolite-paragraph-30886-add-form" type="hidden" name="form_id" value="webform_submission_ergolite_paragraph_30886_add_form" />
 
 
@@ -2775,6 +2775,6 @@ Robert Jacobsens Vej 62A<br />
     <script type="application/json" data-drupal-selector="drupal-settings-json">{"path":{"baseUrl":"\/","scriptPath":null,"pathPrefix":"","currentPath":"node\/54591","currentPathIsAdmin":false,"isFront":false,"currentLanguage":"da"},"pluralDelimiter":"\u0003","suppressDeprecationErrors":true,"dataLayer":{"defaultLang":"da","languages":{"en":{"id":"en","name":"English","direction":"ltr","weight":1},"da":{"id":"da","name":"Danish","direction":"ltr","weight":2}}},"sgdk_marketo_ma":{"key":"132-QWX-653","initParams":[],"library":"\/\/munchkin.marketo.net\/munchkin.js"},"fileDoesNotExistMessage":"Unfortunately, this file doesn\u0027t exist.","field_group":{"html_element":{"mode":"default","context":"view","settings":{"classes":"wrapper-1","id":"","element":"div","show_label":false,"label_element":"h3","label_element_classes":"","attributes":"","effect":"none","speed":"fast"}}},"blazy":{"loadInvisible":false,"offset":300,"saveViewportOffsetDelay":50,"validateDelay":25,"container":""},"blazyIo":{"enabled":true,"disconnect":false,"rootMargin":"0px","threshold":[0]},"ajaxTrustedUrl":{"form_action_p_pvdeGsVG5zNF_XLGPTvYSKCf43t8qZYSwcfZl2uzM":true},"searchUrl":"\/ajax-search","user":{"uid":0,"permissionsHash":"daf601ee0dd2528de7f26d147c0ffca4dfb0af04b048e5f3fe652d6c04f8c2e5"}}</script>
 <script src="/sites/mac3.saint-gobain.dk/files/js/js_uLLWEqYbr2Rznvu92apPD-MtgKmMHlW6ED-FdKlP7vg.js"></script>
 
-  <script type="text/javascript">window.NREUM||(NREUM={});NREUM.info={"beacon":"bam.nr-data.net","licenseKey":"1d38c4325f","applicationID":"597033993","transactionName":"YwBSZEBUDUVYBUEPDFpKcVNGXAxYFiJHExNVCWxeXVEGanoJWxIRWwlcVUBpLVldA2MPBkMmX15GRwxaVQNHS11CDFVH","queueTime":0,"applicationTime":5111,"atts":"T0dREghOHks=","errorBeacon":"bam.nr-data.net","agent":""}</script><script async type="text/javascript" src="/_Incapsula_Resource?SWJIYLWA=719d34d31c8e3a6e6fffd425f7e032f3&ns=2&cb=2027457352"></script>
+  <script type="text/javascript">window.NREUM||(NREUM={});NREUM.info={"beacon":"bam.nr-data.net","licenseKey":"1d38c4325f","applicationID":"597033993","transactionName":"YwBSZEBUDUVYBUEPDFpKcVNGXAxYFhZUAQZrBlFTWlA=","queueTime":0,"applicationTime":68,"atts":"T0dREghOHks=","errorBeacon":"bam.nr-data.net","agent":""}</script><script async type="text/javascript" src="/_Incapsula_Resource?SWJIYLWA=719d34d31c8e3a6e6fffd425f7e032f3&ns=2&cb=1528421486"></script>
 </body>
 </html>

@@ -263,6 +263,8 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
       })
     )
 
+    await DeleteAllCertByCompany(CompanyID)
+
     const allCertificates: Array<DatabaseProductCertificate> = filteredArray.map(prod => {
       return prod.validatedCertificates.map(cert => {
         let fileurl = ''

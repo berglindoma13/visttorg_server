@@ -3,8 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DeleteAllSHelgasonCert = exports.DeleteAllSHelgasonProducts = exports.InsertAllSHelgasonProducts = void 0;
+exports.GetAllInvalidSHelgasonCertificates = exports.DeleteAllSHelgasonCert = exports.DeleteAllSHelgasonProducts = exports.InsertAllSHelgasonProducts = void 0;
 const PrismaHelper_1 = require("../helpers/PrismaHelper");
+const fs_1 = __importDefault(require("fs"));
 const ProductHelper_1 = require("../helpers/ProductHelper");
 const prisma_1 = __importDefault(require("../lib/prisma"));
 const certificateIds_1 = require("../mappers/certificates/certificateIds");
@@ -136,6 +137,8 @@ const ProcessForDatabase = async (products) => {
                 }
             });
         }));
+        const deletedProductsCerts = await (0, PrismaHelper_1.DeleteAllCertByCompany)(CompanyID);
+        console.log('deleted', deletedProductsCerts);
         const allCertificates = filteredArray.map(prod => {
             return prod.validatedCertificates.map(cert => {
                 let fileurl = '';
@@ -182,3 +185,21 @@ const ProcessForDatabase = async (products) => {
         (0, ProductHelper_1.WriteAllFiles)(createdProducts, updatedProducts, productsNotValid, CompanyName);
     });
 };
+const GetAllInvalidSHelgasonCertificates = async (req, res) => {
+    const allCerts = await (0, PrismaHelper_1.GetAllInvalidProductCertsByCompany)(CompanyID);
+    console.log('allcerts', allCerts);
+    const mapped = allCerts.map(cert => {
+        return {
+            productid: cert.productid,
+            certfileurl: cert.fileurl,
+            validDate: cert.validDate
+        };
+    });
+    fs_1.default.writeFile('writefiles/SHelgasonInvalidcerts.json', JSON.stringify(mapped), function (err) {
+        if (err) {
+            return console.error(err);
+        }
+    });
+    res.end("Successfully logged all invalid certs");
+};
+exports.GetAllInvalidSHelgasonCertificates = GetAllInvalidSHelgasonCertificates;

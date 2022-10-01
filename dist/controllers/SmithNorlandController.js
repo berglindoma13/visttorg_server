@@ -224,6 +224,7 @@ const ProcessForDatabase = async (products) => {
                 }
             });
         }));
+        await (0, PrismaHelper_1.DeleteAllCertByCompany)(CompanyID);
         const allCertificates = filteredArray.map(prod => {
             return prod.validatedCertificates.map(cert => {
                 let fileurl = '';

@@ -402,18 +402,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-column elementor-col-16 elementor-top-column elementor-element elementor-element-f1677e0" data-id="f1677e0" data-element_type="column">
 			<div class="elementor-column-wrap elementor-element-populated">
 							<div class="elementor-widget-wrap">
-						<div class="elementor-element elementor-element-af50cc1 elementor-align-justify elementor-widget elementor-widget-button" data-id="af50cc1" data-element_type="widget" data-widget_type="button.default">
-				<div class="elementor-widget-container">
-					<div class="elementor-button-wrapper">
-			<a href="/produkter/interior/safepanel/" class="elementor-button-link elementor-button elementor-size-sm elementor-animation-bob" role="button">
-						<span class="elementor-button-content-wrapper">
-						<span class="elementor-button-text">Akustik Paneler</span>
-		</span>
-					</a>
-		</div>
-				</div>
-				</div>
-				<div class="elementor-element elementor-element-150ca2b elementor-align-justify elementor-widget elementor-widget-button" data-id="150ca2b" data-element_type="widget" data-widget_type="button.default">
+						<div class="elementor-element elementor-element-150ca2b elementor-align-justify elementor-widget elementor-widget-button" data-id="150ca2b" data-element_type="widget" data-widget_type="button.default">
 				<div class="elementor-widget-container">
 					<div class="elementor-button-wrapper">
 			<a href="https://dlh.com/rocko/" class="elementor-button-link elementor-button elementor-size-sm elementor-animation-bob" role="button">
@@ -1504,7 +1493,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-widget-container">
 						<nav migration_allowed="1" migrated="0" role="navigation" class="elementor-nav-menu--main elementor-nav-menu__container elementor-nav-menu--layout-vertical e--pointer-none">
 				<ul id="menu-1-c5e2d9d" class="elementor-nav-menu sm-vertical"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5196"><a href="https://dlh.com/certificeringer/" class="elementor-item">Certificeringer</a></li>
-<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5197"><a href="https://dlh.com/downloads/" class="elementor-item">downloads</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5197"><a href="https://dlh.com/downloads/" class="elementor-item">Downloads</a></li>
 <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5411"><a href="https://dlh.com/om-os/zonekort/" class="elementor-item">Zonekort</a></li>
 <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5412"><a href="https://dlh.com/om-os/vaerdier/" class="elementor-item">Værdier</a></li>
 </ul>			</nav>
@@ -1513,7 +1502,7 @@ gtag("config", "G-X8HWTPW5SC");
 		</div>
 			<nav class="elementor-nav-menu--dropdown elementor-nav-menu__container" role="navigation" aria-hidden="true">
 				<ul id="menu-2-c5e2d9d" class="elementor-nav-menu sm-vertical"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5196"><a href="https://dlh.com/certificeringer/" class="elementor-item" tabindex="-1">Certificeringer</a></li>
-<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5197"><a href="https://dlh.com/downloads/" class="elementor-item" tabindex="-1">downloads</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5197"><a href="https://dlh.com/downloads/" class="elementor-item" tabindex="-1">Downloads</a></li>
 <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5411"><a href="https://dlh.com/om-os/zonekort/" class="elementor-item" tabindex="-1">Zonekort</a></li>
 <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5412"><a href="https://dlh.com/om-os/vaerdier/" class="elementor-item" tabindex="-1">Værdier</a></li>
 </ul>			</nav>
@@ -1786,7 +1775,7 @@ This website uses cookies to improve your experience. We'll assume you're ok wit
 		</section>
 				</div>
 		</div>
-		<link rel='stylesheet' id='elementor-post-5313-css'  href='https://dlh.com/wp-content/uploads/elementor/css/post-5313.css?ver=1664276696' type='text/css' media='all' />
+		<link rel='stylesheet' id='elementor-post-5313-css'  href='https://dlh.com/wp-content/uploads/elementor/css/post-5313.css?ver=1664461607' type='text/css' media='all' />
 <link rel='stylesheet' id='elementor-post-5241-css'  href='https://dlh.com/wp-content/uploads/elementor/css/post-5241.css?ver=1664276120' type='text/css' media='all' />
 <link rel='stylesheet' id='elementor-post-17102-css'  href='https://dlh.com/wp-content/uploads/elementor/css/post-17102.css?ver=1664276120' type='text/css' media='all' />
 <link rel='stylesheet' id='e-animations-css'  href='https://dlh.com/wp-content/plugins/elementor/assets/lib/animations/animations.min.css?ver=3.4.7' type='text/css' media='all' />
@@ -1812,7 +1801,7 @@ This website uses cookies to improve your experience. We'll assume you're ok wit
 <script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/js/webpack.runtime.min.js?ver=3.4.7'></script>
 <script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/js/frontend-modules.min.js?ver=3.4.7'></script>
 <script type='text/javascript'>
-var ElementorProFrontendConfig = {"ajaxurl":"https:\/\/dlh.com\/wp-admin\/admin-ajax.php","nonce":"dc8dc2e6c6","urls":{"assets":"https:\/\/dlh.com\/wp-content\/plugins\/elementor-pro\/assets\/","rest":"https:\/\/dlh.com\/wp-json\/"},"i18n":{"toc_no_headings_found":"No headings were found on this page."},"shareButtonsNetworks":{"facebook":{"title":"Facebook","has_counter":true},"twitter":{"title":"Twitter"},"linkedin":{"title":"LinkedIn","has_counter":true},"pinterest":{"title":"Pinterest","has_counter":true},"reddit":{"title":"Reddit","has_counter":true},"vk":{"title":"VK","has_counter":true},"odnoklassniki":{"title":"OK","has_counter":true},"tumblr":{"title":"Tumblr"},"digg":{"title":"Digg"},"skype":{"title":"Skype"},"stumbleupon":{"title":"StumbleUpon","has_counter":true},"mix":{"title":"Mix"},"telegram":{"title":"Telegram"},"pocket":{"title":"Pocket","has_counter":true},"xing":{"title":"XING","has_counter":true},"whatsapp":{"title":"WhatsApp"},"email":{"title":"Email"},"print":{"title":"Print"}},"facebook_sdk":{"lang":"en_US","app_id":""},"lottie":{"defaultAnimationUrl":"https:\/\/dlh.com\/wp-content\/plugins\/elementor-pro\/modules\/lottie\/assets\/animations\/default.json"}};
+var ElementorProFrontendConfig = {"ajaxurl":"https:\/\/dlh.com\/wp-admin\/admin-ajax.php","nonce":"67f0f0dce3","urls":{"assets":"https:\/\/dlh.com\/wp-content\/plugins\/elementor-pro\/assets\/","rest":"https:\/\/dlh.com\/wp-json\/"},"i18n":{"toc_no_headings_found":"No headings were found on this page."},"shareButtonsNetworks":{"facebook":{"title":"Facebook","has_counter":true},"twitter":{"title":"Twitter"},"linkedin":{"title":"LinkedIn","has_counter":true},"pinterest":{"title":"Pinterest","has_counter":true},"reddit":{"title":"Reddit","has_counter":true},"vk":{"title":"VK","has_counter":true},"odnoklassniki":{"title":"OK","has_counter":true},"tumblr":{"title":"Tumblr"},"digg":{"title":"Digg"},"skype":{"title":"Skype"},"stumbleupon":{"title":"StumbleUpon","has_counter":true},"mix":{"title":"Mix"},"telegram":{"title":"Telegram"},"pocket":{"title":"Pocket","has_counter":true},"xing":{"title":"XING","has_counter":true},"whatsapp":{"title":"WhatsApp"},"email":{"title":"Email"},"print":{"title":"Print"}},"facebook_sdk":{"lang":"en_US","app_id":""},"lottie":{"defaultAnimationUrl":"https:\/\/dlh.com\/wp-content\/plugins\/elementor-pro\/modules\/lottie\/assets\/animations\/default.json"}};
 </script>
 <script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor-pro/assets/js/frontend.min.js?ver=3.5.0'></script>
 <script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/lib/waypoints/waypoints.min.js?ver=4.0.2'></script>

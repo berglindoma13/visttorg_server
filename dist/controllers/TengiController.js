@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DeleteAllTengiCert = exports.DeleteAllTengiProducts = exports.GetAllTengiCategories = exports.InsertAllTengiProducts = void 0;
+exports.GetAllInvalidTengiCertificates = exports.DeleteAllTengiCert = exports.DeleteAllTengiProducts = exports.GetAllTengiCategories = exports.InsertAllTengiProducts = void 0;
 const axios_1 = __importDefault(require("axios"));
 const fs_1 = __importDefault(require("fs"));
 const PrismaHelper_1 = require("../helpers/PrismaHelper");
@@ -230,6 +230,7 @@ const ProcessForDatabase = async (products) => {
                 }
             });
         }));
+        await (0, PrismaHelper_1.DeleteAllCertByCompany)(CompanyID);
         const allCertificates = filteredArray.map(prod => {
             return prod.validatedCertificates.map(cert => {
                 let fileurl = '';
@@ -276,3 +277,20 @@ const ProcessForDatabase = async (products) => {
         (0, ProductHelper_1.WriteAllFiles)(createdProducts, updatedProducts, productsNotValid, 'Tengi');
     });
 };
+const GetAllInvalidTengiCertificates = async (req, res) => {
+    const allCerts = await (0, PrismaHelper_1.GetAllInvalidProductCertsByCompany)(CompanyID);
+    const mapped = allCerts.map(cert => {
+        return {
+            productid: cert.productid,
+            certfileurl: cert.fileurl,
+            validDate: cert.validDate
+        };
+    });
+    fs_1.default.writeFile('writefiles/TengiInvalidcerts.json', JSON.stringify(mapped), function (err) {
+        if (err) {
+            return console.error(err);
+        }
+    });
+    res.end("Successfully logged all invalid certs");
+};
+exports.GetAllInvalidTengiCertificates = GetAllInvalidTengiCertificates;
