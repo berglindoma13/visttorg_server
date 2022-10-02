@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetAllInvalidBykoCertificatesByCertId = exports.GetAllInvalidBykoCertificates = exports.DeleteAllProducts = exports.GetAllCategories = exports.InsertAllBykoProducts = void 0;
+exports.UploadBykoValidatedCerts = exports.GetAllInvalidBykoCertificatesByCertId = exports.GetAllInvalidBykoCertificates = exports.DeleteAllProducts = exports.GetAllCategories = exports.InsertAllBykoProducts = void 0;
 const axios_1 = __importDefault(require("axios"));
 const fs_1 = __importDefault(require("fs"));
 const byko_1 = __importDefault(require("../mappers/categories/byko"));
@@ -313,3 +313,26 @@ const GetAllInvalidBykoCertificatesByCertId = async (req, res) => {
     res.end("Successfully logged all invalid certs");
 };
 exports.GetAllInvalidBykoCertificatesByCertId = GetAllInvalidBykoCertificatesByCertId;
+const UploadBykoValidatedCerts = async (req, res) => {
+    fs_1.default.readFile('writefiles/BykoFixedCerts.json', async (err, data) => {
+        if (err)
+            throw err;
+        let datastring = data.toString();
+        let certlist = JSON.parse(datastring);
+        await prisma_1.default.$transaction(certlist.map(cert => {
+            const swap = ([item0, item1, rest]) => [item1, item0, rest];
+            const dateOfFileSwapedC = swap(cert.validDate.split(".")).join("-");
+            return prisma_1.default.productcertificate.updateMany({
+                where: {
+                    productid: cert.productid,
+                    fileurl: cert.certfileurl
+                },
+                data: {
+                    validDate: new Date(dateOfFileSwapedC)
+                }
+            });
+        }));
+        res.send('succesfully updated certificates');
+    });
+};
+exports.UploadBykoValidatedCerts = UploadBykoValidatedCerts;

@@ -27,11 +27,13 @@ exports.allRoutes.get('/api/byko/deleteall/products', BykoController_1.DeleteAll
 exports.allRoutes.get('/api/byko/getallcategories', BykoController_1.GetAllCategories);
 exports.allRoutes.get('/api/byko/invalidcerts', BykoController_1.GetAllInvalidBykoCertificates);
 exports.allRoutes.get('/api/byko/invalidcerts/epd', BykoController_1.GetAllInvalidBykoCertificatesByCertId);
+exports.allRoutes.get('/api/byko/fixcerts', BykoController_1.UploadBykoValidatedCerts);
 //EBSON ROUTES - GOOGLE SHEETS
 exports.allRoutes.get('/api/ebson', EbsonController_1.InsertAllEbsonProducts);
 exports.allRoutes.get('/api/ebson/deletecert', EbsonController_1.DeleteAllEbsonCert);
 exports.allRoutes.get('/api/ebson/deleteproducts', EbsonController_1.DeleteAllEbsonProducts);
 exports.allRoutes.get('/api/ebson/invalidcerts', EbsonController_1.GetAllInvalidEbsonCertificates);
+exports.allRoutes.get('/api/ebson/fixcerts', EbsonController_1.UploadEbsonValidatedCerts);
 //TENGI ROUTES - API
 exports.allRoutes.get('/api/tengi', TengiController_1.InsertAllTengiProducts);
 exports.allRoutes.get('/api/tengi/getallcategories', TengiController_1.GetAllTengiCategories);

@@ -57,14 +57,14 @@ model certificate {
 }
 
 model category {
-  id       Int @unique @id @default(autoincrement())
+  id       Int @id @default(autoincrement())
   name     String @unique
   subCategories subCategory[]
   products product[] @relation("ConnectedCategory")
 }
 
 model subCategory {
-  id  Int @id @unique @default(autoincrement())  
+  id  Int @id @default(autoincrement())  
   name  String 
   parentCategoryName  String
   parentCategory category @relation(fields: [parentCategoryName], references: [name])

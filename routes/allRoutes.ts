@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { InsertAllBykoProducts, GetAllCategories, DeleteAllProducts, GetAllInvalidBykoCertificates, GetAllInvalidBykoCertificatesByCertId } from '../controllers/BykoController';
-import { InsertAllEbsonProducts, DeleteAllEbsonCert, DeleteAllEbsonProducts, GetAllInvalidEbsonCertificates } from '../controllers/EbsonController'
+import { InsertAllBykoProducts, GetAllCategories, DeleteAllProducts, GetAllInvalidBykoCertificates, GetAllInvalidBykoCertificatesByCertId, UploadBykoValidatedCerts } from '../controllers/BykoController';
+import { InsertAllEbsonProducts, DeleteAllEbsonCert, DeleteAllEbsonProducts, GetAllInvalidEbsonCertificates, UploadEbsonValidatedCerts } from '../controllers/EbsonController'
 import { Postlist } from '../controllers/Postlist'
 import { Login } from '../controllers/loginController';
 import { DeleteAllTengiCert, DeleteAllTengiProducts, GetAllInvalidTengiCertificates, GetAllTengiCategories, InsertAllTengiProducts } from '../controllers/TengiController';
@@ -25,12 +25,14 @@ allRoutes.get('/api/byko/deleteall/products', DeleteAllProducts);
 allRoutes.get('/api/byko/getallcategories', GetAllCategories);
 allRoutes.get('/api/byko/invalidcerts', GetAllInvalidBykoCertificates)
 allRoutes.get('/api/byko/invalidcerts/epd', GetAllInvalidBykoCertificatesByCertId)
+allRoutes.get('/api/byko/fixcerts', UploadBykoValidatedCerts)
 
 //EBSON ROUTES - GOOGLE SHEETS
 allRoutes.get('/api/ebson', InsertAllEbsonProducts)
 allRoutes.get('/api/ebson/deletecert', DeleteAllEbsonCert)
 allRoutes.get('/api/ebson/deleteproducts', DeleteAllEbsonProducts)
 allRoutes.get('/api/ebson/invalidcerts', GetAllInvalidEbsonCertificates)
+allRoutes.get('/api/ebson/fixcerts', UploadEbsonValidatedCerts)
 
 //TENGI ROUTES - API
 allRoutes.get('/api/tengi', InsertAllTengiProducts)

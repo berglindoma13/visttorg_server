@@ -362,3 +362,30 @@ export const GetAllInvalidBykoCertificatesByCertId = async(req,res) => {
 
   res.end("Successfully logged all invalid certs");
 }
+
+export const UploadBykoValidatedCerts = async(req,res) => {
+  fs.readFile('writefiles/BykoFixedCerts.json', async(err, data) => {
+    if (err) throw err;
+    let datastring: string = data.toString()
+    let certlist = JSON.parse(datastring);
+
+    await prismaInstance.$transaction(
+      certlist.map(cert => {  
+        const swap = ([item0, item1, rest]) => [item1, item0, rest]; 
+        const dateOfFileSwapedC = swap(cert.validDate.split(".")).join("-")
+        return prismaInstance.productcertificate.updateMany({
+          where:{
+            productid: cert.productid,
+            fileurl: cert.certfileurl
+          }, 
+          data:{
+            validDate: new Date(dateOfFileSwapedC)
+          }
+        })
+      })
+    )
+
+    res.send('succesfully updated certificates')
+    
+});
+}

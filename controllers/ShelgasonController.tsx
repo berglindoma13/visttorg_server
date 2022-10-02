@@ -160,7 +160,6 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
     )
 
    const deletedProductsCerts = await DeleteAllCertByCompany(CompanyID)
-   console.log('deleted', deletedProductsCerts)
 
     const allCertificates: Array<DatabaseProductCertificate> = filteredArray.map(prod => {
       return prod.validatedCertificates.map(cert => {
@@ -232,4 +231,29 @@ export const GetAllInvalidSHelgasonCertificates = async(req, res) => {
   })
 
   res.end("Successfully logged all invalid certs");
+}
+
+export const UploadSHelgasonValidatedCerts = async(req,res) => {
+  fs.readFile('writefiles/SHelgasonFixedCerts.json', async(err, data) => {
+    if (err) throw err;
+    let datastring: string = data.toString()
+    let certlist = JSON.parse(datastring);
+
+    await prismaInstance.$transaction(
+      certlist.map(cert => { 
+        return prismaInstance.productcertificate.updateMany({
+          where:{
+            productid: cert.productid,
+            fileurl: cert.certfileurl
+          }, 
+          data:{
+            validDate: new Date(cert.validDate)
+          }
+        })
+      })
+    )
+
+    res.send('succesfully updated certificates')
+    
+});
 }

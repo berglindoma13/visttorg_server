@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetAllInvalidSHelgasonCertificates = exports.DeleteAllSHelgasonCert = exports.DeleteAllSHelgasonProducts = exports.InsertAllSHelgasonProducts = void 0;
+exports.UploadSHelgasonValidatedCerts = exports.GetAllInvalidSHelgasonCertificates = exports.DeleteAllSHelgasonCert = exports.DeleteAllSHelgasonProducts = exports.InsertAllSHelgasonProducts = void 0;
 const PrismaHelper_1 = require("../helpers/PrismaHelper");
 const fs_1 = __importDefault(require("fs"));
 const ProductHelper_1 = require("../helpers/ProductHelper");
@@ -138,7 +138,6 @@ const ProcessForDatabase = async (products) => {
             });
         }));
         const deletedProductsCerts = await (0, PrismaHelper_1.DeleteAllCertByCompany)(CompanyID);
-        console.log('deleted', deletedProductsCerts);
         const allCertificates = filteredArray.map(prod => {
             return prod.validatedCertificates.map(cert => {
                 let fileurl = '';
@@ -203,3 +202,24 @@ const GetAllInvalidSHelgasonCertificates = async (req, res) => {
     res.end("Successfully logged all invalid certs");
 };
 exports.GetAllInvalidSHelgasonCertificates = GetAllInvalidSHelgasonCertificates;
+const UploadSHelgasonValidatedCerts = async (req, res) => {
+    fs_1.default.readFile('writefiles/SHelgasonFixedCerts.json', async (err, data) => {
+        if (err)
+            throw err;
+        let datastring = data.toString();
+        let certlist = JSON.parse(datastring);
+        await prisma_1.default.$transaction(certlist.map(cert => {
+            return prisma_1.default.productcertificate.updateMany({
+                where: {
+                    productid: cert.productid,
+                    fileurl: cert.certfileurl
+                },
+                data: {
+                    validDate: new Date(cert.validDate)
+                }
+            });
+        }));
+        res.send('succesfully updated certificates');
+    });
+};
+exports.UploadSHelgasonValidatedCerts = UploadSHelgasonValidatedCerts;

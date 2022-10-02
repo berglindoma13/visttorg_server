@@ -4,7 +4,8 @@ import { Request, Response } from 'express';
 import { DeleteAllProductsByCompany,
         DeleteAllCertByCompany,
         GetUniqueProduct,
-        GetAllInvalidProductCertsByCompany
+        GetAllInvalidProductCertsByCompany,
+        DeleteProductCertificates
       } from '../helpers/PrismaHelper'
 import fs from 'fs'
 import { deleteOldProducts, WriteAllFiles, VerifyProduct, getAllProductsFromGoogleSheets } from '../helpers/ProductHelper';
@@ -111,6 +112,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
   Promise.all(allProductPromises).then(async(productsWithProps) => {
 
     const filteredArray = productsWithProps.filter(prod => prod.productState !== 1)
+    const arrayWithChanges = productsWithProps.filter(prod => prod.productState !== 1 && prod.productState !== 4)
 
     await prismaInstance.$transaction(
       filteredArray.map(productWithProps => {
@@ -158,52 +160,58 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
       })
     )
 
-    await DeleteAllCertByCompany(CompanyID)
+    if(arrayWithChanges.length > 0){
 
-    const allCertificates: Array<DatabaseProductCertificate> = filteredArray.map(prod => {
-      return prod.validatedCertificates.map(cert => {
-        let fileurl = ''
-        let validdate = null
-        if(cert.name === 'EPD'){
-          fileurl = prod.product.epdUrl
-          validdate = prod.validDate[0].date
-        }
-        else if(cert.name === 'FSC'){
-          fileurl = prod.product.fscUrl
-          validdate = prod.validDate[1].date
-        }
-        else if(cert.name === 'VOC'){
-          fileurl = prod.product.vocUrl
-          validdate = prod.validDate[2].date
-        }
-        const certItem: DatabaseProductCertificate = { 
-          name: cert.name,
-          fileurl: fileurl,
-          validDate: validdate,
-          productId: prod.product.id
-        }
-        return certItem
+      arrayWithChanges.map(async(item) => {
+        await DeleteProductCertificates(item.product.id)
       })
-    }).flat()
 
-    await prismaInstance.$transaction(
-      allCertificates.map(cert => {
-        return prismaInstance.productcertificate.create({
-          data: {
-            certificate : {
-              connect : { id : certIdFinder[cert.name] }
-            },
-            connectedproduct : {
-              connect : { 
-                productIdentifier : { productid: cert.productId, companyid: CompanyID}
-               },
-            },
-            fileurl : cert.fileurl,
-            validDate : cert.validDate
+      const allCertificates: Array<DatabaseProductCertificate> = arrayWithChanges.map(prod => {
+        return prod.validatedCertificates.map(cert => {
+          let fileurl = ''
+          let validdate = null
+          if(cert.name === 'EPD'){
+            fileurl = prod.product.epdUrl
+            validdate = prod.validDate[0].date
           }
+          else if(cert.name === 'FSC'){
+            fileurl = prod.product.fscUrl
+            validdate = prod.validDate[1].date
+          }
+          else if(cert.name === 'VOC'){
+            fileurl = prod.product.vocUrl
+            validdate = prod.validDate[2].date
+          }
+          const certItem: DatabaseProductCertificate = { 
+            name: cert.name,
+            fileurl: fileurl,
+            validDate: validdate,
+            productId: prod.product.id
+          }
+          return certItem
         })
-      })
-    ) 
+      }).flat()
+  
+      await prismaInstance.$transaction(
+        allCertificates.map(cert => {
+          return prismaInstance.productcertificate.create({
+            data: {
+              certificate : {
+                connect : { id : certIdFinder[cert.name] }
+              },
+              connectedproduct : {
+                connect : { 
+                  productIdentifier : { productid: cert.productId, companyid: CompanyID}
+                 },
+              },
+              fileurl : cert.fileurl,
+              validDate : cert.validDate
+            }
+          })
+        })
+      ) 
+    }
+    
   }).then(() => {
     // write all appropriate files
     WriteAllFiles(createdProducts, updatedProducts, productsNotValid, CompanyName)
@@ -228,4 +236,31 @@ export const GetAllInvalidEbsonCertificates = async(req, res) => {
   })
 
   res.end("Successfully logged all invalid certs");
+}
+
+export const UploadEbsonValidatedCerts = async(req,res) => {
+  fs.readFile('writefiles/EbsonFixedCerts.json', async(err, data) => {
+    if (err) throw err;
+    let datastring: string = data.toString()
+    let certlist = JSON.parse(datastring);
+
+    await prismaInstance.$transaction(
+      certlist.map(cert => {  
+        const swap = ([item0, item1, rest]) => [item1, item0, rest]; 
+        const dateOfFileSwapedC = swap(cert.validDate.split(".")).join("-")
+        return prismaInstance.productcertificate.updateMany({
+          where:{
+            productid: cert.productid,
+            fileurl: cert.certfileurl
+          }, 
+          data:{
+            validDate: new Date(dateOfFileSwapedC)
+          }
+        })
+      })
+    )
+
+    res.send('succesfully updated certificates')
+    
+});
 }

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetAllInvalidEbsonCertificates = exports.DeleteAllEbsonCert = exports.DeleteAllEbsonProducts = exports.InsertAllEbsonProducts = void 0;
+exports.UploadEbsonValidatedCerts = exports.GetAllInvalidEbsonCertificates = exports.DeleteAllEbsonCert = exports.DeleteAllEbsonProducts = exports.InsertAllEbsonProducts = void 0;
 const PrismaHelper_1 = require("../helpers/PrismaHelper");
 const fs_1 = __importDefault(require("fs"));
 const ProductHelper_1 = require("../helpers/ProductHelper");
@@ -96,6 +96,7 @@ const ProcessForDatabase = async (products) => {
     });
     Promise.all(allProductPromises).then(async (productsWithProps) => {
         const filteredArray = productsWithProps.filter(prod => prod.productState !== 1);
+        const arrayWithChanges = productsWithProps.filter(prod => prod.productState !== 1 && prod.productState !== 4);
         await prisma_1.default.$transaction(filteredArray.map(productWithProps => {
             return prisma_1.default.product.upsert({
                 where: {
@@ -137,48 +138,52 @@ const ProcessForDatabase = async (products) => {
                 }
             });
         }));
-        await (0, PrismaHelper_1.DeleteAllCertByCompany)(CompanyID);
-        const allCertificates = filteredArray.map(prod => {
-            return prod.validatedCertificates.map(cert => {
-                let fileurl = '';
-                let validdate = null;
-                if (cert.name === 'EPD') {
-                    fileurl = prod.product.epdUrl;
-                    validdate = prod.validDate[0].date;
-                }
-                else if (cert.name === 'FSC') {
-                    fileurl = prod.product.fscUrl;
-                    validdate = prod.validDate[1].date;
-                }
-                else if (cert.name === 'VOC') {
-                    fileurl = prod.product.vocUrl;
-                    validdate = prod.validDate[2].date;
-                }
-                const certItem = {
-                    name: cert.name,
-                    fileurl: fileurl,
-                    validDate: validdate,
-                    productId: prod.product.id
-                };
-                return certItem;
+        if (arrayWithChanges.length > 0) {
+            arrayWithChanges.map(async (item) => {
+                await (0, PrismaHelper_1.DeleteProductCertificates)(item.product.id);
             });
-        }).flat();
-        await prisma_1.default.$transaction(allCertificates.map(cert => {
-            return prisma_1.default.productcertificate.create({
-                data: {
-                    certificate: {
-                        connect: { id: certificateIds_1.certIdFinder[cert.name] }
-                    },
-                    connectedproduct: {
-                        connect: {
-                            productIdentifier: { productid: cert.productId, companyid: CompanyID }
+            const allCertificates = arrayWithChanges.map(prod => {
+                return prod.validatedCertificates.map(cert => {
+                    let fileurl = '';
+                    let validdate = null;
+                    if (cert.name === 'EPD') {
+                        fileurl = prod.product.epdUrl;
+                        validdate = prod.validDate[0].date;
+                    }
+                    else if (cert.name === 'FSC') {
+                        fileurl = prod.product.fscUrl;
+                        validdate = prod.validDate[1].date;
+                    }
+                    else if (cert.name === 'VOC') {
+                        fileurl = prod.product.vocUrl;
+                        validdate = prod.validDate[2].date;
+                    }
+                    const certItem = {
+                        name: cert.name,
+                        fileurl: fileurl,
+                        validDate: validdate,
+                        productId: prod.product.id
+                    };
+                    return certItem;
+                });
+            }).flat();
+            await prisma_1.default.$transaction(allCertificates.map(cert => {
+                return prisma_1.default.productcertificate.create({
+                    data: {
+                        certificate: {
+                            connect: { id: certificateIds_1.certIdFinder[cert.name] }
                         },
-                    },
-                    fileurl: cert.fileurl,
-                    validDate: cert.validDate
-                }
-            });
-        }));
+                        connectedproduct: {
+                            connect: {
+                                productIdentifier: { productid: cert.productId, companyid: CompanyID }
+                            },
+                        },
+                        fileurl: cert.fileurl,
+                        validDate: cert.validDate
+                    }
+                });
+            }));
+        }
     }).then(() => {
         // write all appropriate files
         (0, ProductHelper_1.WriteAllFiles)(createdProducts, updatedProducts, productsNotValid, CompanyName);
@@ -201,3 +206,26 @@ const GetAllInvalidEbsonCertificates = async (req, res) => {
     res.end("Successfully logged all invalid certs");
 };
 exports.GetAllInvalidEbsonCertificates = GetAllInvalidEbsonCertificates;
+const UploadEbsonValidatedCerts = async (req, res) => {
+    fs_1.default.readFile('writefiles/EbsonFixedCerts.json', async (err, data) => {
+        if (err)
+            throw err;
+        let datastring = data.toString();
+        let certlist = JSON.parse(datastring);
+        await prisma_1.default.$transaction(certlist.map(cert => {
+            const swap = ([item0, item1, rest]) => [item1, item0, rest];
+            const dateOfFileSwapedC = swap(cert.validDate.split(".")).join("-");
+            return prisma_1.default.productcertificate.updateMany({
+                where: {
+                    productid: cert.productid,
+                    fileurl: cert.certfileurl
+                },
+                data: {
+                    validDate: new Date(dateOfFileSwapedC)
+                }
+            });
+        }));
+        res.send('succesfully updated certificates');
+    });
+};
+exports.UploadEbsonValidatedCerts = UploadEbsonValidatedCerts;
