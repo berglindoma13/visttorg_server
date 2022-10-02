@@ -11,7 +11,7 @@ dotenv.config();
 const app: Express = express();
 const port = process.env.PORT;
 
-var whitelist = ['http://localhost:3000', 'https://vistbokserver.herokuapp.com', 'https://visttorg-primary.vercel.app', 'https://www.vistbok.is/']
+var whitelist = ['http://localhost:3000', 'https://vistbokserver.herokuapp.com', 'https://visttorg-primary.vercel.app', 'https://www.vistbok.is']
 var corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1  || !origin) {
