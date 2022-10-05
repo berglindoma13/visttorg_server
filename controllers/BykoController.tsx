@@ -331,15 +331,31 @@ const ListCategories = async(data : BykoResponseData) => {
 export const GetAllInvalidBykoCertificates = async(req, res) => {
   const allCerts = await GetAllInvalidProductCertsByCompany(CompanyID)
 
+  console.log('allCerts', allCerts)
+  console.log('count', allCerts.length)
+
   const mapped = allCerts.map(cert => {
     return {
       productid: cert.productid,
       certfileurl: cert.fileurl,
-      validDate: cert.validDate
+      validDate: cert.validDate,
+    }
+  })
+
+  const mappedForCompany = allCerts.map(cert => {
+    return {
+      certfileurl: cert.fileurl,
+      productId: cert.connectedproduct.productid.substring(1)
     }
   })
 
   fs.writeFile('writefiles/bykoinvalidcerts.json', JSON.stringify(mapped) , function(err) {
+    if(err){
+      return console.error(err)
+    }
+  })
+
+  fs.writeFile('writefiles/BykoOgildVoruskirteini.txt', JSON.stringify(mappedForCompany) , function(err) {
     if(err){
       return console.error(err)
     }
@@ -350,9 +366,6 @@ export const GetAllInvalidBykoCertificates = async(req, res) => {
 
 export const GetAllInvalidBykoCertificatesByCertId = async(req,res) => {
   const allCerts = await GetAllInvalidProductCertsByCompanyAndCertId(CompanyID, 1)
-
-  console.log('allCerts', allCerts)
-  console.log('count', allCerts.length)
 
   fs.writeFile('/writefiles/bykoinvalidcerts.txt', allCerts.toString(), function(err) {
     if(err){

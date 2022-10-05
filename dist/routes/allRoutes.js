@@ -19,7 +19,7 @@ const PrismaHelper_1 = require("../helpers/PrismaHelper");
 exports.allRoutes = (0, express_1.Router)();
 //ALMENNT
 exports.allRoutes.get('/', (req, res) => {
-    res.send('Server is up and running here!');
+    res.send('Server is up and running here NOW!');
 });
 //BYKO ROUTES - API
 exports.allRoutes.get('/api/byko', BykoController_1.InsertAllBykoProducts);
@@ -45,6 +45,7 @@ exports.allRoutes.get('/api/shelgason', ShelgasonController_1.InsertAllSHelgason
 exports.allRoutes.get('/api/shelgason/deletecert', ShelgasonController_1.DeleteAllSHelgasonCert);
 exports.allRoutes.get('/api/shelgason/deleteproducts', ShelgasonController_1.DeleteAllSHelgasonProducts);
 exports.allRoutes.get('/api/shelgason/invalidcerts', ShelgasonController_1.GetAllInvalidSHelgasonCertificates);
+exports.allRoutes.get('/api/shelgason/fixcerts', ShelgasonController_1.UploadSHelgasonValidatedCerts);
 //Sérefni ROUTES - API
 exports.allRoutes.get('/api/serefni', SerefniController_1.InsertAllSerefniProducts);
 exports.allRoutes.get('/api/serefni/deletecert', SerefniController_1.DeleteAllSerefniCert);

@@ -286,14 +286,27 @@ const ListCategories = async (data) => {
 };
 const GetAllInvalidBykoCertificates = async (req, res) => {
     const allCerts = await (0, PrismaHelper_1.GetAllInvalidProductCertsByCompany)(CompanyID);
+    console.log('allCerts', allCerts);
+    console.log('count', allCerts.length);
     const mapped = allCerts.map(cert => {
         return {
             productid: cert.productid,
             certfileurl: cert.fileurl,
-            validDate: cert.validDate
+            validDate: cert.validDate,
+        };
+    });
+    const mappedForCompany = allCerts.map(cert => {
+        return {
+            certfileurl: cert.fileurl,
+            productId: cert.connectedproduct.productid.substring(1)
         };
     });
     fs_1.default.writeFile('writefiles/bykoinvalidcerts.json', JSON.stringify(mapped), function (err) {
+        if (err) {
+            return console.error(err);
+        }
+    });
+    fs_1.default.writeFile('writefiles/BykoOgildVoruskirteini.txt', JSON.stringify(mappedForCompany), function (err) {
         if (err) {
             return console.error(err);
         }
@@ -303,8 +316,6 @@ const GetAllInvalidBykoCertificates = async (req, res) => {
 exports.GetAllInvalidBykoCertificates = GetAllInvalidBykoCertificates;
 const GetAllInvalidBykoCertificatesByCertId = async (req, res) => {
     const allCerts = await (0, PrismaHelper_1.GetAllInvalidProductCertsByCompanyAndCertId)(CompanyID, 1);
-    console.log('allCerts', allCerts);
-    console.log('count', allCerts.length);
     fs_1.default.writeFile('/writefiles/bykoinvalidcerts.txt', allCerts.toString(), function (err) {
         if (err) {
             return console.error(err);

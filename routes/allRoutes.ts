@@ -4,7 +4,7 @@ import { InsertAllEbsonProducts, DeleteAllEbsonCert, DeleteAllEbsonProducts, Get
 import { Postlist } from '../controllers/Postlist'
 import { Login } from '../controllers/loginController';
 import { DeleteAllTengiCert, DeleteAllTengiProducts, GetAllInvalidTengiCertificates, GetAllTengiCategories, InsertAllTengiProducts } from '../controllers/TengiController';
-import { DeleteAllSHelgasonCert, DeleteAllSHelgasonProducts, GetAllInvalidSHelgasonCertificates, InsertAllSHelgasonProducts } from '../controllers/ShelgasonController';
+import { DeleteAllSHelgasonCert, DeleteAllSHelgasonProducts, GetAllInvalidSHelgasonCertificates, InsertAllSHelgasonProducts, UploadSHelgasonValidatedCerts } from '../controllers/ShelgasonController';
 import { DeleteAllSerefniCert, DeleteAllSerefniProducts, GetAllInvalidSerefniCertificates, InsertAllSerefniProducts } from '../controllers/SerefniController';
 // import { InsertAllTestProducts } from '../controllers/testController';
 import { DeleteAllSmithNorlandCert, DeleteAllSmithNorlandProducts, GetAllSmithNorlandCategories, InsertAllSmithNorlandProducts } from '../controllers/SmithNorlandController';
@@ -16,7 +16,7 @@ export const allRoutes = Router();
 
 //ALMENNT
 allRoutes.get('/', (req: Request, res: Response) => {
-  res.send('Server is up and running here!')
+  res.send('Server is up and running here NOW!')
 })
 
 //BYKO ROUTES - API
@@ -46,6 +46,7 @@ allRoutes.get('/api/shelgason', InsertAllSHelgasonProducts)
 allRoutes.get('/api/shelgason/deletecert', DeleteAllSHelgasonCert)
 allRoutes.get('/api/shelgason/deleteproducts', DeleteAllSHelgasonProducts)
 allRoutes.get('/api/shelgason/invalidcerts', GetAllInvalidSHelgasonCertificates)
+allRoutes.get('/api/shelgason/fixcerts', UploadSHelgasonValidatedCerts)
 
 //Sérefni ROUTES - API
 allRoutes.get('/api/serefni', InsertAllSerefniProducts)

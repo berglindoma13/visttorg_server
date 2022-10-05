@@ -63,6 +63,9 @@ export const GetAllInvalidProductCertsByCompany = async(companyid: number) => {
       connectedproduct: {
         companyid: companyid
       }
+    },
+    include: {
+      connectedproduct: true
     }
   })
 }

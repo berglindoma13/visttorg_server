@@ -209,13 +209,15 @@ const UploadSHelgasonValidatedCerts = async (req, res) => {
         let datastring = data.toString();
         let certlist = JSON.parse(datastring);
         await prisma_1.default.$transaction(certlist.map(cert => {
+            const swap = ([item0, item1, rest]) => [item1, item0, rest];
+            const dateOfFileSwapedC = swap(cert.validDate.split(".")).join("-");
             return prisma_1.default.productcertificate.updateMany({
                 where: {
                     productid: cert.productid,
                     fileurl: cert.certfileurl
                 },
                 data: {
-                    validDate: new Date(cert.validDate)
+                    validDate: new Date(dateOfFileSwapedC)
                 }
             });
         }));
