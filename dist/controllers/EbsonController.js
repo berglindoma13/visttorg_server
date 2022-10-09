@@ -138,52 +138,48 @@ const ProcessForDatabase = async (products) => {
                 }
             });
         }));
-        if (arrayWithChanges.length > 0) {
-            arrayWithChanges.map(async (item) => {
-                await (0, PrismaHelper_1.DeleteProductCertificates)(item.product.id);
+        const deletedProductsCerts = await (0, PrismaHelper_1.DeleteAllCertByCompany)(CompanyID);
+        const allCertificates = filteredArray.map(prod => {
+            return prod.validatedCertificates.map(cert => {
+                let fileurl = '';
+                let validdate = null;
+                if (cert.name === 'EPD') {
+                    fileurl = prod.product.epdUrl;
+                    validdate = prod.validDate[0].date;
+                }
+                else if (cert.name === 'FSC') {
+                    fileurl = prod.product.fscUrl;
+                    validdate = prod.validDate[1].date;
+                }
+                else if (cert.name === 'VOC') {
+                    fileurl = prod.product.vocUrl;
+                    validdate = prod.validDate[2].date;
+                }
+                const certItem = {
+                    name: cert.name,
+                    fileurl: fileurl,
+                    validDate: validdate,
+                    productId: prod.product.id
+                };
+                return certItem;
             });
-            const allCertificates = arrayWithChanges.map(prod => {
-                return prod.validatedCertificates.map(cert => {
-                    let fileurl = '';
-                    let validdate = null;
-                    if (cert.name === 'EPD') {
-                        fileurl = prod.product.epdUrl;
-                        validdate = prod.validDate[0].date;
-                    }
-                    else if (cert.name === 'FSC') {
-                        fileurl = prod.product.fscUrl;
-                        validdate = prod.validDate[1].date;
-                    }
-                    else if (cert.name === 'VOC') {
-                        fileurl = prod.product.vocUrl;
-                        validdate = prod.validDate[2].date;
-                    }
-                    const certItem = {
-                        name: cert.name,
-                        fileurl: fileurl,
-                        validDate: validdate,
-                        productId: prod.product.id
-                    };
-                    return certItem;
-                });
-            }).flat();
-            await prisma_1.default.$transaction(allCertificates.map(cert => {
-                return prisma_1.default.productcertificate.create({
-                    data: {
-                        certificate: {
-                            connect: { id: certificateIds_1.certIdFinder[cert.name] }
+        }).flat();
+        await prisma_1.default.$transaction(allCertificates.map(cert => {
+            return prisma_1.default.productcertificate.create({
+                data: {
+                    certificate: {
+                        connect: { id: certificateIds_1.certIdFinder[cert.name] }
+                    },
+                    connectedproduct: {
+                        connect: {
+                            productIdentifier: { productid: cert.productId, companyid: CompanyID }
                         },
-                        connectedproduct: {
-                            connect: {
-                                productIdentifier: { productid: cert.productId, companyid: CompanyID }
-                            },
-                        },
-                        fileurl: cert.fileurl,
-                        validDate: cert.validDate
-                    }
-                });
-            }));
-        }
+                    },
+                    fileurl: cert.fileurl,
+                    validDate: cert.validDate
+                }
+            });
+        }));
     }).then(() => {
         // write all appropriate files
         (0, ProductHelper_1.WriteAllFiles)(createdProducts, updatedProducts, productsNotValid, CompanyName);

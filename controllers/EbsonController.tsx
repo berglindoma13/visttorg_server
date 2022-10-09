@@ -112,7 +112,6 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
   Promise.all(allProductPromises).then(async(productsWithProps) => {
 
     const filteredArray = productsWithProps.filter(prod => prod.productState !== 1)
-    const arrayWithChanges = productsWithProps.filter(prod => prod.productState !== 1 && prod.productState !== 4)
 
     await prismaInstance.$transaction(
       filteredArray.map(productWithProps => {
@@ -160,13 +159,12 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
       })
     )
 
-    if(arrayWithChanges.length > 0){
+    const arrayWithCertifiateChanges = productsWithProps.filter(prod => prod.productState !== 1 && prod.productState !== 4)
 
-      arrayWithChanges.map(async(item) => {
-        await DeleteProductCertificates(item.product.id)
-      })
+    // const deletedProductsCerts = await DeleteAllCertByCompany(CompanyID)
 
-      const allCertificates: Array<DatabaseProductCertificate> = arrayWithChanges.map(prod => {
+
+      const allCertificates: Array<DatabaseProductCertificate> = arrayWithCertifiateChanges.map(prod => {
         return prod.validatedCertificates.map(cert => {
           let fileurl = ''
           let validdate = null
@@ -194,23 +192,31 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
   
       await prismaInstance.$transaction(
         allCertificates.map(cert => {
-          return prismaInstance.productcertificate.create({
-            data: {
-              certificate : {
-                connect : { id : certIdFinder[cert.name] }
-              },
+          return prismaInstance.productcertificate.upsert({
+            where:{
+              prodcertidentifier: { certificateid: cert.id, productid: cert.productId }
+            },
+            create:{
               connectedproduct : {
                 connect : { 
                   productIdentifier : { productid: cert.productId, companyid: CompanyID}
                  },
               },
+              certificate : {
+                connect : { 
+                  id: cert.id
+                 },
+              },
+              fileurl : cert.fileurl,
+              validDate : cert.validDate
+            },
+            update:{
               fileurl : cert.fileurl,
               validDate : cert.validDate
             }
           })
         })
       ) 
-    }
     
   }).then(() => {
     // write all appropriate files

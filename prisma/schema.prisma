@@ -48,6 +48,8 @@ model productcertificate {
   productid        String
   connectedproduct product    @relation(fields: [productid], references: [id])
   validDate        DateTime?
+
+  @@unique([certificateid, productid], name: "prodcertidentifier")
 }
 
 model certificate {
