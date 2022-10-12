@@ -5,13 +5,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetAllInvalidSerefniCertificates = exports.DeleteAllSerefniCert = exports.DeleteAllSerefniProducts = exports.InsertAllSerefniProducts = void 0;
 const PrismaHelper_1 = require("../helpers/PrismaHelper");
-const fs_1 = __importDefault(require("fs"));
 const ProductHelper_1 = require("../helpers/ProductHelper");
 const prisma_1 = __importDefault(require("../lib/prisma"));
 const certificateIds_1 = require("../mappers/certificates/certificateIds");
+const sanity_1 = require("../lib/sanity");
 const CompanyID = 6;
 const SheetID = '1PIP46MtGWgf-qdxbTyMo8FSd1A_sIljIaoqlI8rjzW4';
-const CompanyName = 'Sérefni';
+const CompanyName = 'Serefni';
 var updatedProducts = [];
 var createdProducts = [];
 var productsNotValid = [];
@@ -110,6 +110,9 @@ const ProcessForDatabase = async (products) => {
                     categories: {
                         connect: typeof productWithProps.product.fl === 'string' ? { name: productWithProps.product.fl } : productWithProps.product.fl
                     },
+                    subCategories: {
+                        connect: productWithProps.product.subFl
+                    },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
                     productimageurl: productWithProps.product.prodImage,
@@ -125,6 +128,9 @@ const ProcessForDatabase = async (products) => {
                     },
                     categories: {
                         connect: typeof productWithProps.product.fl === 'string' ? { name: productWithProps.product.fl } : productWithProps.product.fl
+                    },
+                    subCategories: {
+                        connect: productWithProps.product.subFl
                     },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
@@ -185,17 +191,43 @@ const ProcessForDatabase = async (products) => {
 };
 const GetAllInvalidSerefniCertificates = async (req, res) => {
     const allCerts = await (0, PrismaHelper_1.GetAllInvalidProductCertsByCompany)(CompanyID);
-    const mapped = allCerts.map(cert => {
+    const SanityCertArray = allCerts.map(cert => {
         return {
-            productid: cert.productid,
-            certfileurl: cert.fileurl,
-            validDate: cert.validDate
+            _id: `${CompanyName}Cert${cert.id}`,
+            _type: "Certificate",
+            productid: `${cert.productid}`,
+            certfileurl: `${cert.fileurl}`
         };
     });
-    fs_1.default.writeFile('writefiles/SerefniInvalidcerts.json', JSON.stringify(mapped), function (err) {
-        if (err) {
-            return console.error(err);
-        }
+    const sanityCertReferences = [];
+    const SanityPromises = SanityCertArray.map(sanityCert => {
+        return sanity_1.client.createIfNotExists(sanityCert).then(createdCert => {
+            sanityCertReferences.push({ "_type": "reference", "_ref": createdCert._id });
+        }).catch(error => {
+            console.log('error', error);
+        });
+    });
+    Promise.all(SanityPromises).then(() => {
+        //SANITY.IO CREATE CERTIFICATELIST IF IT DOES NOT EXIST
+        const doc = {
+            _id: `${CompanyName}CertList`,
+            _type: "CertificateList",
+            CompanyName: CompanyName,
+        };
+        sanity_1.client
+            .transaction()
+            .createIfNotExists(doc)
+            .patch(`${CompanyName}CertList`, (p) => p.setIfMissing({ Certificates: [] })
+            // Add the items after the last item in the array (append)
+            .insert('after', 'Certificates[-1]', sanityCertReferences))
+            .commit({ autoGenerateArrayKeys: true })
+            .then((updatedCert) => {
+            console.log('Hurray, the cert is updated! New document:');
+            console.log(updatedCert);
+        })
+            .catch((err) => {
+            console.error('Oh no, the update failed: ', err.message);
+        });
     });
     res.end("Successfully logged all invalid certs");
 };

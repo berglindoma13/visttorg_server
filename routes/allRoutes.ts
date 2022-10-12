@@ -1,16 +1,17 @@
 import { Router, Request, Response } from 'express';
-import { InsertAllBykoProducts, GetAllCategories, DeleteAllProducts, GetAllInvalidBykoCertificates, GetAllInvalidBykoCertificatesByCertId, UploadBykoValidatedCerts } from '../controllers/BykoController';
-import { InsertAllEbsonProducts, DeleteAllEbsonCert, DeleteAllEbsonProducts, GetAllInvalidEbsonCertificates, UploadEbsonValidatedCerts } from '../controllers/EbsonController'
+import { InsertAllBykoProducts, GetAllCategories, DeleteAllProducts, GetAllInvalidBykoCertificates } from '../controllers/BykoController';
+import { InsertAllEbsonProducts, DeleteAllEbsonCert, DeleteAllEbsonProducts, GetAllInvalidEbsonCertificates } from '../controllers/EbsonController'
 import { Postlist } from '../controllers/Postlist'
 import { Login } from '../controllers/loginController';
 import { DeleteAllTengiCert, DeleteAllTengiProducts, GetAllInvalidTengiCertificates, GetAllTengiCategories, InsertAllTengiProducts } from '../controllers/TengiController';
-import { DeleteAllSHelgasonCert, DeleteAllSHelgasonProducts, GetAllInvalidSHelgasonCertificates, InsertAllSHelgasonProducts, UploadSHelgasonValidatedCerts } from '../controllers/ShelgasonController';
+import { DeleteAllSHelgasonCert, DeleteAllSHelgasonProducts, GetAllInvalidSHelgasonCertificates, InsertAllSHelgasonProducts } from '../controllers/ShelgasonController';
 import { DeleteAllSerefniCert, DeleteAllSerefniProducts, GetAllInvalidSerefniCertificates, InsertAllSerefniProducts } from '../controllers/SerefniController';
 // import { InsertAllTestProducts } from '../controllers/testController';
-import { DeleteAllSmithNorlandCert, DeleteAllSmithNorlandProducts, GetAllSmithNorlandCategories, InsertAllSmithNorlandProducts } from '../controllers/SmithNorlandController';
+import { DeleteAllSmithNorlandCert, DeleteAllSmithNorlandProducts, GetAllInvalidSmithNorlandCertificates, GetAllSmithNorlandCategories, InsertAllSmithNorlandProducts } from '../controllers/SmithNorlandController';
 import fs from 'fs'
 import { DatabaseCategory } from '../types/models';
 import { UpsertAllCategories } from '../helpers/PrismaHelper';
+import { UploadValidatedCerts } from '../controllers/CommonController';
 
 export const allRoutes = Router();
 
@@ -18,21 +19,20 @@ export const allRoutes = Router();
 allRoutes.get('/', (req: Request, res: Response) => {
   res.send('Server is up and running here NOW!')
 })
+allRoutes.post('/api/fixcerts', UploadValidatedCerts)
+
 
 //BYKO ROUTES - API
 allRoutes.get('/api/byko', InsertAllBykoProducts);
 allRoutes.get('/api/byko/deleteall/products', DeleteAllProducts);
 allRoutes.get('/api/byko/getallcategories', GetAllCategories);
 allRoutes.get('/api/byko/invalidcerts', GetAllInvalidBykoCertificates)
-allRoutes.get('/api/byko/invalidcerts/epd', GetAllInvalidBykoCertificatesByCertId)
-allRoutes.get('/api/byko/fixcerts', UploadBykoValidatedCerts)
 
 //EBSON ROUTES - GOOGLE SHEETS
 allRoutes.get('/api/ebson', InsertAllEbsonProducts)
 allRoutes.get('/api/ebson/deletecert', DeleteAllEbsonCert)
 allRoutes.get('/api/ebson/deleteproducts', DeleteAllEbsonProducts)
 allRoutes.get('/api/ebson/invalidcerts', GetAllInvalidEbsonCertificates)
-allRoutes.get('/api/ebson/fixcerts', UploadEbsonValidatedCerts)
 
 //TENGI ROUTES - API
 allRoutes.get('/api/tengi', InsertAllTengiProducts)
@@ -46,7 +46,6 @@ allRoutes.get('/api/shelgason', InsertAllSHelgasonProducts)
 allRoutes.get('/api/shelgason/deletecert', DeleteAllSHelgasonCert)
 allRoutes.get('/api/shelgason/deleteproducts', DeleteAllSHelgasonProducts)
 allRoutes.get('/api/shelgason/invalidcerts', GetAllInvalidSHelgasonCertificates)
-allRoutes.get('/api/shelgason/fixcerts', UploadSHelgasonValidatedCerts)
 
 //Sérefni ROUTES - API
 allRoutes.get('/api/serefni', InsertAllSerefniProducts)
@@ -59,6 +58,7 @@ allRoutes.get('/api/smithnorland', InsertAllSmithNorlandProducts)
 allRoutes.get('/api/smithnorland/getallcategories', GetAllSmithNorlandCategories)
 allRoutes.get('/api/smithnorland/deletecert', DeleteAllSmithNorlandCert)
 allRoutes.get('/api/smithnorland/deleteproducts', DeleteAllSmithNorlandProducts)
+allRoutes.get('/api/smithnorland/invalidcerts', GetAllInvalidSmithNorlandCertificates)
 
 // allRoutes.get('/api/test', InsertAllTestProducts);
 // allRoutes.get('/api/deletesheets', DeleteAllSheetsProducts);

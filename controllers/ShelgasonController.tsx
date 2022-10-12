@@ -10,6 +10,7 @@ import fs from 'fs'
 import { deleteOldProducts, WriteAllFiles, VerifyProduct, getAllProductsFromGoogleSheets } from '../helpers/ProductHelper';
 import prismaInstance from '../lib/prisma';
 import { certIdFinder } from '../mappers/certificates/certificateIds';
+import { client } from '../lib/sanity';
 
 const CompanyID = 5
 const SheetID = '1fMgOGGoI20sqTiapQNC-89F9UrrqnvselMnw-OXlgX8'
@@ -130,6 +131,9 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               categories : {
                 connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl            
               },
+              subCategories:{
+                connect: productWithProps.product.subFl            
+              },
               description : productWithProps.product.longDescription,
               shortdescription : productWithProps.product.shortDescription,
               productimageurl : productWithProps.product.prodImage,
@@ -145,6 +149,9 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               },
               categories : {
                 connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl
+              },
+              subCategories:{
+                connect: productWithProps.product.subFl            
               },
               description : productWithProps.product.longDescription,
               shortdescription : productWithProps.product.shortDescription,
@@ -214,49 +221,51 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 export const GetAllInvalidSHelgasonCertificates = async(req, res) => {
   const allCerts = await GetAllInvalidProductCertsByCompany(CompanyID)
 
-  console.log('allcerts', allCerts)
-
-  const mapped = allCerts.map(cert => {
+  const SanityCertArray = allCerts.map(cert => {
     return {
-      productid: cert.productid,
-      certfileurl: cert.fileurl,
-      validDate: cert.validDate
+      _id:`${CompanyName}Cert${cert.id}`,
+      _type:"Certificate",
+      productid:`${cert.productid}`,
+      certfileurl:`${cert.fileurl}`
     }
   })
 
-  fs.writeFile('writefiles/SHelgasonInvalidcerts.json', JSON.stringify(mapped) , function(err) {
-    if(err){
-      return console.error(err)
+  const sanityCertReferences = []
+
+  const SanityPromises = SanityCertArray.map(sanityCert => {
+    return client.createIfNotExists(sanityCert).then(createdCert => {
+      sanityCertReferences.push({ "_type":"reference", "_ref": createdCert._id })
+    }).catch(error => {
+      console.log('error', error)
+    })
+  })
+
+  Promise.all(SanityPromises).then(() => {
+
+    //SANITY.IO CREATE CERTIFICATELIST IF IT DOES NOT EXIST
+    const doc = {
+      _id: `${CompanyName}CertList`,
+      _type:"CertificateList",
+      CompanyName: CompanyName,
     }
+    
+    client
+    .transaction()
+    .createIfNotExists(doc)
+    .patch(`${CompanyName}CertList`, (p) => 
+      p.setIfMissing({Certificates: []})
+      // Add the items after the last item in the array (append)
+      .insert('after', 'Certificates[-1]', sanityCertReferences)
+    )
+    .commit({ autoGenerateArrayKeys: true })
+    .then((updatedCert) => {
+      console.log('Hurray, the cert is updated! New document:')
+      console.log(updatedCert)
+    })
+    .catch((err) => {
+      console.error('Oh no, the update failed: ', err.message)
+    })
   })
 
   res.end("Successfully logged all invalid certs");
-}
-
-export const UploadSHelgasonValidatedCerts = async(req,res) => {
-  fs.readFile('writefiles/SHelgasonFixedCerts.json', async(err, data) => {
-    if (err) throw err;
-    let datastring: string = data.toString()
-    let certlist = JSON.parse(datastring);
-
-    await prismaInstance.$transaction(
-      certlist.map(cert => { 
-        const swap = ([item0, item1, rest]) => [item1, item0, rest]; 
-        const dateOfFileSwapedC = swap(cert.validDate.split(".")).join("-")
-        
-        return prismaInstance.productcertificate.updateMany({
-          where:{
-            productid: cert.productid,
-            fileurl: cert.certfileurl
-          }, 
-          data:{
-            validDate: new Date(dateOfFileSwapedC)
-          }
-        })
-      })
-    )
-
-    res.send('succesfully updated certificates')
-    
-});
 }

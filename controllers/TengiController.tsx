@@ -13,11 +13,14 @@ import TengiCategoryMapper from '../mappers/categories/tengi'
 import { deleteOldProducts, VerifyProduct, WriteAllFiles } from '../helpers/ProductHelper'
 import prismaInstance from '../lib/prisma'
 import { certIdFinder } from '../mappers/certificates/certificateIds'
+import { client } from '../lib/sanity'
 
 // TENGI COMPANY ID = 3
 
 const TengiAPI = "https://api.integrator.is/Products/GetMany/?CompanyId=608c19f3591c2b328096b230&ApiKey=b3a6e86d4d4d6612b55d436f7fa60c65d0f8f217c34ead6333407162d308982b&Status=2&Brands=61efc9d1591c275358c86f84" 
 const CompanyID = 3
+const CompanyName = 'Tengi'
+
 
 var updatedProducts: Array<DatabaseProduct> = [];
 var createdProducts: Array<DatabaseProduct> = [];
@@ -319,21 +322,54 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
   });
 }
 
-export const GetAllInvalidTengiCertificates = async(req, res) => {
+
+export const GetAllInvalidTengiCertificates = async(req,res) => {
   const allCerts = await GetAllInvalidProductCertsByCompany(CompanyID)
 
-  const mapped = allCerts.map(cert => {
+  const SanityCertArray = allCerts.map(cert => {
     return {
-      productid: cert.productid,
-      certfileurl: cert.fileurl,
-      validDate: cert.validDate
+      _id:`${CompanyName}Cert${cert.id}`,
+      _type:"Certificate",
+      productid:`${cert.productid}`,
+      certfileurl:`${cert.fileurl}`
     }
   })
 
-  fs.writeFile('writefiles/TengiInvalidcerts.json', JSON.stringify(mapped) , function(err) {
-    if(err){
-      return console.error(err)
+  const sanityCertReferences = []
+
+  const SanityPromises = SanityCertArray.map(sanityCert => {
+    return client.createIfNotExists(sanityCert).then(createdCert => {
+      sanityCertReferences.push({ "_type":"reference", "_ref": createdCert._id })
+    }).catch(error => {
+      console.log('error', error)
+    })
+  })
+
+  Promise.all(SanityPromises).then(() => {
+
+    //SANITY.IO CREATE CERTIFICATELIST IF IT DOES NOT EXIST
+    const doc = {
+      _id: `${CompanyName}CertList`,
+      _type:"CertificateList",
+      CompanyName: CompanyName,
     }
+    
+    client
+    .transaction()
+    .createIfNotExists(doc)
+    .patch(`${CompanyName}CertList`, (p) => 
+      p.setIfMissing({Certificates: []})
+      // Add the items after the last item in the array (append)
+      .insert('after', 'Certificates[-1]', sanityCertReferences)
+    )
+    .commit({ autoGenerateArrayKeys: true })
+    .then((updatedCert) => {
+      console.log('Hurray, the cert is updated! New document:')
+      console.log(updatedCert)
+    })
+    .catch((err) => {
+      console.error('Oh no, the update failed: ', err.message)
+    })
   })
 
   res.end("Successfully logged all invalid certs");
