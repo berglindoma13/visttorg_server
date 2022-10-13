@@ -4,6 +4,7 @@ import fs from 'fs'
 import { DeleteAllProductsByCompany,
         DeleteAllCertByCompany,
         GetUniqueProduct,
+        GetAllInvalidProductCertsByCompany,
 } from '../helpers/PrismaHelper'
 import { SmithNorlandProduct, SmithNorlandResponse } from '../types/smithnorland'
 import { Request, Response } from 'express';
@@ -12,11 +13,13 @@ import SmithNorlandCategoryMapper from '../mappers/categories/smithnorland'
 import { deleteOldProducts, VerifyProduct, WriteAllFiles } from '../helpers/ProductHelper'
 import prismaInstance from '../lib/prisma'
 import { certIdFinder } from '../mappers/certificates/certificateIds'
+import { client } from '../lib/sanity'
 
 // SmithNorland COMPANY ID = 4
 
 const SmithNorlandAPI = "https://www.sminor.is/visttorg-products" 
 const CompanyID = 4
+const CompanyName = 'SmithNorland'
 
 var updatedProducts: Array<DatabaseProduct> = [];
 var createdProducts: Array<DatabaseProduct> = [];
@@ -31,6 +34,9 @@ const convertSmithNorlandProductToDatabaseProduct = async(product: SmithNorlandP
   })
   const mappedCategories = getMappedCategory(prodCategories, SmithNorlandCategoryMapper)
   const mappedSubCategories = getMappedCategorySub(prodCategories, SmithNorlandCategoryMapper)
+
+  console.log('prodCategories', prodCategories)
+  console.log('mappedSubCategories', mappedSubCategories)
 
   const uniqueMappedCategories = mappedCategories.filter((value, index, self) =>
     index === self.findIndex((t) => (
@@ -234,6 +240,9 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               categories : {
                 connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl            
               },
+              subCategories:{
+                connect: productWithProps.product.subFl            
+              },
               description : productWithProps.product.longDescription,
               shortdescription : productWithProps.product.shortDescription,
               productimageurl : productWithProps.product.prodImage,
@@ -247,8 +256,12 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               sellingcompany: {
                   connect: { id : CompanyID}
               },
-              categories : {
+              categories :
+              {
                 connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl
+              },
+              subCategories:{
+                connect: productWithProps.product.subFl            
               },
               description : productWithProps.product.longDescription,
               shortdescription : productWithProps.product.shortDescription,
@@ -313,4 +326,56 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
     // write all appropriate files
     WriteAllFiles(createdProducts, updatedProducts, productsNotValid, 'SmithNorland')
   });
+}
+
+export const GetAllInvalidSmithNorlandCertificates = async(req,res) => {
+  const allCerts = await GetAllInvalidProductCertsByCompany(CompanyID)
+
+  const SanityCertArray = allCerts.map(cert => {
+    return {
+      _id:`${CompanyName}Cert${cert.id}`,
+      _type:"Certificate",
+      productid:`${cert.productid}`,
+      certfileurl:`${cert.fileurl}`
+    }
+  })
+
+  const sanityCertReferences = []
+
+  const SanityPromises = SanityCertArray.map(sanityCert => {
+    return client.createIfNotExists(sanityCert).then(createdCert => {
+      sanityCertReferences.push({ "_type":"reference", "_ref": createdCert._id })
+    }).catch(error => {
+      console.log('error', error)
+    })
+  })
+
+  Promise.all(SanityPromises).then(() => {
+
+    //SANITY.IO CREATE CERTIFICATELIST IF IT DOES NOT EXIST
+    const doc = {
+      _id: `${CompanyName}CertList`,
+      _type:"CertificateList",
+      CompanyName: CompanyName,
+    }
+    
+    client
+    .transaction()
+    .createIfNotExists(doc)
+    .patch(`${CompanyName}CertList`, (p) => 
+      p.setIfMissing({Certificates: []})
+      // Add the items after the last item in the array (append)
+      .insert('after', 'Certificates[-1]', sanityCertReferences)
+    )
+    .commit({ autoGenerateArrayKeys: true })
+    .then((updatedCert) => {
+      console.log('Hurray, the cert is updated! New document:')
+      console.log(updatedCert)
+    })
+    .catch((err) => {
+      console.error('Oh no, the update failed: ', err.message)
+    })
+  })
+
+  res.end("Successfully logged all invalid certs");
 }

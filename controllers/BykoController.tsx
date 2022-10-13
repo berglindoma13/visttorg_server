@@ -15,11 +15,13 @@ import { deleteOldProducts, VerifyProduct, WriteAllFiles } from '../helpers/Prod
 import prismaInstance from '../lib/prisma';
 import { certIdFinder } from '../mappers/certificates/certificateIds';
 import { getMappedCategory, getMappedCategorySub } from '../helpers/MapCategories';
+import { client } from '../lib/sanity';
  
 // BYKO COMPANY ID = 1
 
 const BykoAPI = "https://byko.is/umhverfisvottadar?password=cert4env"
 const CompanyID = 1
+const CompanyName = 'Byko'
 
 var updatedProducts: Array<DatabaseProduct> = [];
 var createdProducts: Array<DatabaseProduct> = [];
@@ -303,7 +305,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
   }).then(() => {
 
     // write all appropriate files
-    WriteAllFiles(createdProducts, updatedProducts, productsNotValid, 'Tengi')
+    WriteAllFiles(createdProducts, updatedProducts, productsNotValid, CompanyName)
   });
 }
 
@@ -328,36 +330,53 @@ const ListCategories = async(data : BykoResponseData) => {
 
 }
 
-export const GetAllInvalidBykoCertificates = async(req, res) => {
+export const GetAllInvalidBykoCertificates = async(req,res) => {
   const allCerts = await GetAllInvalidProductCertsByCompany(CompanyID)
 
-  const mapped = allCerts.map(cert => {
+  const SanityCertArray = allCerts.map(cert => {
     return {
-      productid: cert.productid,
-      certfileurl: cert.fileurl,
-      validDate: cert.validDate
+      _id:`${CompanyName}Cert${cert.id}`,
+      _type:"Certificate",
+      productid:`${cert.productid}`,
+      certfileurl:`${cert.fileurl}`
     }
   })
 
-  fs.writeFile('writefiles/bykoinvalidcerts.json', JSON.stringify(mapped) , function(err) {
-    if(err){
-      return console.error(err)
-    }
+  const sanityCertReferences = []
+
+  const SanityPromises = SanityCertArray.map(sanityCert => {
+    return client.createIfNotExists(sanityCert).then(createdCert => {
+      sanityCertReferences.push({ "_type":"reference", "_ref": createdCert._id })
+    }).catch(error => {
+      console.log('error', error)
+    })
   })
 
-  res.end("Successfully logged all invalid certs");
-}
+  Promise.all(SanityPromises).then(() => {
 
-export const GetAllInvalidBykoCertificatesByCertId = async(req,res) => {
-  const allCerts = await GetAllInvalidProductCertsByCompanyAndCertId(CompanyID, 1)
-
-  console.log('allCerts', allCerts)
-  console.log('count', allCerts.length)
-
-  fs.writeFile('/writefiles/bykoinvalidcerts.txt', allCerts.toString(), function(err) {
-    if(err){
-      return console.error(err)
+    //SANITY.IO CREATE CERTIFICATELIST IF IT DOES NOT EXIST
+    const doc = {
+      _id: `${CompanyName}CertList`,
+      _type:"CertificateList",
+      CompanyName: CompanyName,
     }
+    
+    client
+    .transaction()
+    .createIfNotExists(doc)
+    .patch(`${CompanyName}CertList`, (p) => 
+      p.setIfMissing({Certificates: []})
+      // Add the items after the last item in the array (append)
+      .insert('after', 'Certificates[-1]', sanityCertReferences)
+    )
+    .commit({ autoGenerateArrayKeys: true })
+    .then((updatedCert) => {
+      console.log('Hurray, the cert is updated! New document:')
+      console.log(updatedCert)
+    })
+    .catch((err) => {
+      console.error('Oh no, the update failed: ', err.message)
+    })
   })
 
   res.end("Successfully logged all invalid certs");

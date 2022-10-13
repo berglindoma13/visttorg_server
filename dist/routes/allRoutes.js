@@ -16,17 +16,18 @@ const SerefniController_1 = require("../controllers/SerefniController");
 const SmithNorlandController_1 = require("../controllers/SmithNorlandController");
 const fs_1 = __importDefault(require("fs"));
 const PrismaHelper_1 = require("../helpers/PrismaHelper");
+const CommonController_1 = require("../controllers/CommonController");
 exports.allRoutes = (0, express_1.Router)();
 //ALMENNT
 exports.allRoutes.get('/', (req, res) => {
-    res.send('Server is up and running here!');
+    res.send('Server is up and running here NOW!');
 });
+exports.allRoutes.post('/api/fixcerts', CommonController_1.UploadValidatedCerts);
 //BYKO ROUTES - API
 exports.allRoutes.get('/api/byko', BykoController_1.InsertAllBykoProducts);
 exports.allRoutes.get('/api/byko/deleteall/products', BykoController_1.DeleteAllProducts);
 exports.allRoutes.get('/api/byko/getallcategories', BykoController_1.GetAllCategories);
 exports.allRoutes.get('/api/byko/invalidcerts', BykoController_1.GetAllInvalidBykoCertificates);
-exports.allRoutes.get('/api/byko/invalidcerts/epd', BykoController_1.GetAllInvalidBykoCertificatesByCertId);
 //EBSON ROUTES - GOOGLE SHEETS
 exports.allRoutes.get('/api/ebson', EbsonController_1.InsertAllEbsonProducts);
 exports.allRoutes.get('/api/ebson/deletecert', EbsonController_1.DeleteAllEbsonCert);
@@ -53,6 +54,7 @@ exports.allRoutes.get('/api/smithnorland', SmithNorlandController_1.InsertAllSmi
 exports.allRoutes.get('/api/smithnorland/getallcategories', SmithNorlandController_1.GetAllSmithNorlandCategories);
 exports.allRoutes.get('/api/smithnorland/deletecert', SmithNorlandController_1.DeleteAllSmithNorlandCert);
 exports.allRoutes.get('/api/smithnorland/deleteproducts', SmithNorlandController_1.DeleteAllSmithNorlandProducts);
+exports.allRoutes.get('/api/smithnorland/invalidcerts', SmithNorlandController_1.GetAllInvalidSmithNorlandCertificates);
 // allRoutes.get('/api/test', InsertAllTestProducts);
 // allRoutes.get('/api/deletesheets', DeleteAllSheetsProducts);
 // allRoutes.get('/api/deletesheetscertificates', DeleteAllSheetsCert);

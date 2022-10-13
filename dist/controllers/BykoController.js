@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetAllInvalidBykoCertificatesByCertId = exports.GetAllInvalidBykoCertificates = exports.DeleteAllProducts = exports.GetAllCategories = exports.InsertAllBykoProducts = void 0;
+exports.GetAllInvalidBykoCertificates = exports.DeleteAllProducts = exports.GetAllCategories = exports.InsertAllBykoProducts = void 0;
 const axios_1 = __importDefault(require("axios"));
 const fs_1 = __importDefault(require("fs"));
 const byko_1 = __importDefault(require("../mappers/categories/byko"));
@@ -13,9 +13,11 @@ const ProductHelper_1 = require("../helpers/ProductHelper");
 const prisma_1 = __importDefault(require("../lib/prisma"));
 const certificateIds_1 = require("../mappers/certificates/certificateIds");
 const MapCategories_1 = require("../helpers/MapCategories");
+const sanity_1 = require("../lib/sanity");
 // BYKO COMPANY ID = 1
 const BykoAPI = "https://byko.is/umhverfisvottadar?password=cert4env";
 const CompanyID = 1;
+const CompanyName = 'Byko';
 var updatedProducts = [];
 var createdProducts = [];
 var productsNotValid = [];
@@ -266,7 +268,7 @@ const ProcessForDatabase = async (products) => {
         }));
     }).then(() => {
         // write all appropriate files
-        (0, ProductHelper_1.WriteAllFiles)(createdProducts, updatedProducts, productsNotValid, 'Tengi');
+        (0, ProductHelper_1.WriteAllFiles)(createdProducts, updatedProducts, productsNotValid, CompanyName);
     });
 };
 const ListCategories = async (data) => {
@@ -286,30 +288,44 @@ const ListCategories = async (data) => {
 };
 const GetAllInvalidBykoCertificates = async (req, res) => {
     const allCerts = await (0, PrismaHelper_1.GetAllInvalidProductCertsByCompany)(CompanyID);
-    const mapped = allCerts.map(cert => {
+    const SanityCertArray = allCerts.map(cert => {
         return {
-            productid: cert.productid,
-            certfileurl: cert.fileurl,
-            validDate: cert.validDate
+            _id: `${CompanyName}Cert${cert.id}`,
+            _type: "Certificate",
+            productid: `${cert.productid}`,
+            certfileurl: `${cert.fileurl}`
         };
     });
-    fs_1.default.writeFile('writefiles/bykoinvalidcerts.json', JSON.stringify(mapped), function (err) {
-        if (err) {
-            return console.error(err);
-        }
+    const sanityCertReferences = [];
+    const SanityPromises = SanityCertArray.map(sanityCert => {
+        return sanity_1.client.createIfNotExists(sanityCert).then(createdCert => {
+            sanityCertReferences.push({ "_type": "reference", "_ref": createdCert._id });
+        }).catch(error => {
+            console.log('error', error);
+        });
+    });
+    Promise.all(SanityPromises).then(() => {
+        //SANITY.IO CREATE CERTIFICATELIST IF IT DOES NOT EXIST
+        const doc = {
+            _id: `${CompanyName}CertList`,
+            _type: "CertificateList",
+            CompanyName: CompanyName,
+        };
+        sanity_1.client
+            .transaction()
+            .createIfNotExists(doc)
+            .patch(`${CompanyName}CertList`, (p) => p.setIfMissing({ Certificates: [] })
+            // Add the items after the last item in the array (append)
+            .insert('after', 'Certificates[-1]', sanityCertReferences))
+            .commit({ autoGenerateArrayKeys: true })
+            .then((updatedCert) => {
+            console.log('Hurray, the cert is updated! New document:');
+            console.log(updatedCert);
+        })
+            .catch((err) => {
+            console.error('Oh no, the update failed: ', err.message);
+        });
     });
     res.end("Successfully logged all invalid certs");
 };
 exports.GetAllInvalidBykoCertificates = GetAllInvalidBykoCertificates;
-const GetAllInvalidBykoCertificatesByCertId = async (req, res) => {
-    const allCerts = await (0, PrismaHelper_1.GetAllInvalidProductCertsByCompanyAndCertId)(CompanyID, 1);
-    console.log('allCerts', allCerts);
-    console.log('count', allCerts.length);
-    fs_1.default.writeFile('/writefiles/bykoinvalidcerts.txt', allCerts.toString(), function (err) {
-        if (err) {
-            return console.error(err);
-        }
-    });
-    res.end("Successfully logged all invalid certs");
-};
-exports.GetAllInvalidBykoCertificatesByCertId = GetAllInvalidBykoCertificatesByCertId;

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DeleteAllSmithNorlandCert = exports.DeleteAllSmithNorlandProducts = exports.GetAllSmithNorlandCategories = exports.InsertAllSmithNorlandProducts = void 0;
+exports.GetAllInvalidSmithNorlandCertificates = exports.DeleteAllSmithNorlandCert = exports.DeleteAllSmithNorlandProducts = exports.GetAllSmithNorlandCategories = exports.InsertAllSmithNorlandProducts = void 0;
 const axios_1 = __importDefault(require("axios"));
 const fs_1 = __importDefault(require("fs"));
 const PrismaHelper_1 = require("../helpers/PrismaHelper");
@@ -12,9 +12,11 @@ const smithnorland_1 = __importDefault(require("../mappers/categories/smithnorla
 const ProductHelper_1 = require("../helpers/ProductHelper");
 const prisma_1 = __importDefault(require("../lib/prisma"));
 const certificateIds_1 = require("../mappers/certificates/certificateIds");
+const sanity_1 = require("../lib/sanity");
 // SmithNorland COMPANY ID = 4
 const SmithNorlandAPI = "https://www.sminor.is/visttorg-products";
 const CompanyID = 4;
+const CompanyName = 'SmithNorland';
 var updatedProducts = [];
 var createdProducts = [];
 var productsNotValid = [];
@@ -25,6 +27,8 @@ const convertSmithNorlandProductToDatabaseProduct = async (product) => {
     });
     const mappedCategories = (0, MapCategories_1.getMappedCategory)(prodCategories, smithnorland_1.default);
     const mappedSubCategories = (0, MapCategories_1.getMappedCategorySub)(prodCategories, smithnorland_1.default);
+    console.log('prodCategories', prodCategories);
+    console.log('mappedSubCategories', mappedSubCategories);
     const uniqueMappedCategories = mappedCategories.filter((value, index, self) => index === self.findIndex((t) => (t.name === value.name)));
     //Map certificates and validate them before adding to database 
     //TODO WHEN THE FIELD IS ADDED TO THE API
@@ -198,6 +202,9 @@ const ProcessForDatabase = async (products) => {
                     categories: {
                         connect: typeof productWithProps.product.fl === 'string' ? { name: productWithProps.product.fl } : productWithProps.product.fl
                     },
+                    subCategories: {
+                        connect: productWithProps.product.subFl
+                    },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
                     productimageurl: productWithProps.product.prodImage,
@@ -213,6 +220,9 @@ const ProcessForDatabase = async (products) => {
                     },
                     categories: {
                         connect: typeof productWithProps.product.fl === 'string' ? { name: productWithProps.product.fl } : productWithProps.product.fl
+                    },
+                    subCategories: {
+                        connect: productWithProps.product.subFl
                     },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
@@ -271,3 +281,46 @@ const ProcessForDatabase = async (products) => {
         (0, ProductHelper_1.WriteAllFiles)(createdProducts, updatedProducts, productsNotValid, 'SmithNorland');
     });
 };
+const GetAllInvalidSmithNorlandCertificates = async (req, res) => {
+    const allCerts = await (0, PrismaHelper_1.GetAllInvalidProductCertsByCompany)(CompanyID);
+    const SanityCertArray = allCerts.map(cert => {
+        return {
+            _id: `${CompanyName}Cert${cert.id}`,
+            _type: "Certificate",
+            productid: `${cert.productid}`,
+            certfileurl: `${cert.fileurl}`
+        };
+    });
+    const sanityCertReferences = [];
+    const SanityPromises = SanityCertArray.map(sanityCert => {
+        return sanity_1.client.createIfNotExists(sanityCert).then(createdCert => {
+            sanityCertReferences.push({ "_type": "reference", "_ref": createdCert._id });
+        }).catch(error => {
+            console.log('error', error);
+        });
+    });
+    Promise.all(SanityPromises).then(() => {
+        //SANITY.IO CREATE CERTIFICATELIST IF IT DOES NOT EXIST
+        const doc = {
+            _id: `${CompanyName}CertList`,
+            _type: "CertificateList",
+            CompanyName: CompanyName,
+        };
+        sanity_1.client
+            .transaction()
+            .createIfNotExists(doc)
+            .patch(`${CompanyName}CertList`, (p) => p.setIfMissing({ Certificates: [] })
+            // Add the items after the last item in the array (append)
+            .insert('after', 'Certificates[-1]', sanityCertReferences))
+            .commit({ autoGenerateArrayKeys: true })
+            .then((updatedCert) => {
+            console.log('Hurray, the cert is updated! New document:');
+            console.log(updatedCert);
+        })
+            .catch((err) => {
+            console.error('Oh no, the update failed: ', err.message);
+        });
+    });
+    res.end("Successfully logged all invalid certs");
+};
+exports.GetAllInvalidSmithNorlandCertificates = GetAllInvalidSmithNorlandCertificates;

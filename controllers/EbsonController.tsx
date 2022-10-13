@@ -4,12 +4,14 @@ import { Request, Response } from 'express';
 import { DeleteAllProductsByCompany,
         DeleteAllCertByCompany,
         GetUniqueProduct,
-        GetAllInvalidProductCertsByCompany
+        GetAllInvalidProductCertsByCompany,
+        DeleteProductCertificates
       } from '../helpers/PrismaHelper'
 import fs from 'fs'
 import { deleteOldProducts, WriteAllFiles, VerifyProduct, getAllProductsFromGoogleSheets } from '../helpers/ProductHelper';
 import prismaInstance from '../lib/prisma';
 import { certIdFinder } from '../mappers/certificates/certificateIds';
+import { client } from '../lib/sanity';
 
 // company id 2, get data from google sheets and insert into database from Ebson
 const CompanyID = 2
@@ -129,6 +131,9 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               categories : {
                 connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl            
               },
+              subCategories:{
+                connect: productWithProps.product.subFl            
+              },
               description : productWithProps.product.longDescription,
               shortdescription : productWithProps.product.shortDescription,
               productimageurl : productWithProps.product.prodImage,
@@ -145,6 +150,9 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               categories : {
                 connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl
               },
+              subCategories:{
+                connect: productWithProps.product.subFl            
+              },
               description : productWithProps.product.longDescription,
               shortdescription : productWithProps.product.shortDescription,
               productimageurl : productWithProps.product.prodImage,
@@ -158,73 +166,118 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
       })
     )
 
-    await DeleteAllCertByCompany(CompanyID)
+    const arrayWithCertifiateChanges = productsWithProps.filter(prod => prod.productState !== 1 && prod.productState !== 4)
 
-    const allCertificates: Array<DatabaseProductCertificate> = filteredArray.map(prod => {
-      return prod.validatedCertificates.map(cert => {
-        let fileurl = ''
-        let validdate = null
-        if(cert.name === 'EPD'){
-          fileurl = prod.product.epdUrl
-          validdate = prod.validDate[0].date
-        }
-        else if(cert.name === 'FSC'){
-          fileurl = prod.product.fscUrl
-          validdate = prod.validDate[1].date
-        }
-        else if(cert.name === 'VOC'){
-          fileurl = prod.product.vocUrl
-          validdate = prod.validDate[2].date
-        }
-        const certItem: DatabaseProductCertificate = { 
-          name: cert.name,
-          fileurl: fileurl,
-          validDate: validdate,
-          productId: prod.product.id
-        }
-        return certItem
-      })
-    }).flat()
+    // const deletedProductsCerts = await DeleteAllCertByCompany(CompanyID)
 
-    await prismaInstance.$transaction(
-      allCertificates.map(cert => {
-        return prismaInstance.productcertificate.create({
-          data: {
-            certificate : {
-              connect : { id : certIdFinder[cert.name] }
-            },
-            connectedproduct : {
-              connect : { 
-                productIdentifier : { productid: cert.productId, companyid: CompanyID}
-               },
-            },
-            fileurl : cert.fileurl,
-            validDate : cert.validDate
+
+      const allCertificates: Array<DatabaseProductCertificate> = arrayWithCertifiateChanges.map(prod => {
+        return prod.validatedCertificates.map(cert => {
+          let fileurl = ''
+          let validdate = null
+          if(cert.name === 'EPD'){
+            fileurl = prod.product.epdUrl
+            validdate = prod.validDate[0].date
           }
+          else if(cert.name === 'FSC'){
+            fileurl = prod.product.fscUrl
+            validdate = prod.validDate[1].date
+          }
+          else if(cert.name === 'VOC'){
+            fileurl = prod.product.vocUrl
+            validdate = prod.validDate[2].date
+          }
+          const certItem: DatabaseProductCertificate = { 
+            name: cert.name,
+            fileurl: fileurl,
+            validDate: validdate,
+            productId: prod.product.id
+          }
+          return certItem
         })
-      })
-    ) 
+      }).flat()
+  
+      await prismaInstance.$transaction(
+        allCertificates.map(cert => {
+          return prismaInstance.productcertificate.upsert({
+            where:{
+              prodcertidentifier: { certificateid: cert.id, productid: cert.productId }
+            },
+            create:{
+              connectedproduct : {
+                connect : { 
+                  productIdentifier : { productid: cert.productId, companyid: CompanyID}
+                 },
+              },
+              certificate : {
+                connect : { 
+                  id: cert.id
+                 },
+              },
+              fileurl : cert.fileurl,
+              validDate : cert.validDate
+            },
+            update:{
+              fileurl : cert.fileurl,
+              validDate : cert.validDate
+            }
+          })
+        })
+      ) 
+    
   }).then(() => {
     // write all appropriate files
     WriteAllFiles(createdProducts, updatedProducts, productsNotValid, CompanyName)
   });
 }
 
-export const GetAllInvalidEbsonCertificates = async(req, res) => {
+export const GetAllInvalidEbsonCertificates = async(req,res) => {
   const allCerts = await GetAllInvalidProductCertsByCompany(CompanyID)
 
-  const mapped = allCerts.map(cert => {
+  const SanityCertArray = allCerts.map(cert => {
     return {
-      productid: cert.productid,
-      certfileurl: cert.fileurl,
-      validDate: cert.validDate
+      _id:`${CompanyName}Cert${cert.id}`,
+      _type:"Certificate",
+      productid:`${cert.productid}`,
+      certfileurl:`${cert.fileurl}`
     }
   })
 
-  fs.writeFile('writefiles/EbsonInvalidcerts.json', JSON.stringify(mapped) , function(err) {
-    if(err){
-      return console.error(err)
+  const sanityCertReferences = []
+
+  const SanityPromises = SanityCertArray.map(sanityCert => {
+    return client.createIfNotExists(sanityCert).then(createdCert => {
+      sanityCertReferences.push({ "_type":"reference", "_ref": createdCert._id })
+    }).catch(error => {
+      console.log('error', error)
+    })
+  })
+
+  Promise.all(SanityPromises).then(() => {
+
+    //SANITY.IO CREATE CERTIFICATELIST IF IT DOES NOT EXIST
+    const doc = {
+      _id: `${CompanyName}CertList`,
+      _type:"CertificateList",
+      CompanyName: CompanyName,
     }
+    
+    client
+    .transaction()
+    .createIfNotExists(doc)
+    .patch(`${CompanyName}CertList`, (p) => 
+      p.setIfMissing({Certificates: []})
+      // Add the items after the last item in the array (append)
+      .insert('after', 'Certificates[-1]', sanityCertReferences)
+    )
+    .commit({ autoGenerateArrayKeys: true })
+    .then((updatedCert) => {
+      console.log('Hurray, the cert is updated! New document:')
+      console.log(updatedCert)
+    })
+    .catch((err) => {
+      console.error('Oh no, the update failed: ', err.message)
+    })
   })
 
   res.end("Successfully logged all invalid certs");

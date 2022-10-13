@@ -67,6 +67,9 @@ const GetAllInvalidProductCertsByCompany = async (companyid) => {
             connectedproduct: {
                 companyid: companyid
             }
+        },
+        include: {
+            connectedproduct: true
         }
     });
 };

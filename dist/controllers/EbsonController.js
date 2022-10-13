@@ -5,10 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetAllInvalidEbsonCertificates = exports.DeleteAllEbsonCert = exports.DeleteAllEbsonProducts = exports.InsertAllEbsonProducts = void 0;
 const PrismaHelper_1 = require("../helpers/PrismaHelper");
-const fs_1 = __importDefault(require("fs"));
 const ProductHelper_1 = require("../helpers/ProductHelper");
 const prisma_1 = __importDefault(require("../lib/prisma"));
-const certificateIds_1 = require("../mappers/certificates/certificateIds");
+const sanity_1 = require("../lib/sanity");
 // company id 2, get data from google sheets and insert into database from Ebson
 const CompanyID = 2;
 const SheetID = '1mbdkZvGHbBnj4QeOQdfAIQWQ1uOUQdm5aWYmoV-6yeg';
@@ -111,6 +110,9 @@ const ProcessForDatabase = async (products) => {
                     categories: {
                         connect: typeof productWithProps.product.fl === 'string' ? { name: productWithProps.product.fl } : productWithProps.product.fl
                     },
+                    subCategories: {
+                        connect: productWithProps.product.subFl
+                    },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
                     productimageurl: productWithProps.product.prodImage,
@@ -127,6 +129,9 @@ const ProcessForDatabase = async (products) => {
                     categories: {
                         connect: typeof productWithProps.product.fl === 'string' ? { name: productWithProps.product.fl } : productWithProps.product.fl
                     },
+                    subCategories: {
+                        connect: productWithProps.product.subFl
+                    },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
                     productimageurl: productWithProps.product.prodImage,
@@ -137,8 +142,9 @@ const ProcessForDatabase = async (products) => {
                 }
             });
         }));
-        await (0, PrismaHelper_1.DeleteAllCertByCompany)(CompanyID);
-        const allCertificates = filteredArray.map(prod => {
+        const arrayWithCertifiateChanges = productsWithProps.filter(prod => prod.productState !== 1 && prod.productState !== 4);
+        // const deletedProductsCerts = await DeleteAllCertByCompany(CompanyID)
+        const allCertificates = arrayWithCertifiateChanges.map(prod => {
             return prod.validatedCertificates.map(cert => {
                 let fileurl = '';
                 let validdate = null;
@@ -164,16 +170,25 @@ const ProcessForDatabase = async (products) => {
             });
         }).flat();
         await prisma_1.default.$transaction(allCertificates.map(cert => {
-            return prisma_1.default.productcertificate.create({
-                data: {
-                    certificate: {
-                        connect: { id: certificateIds_1.certIdFinder[cert.name] }
-                    },
+            return prisma_1.default.productcertificate.upsert({
+                where: {
+                    prodcertidentifier: { certificateid: cert.id, productid: cert.productId }
+                },
+                create: {
                     connectedproduct: {
                         connect: {
                             productIdentifier: { productid: cert.productId, companyid: CompanyID }
                         },
                     },
+                    certificate: {
+                        connect: {
+                            id: cert.id
+                        },
+                    },
+                    fileurl: cert.fileurl,
+                    validDate: cert.validDate
+                },
+                update: {
                     fileurl: cert.fileurl,
                     validDate: cert.validDate
                 }
@@ -186,17 +201,43 @@ const ProcessForDatabase = async (products) => {
 };
 const GetAllInvalidEbsonCertificates = async (req, res) => {
     const allCerts = await (0, PrismaHelper_1.GetAllInvalidProductCertsByCompany)(CompanyID);
-    const mapped = allCerts.map(cert => {
+    const SanityCertArray = allCerts.map(cert => {
         return {
-            productid: cert.productid,
-            certfileurl: cert.fileurl,
-            validDate: cert.validDate
+            _id: `${CompanyName}Cert${cert.id}`,
+            _type: "Certificate",
+            productid: `${cert.productid}`,
+            certfileurl: `${cert.fileurl}`
         };
     });
-    fs_1.default.writeFile('writefiles/EbsonInvalidcerts.json', JSON.stringify(mapped), function (err) {
-        if (err) {
-            return console.error(err);
-        }
+    const sanityCertReferences = [];
+    const SanityPromises = SanityCertArray.map(sanityCert => {
+        return sanity_1.client.createIfNotExists(sanityCert).then(createdCert => {
+            sanityCertReferences.push({ "_type": "reference", "_ref": createdCert._id });
+        }).catch(error => {
+            console.log('error', error);
+        });
+    });
+    Promise.all(SanityPromises).then(() => {
+        //SANITY.IO CREATE CERTIFICATELIST IF IT DOES NOT EXIST
+        const doc = {
+            _id: `${CompanyName}CertList`,
+            _type: "CertificateList",
+            CompanyName: CompanyName,
+        };
+        sanity_1.client
+            .transaction()
+            .createIfNotExists(doc)
+            .patch(`${CompanyName}CertList`, (p) => p.setIfMissing({ Certificates: [] })
+            // Add the items after the last item in the array (append)
+            .insert('after', 'Certificates[-1]', sanityCertReferences))
+            .commit({ autoGenerateArrayKeys: true })
+            .then((updatedCert) => {
+            console.log('Hurray, the cert is updated! New document:');
+            console.log(updatedCert);
+        })
+            .catch((err) => {
+            console.error('Oh no, the update failed: ', err.message);
+        });
     });
     res.end("Successfully logged all invalid certs");
 };
