@@ -17,7 +17,7 @@ const sanity_1 = require("../lib/sanity");
 // BYKO COMPANY ID = 1
 const BykoAPI = "https://byko.is/umhverfisvottadar?password=cert4env";
 const CompanyID = 1;
-const CompanyName = 'Byko';
+const CompanyName = 'BYKO';
 var updatedProducts = [];
 var createdProducts = [];
 var productsNotValid = [];
@@ -292,7 +292,7 @@ const GetAllInvalidBykoCertificates = async (req, res) => {
         return {
             _id: `${CompanyName}Cert${cert.id}`,
             _type: "Certificate",
-            productid: `${cert.productid}`,
+            productid: `*${cert.productid}`,
             certfileurl: `${cert.fileurl}`
         };
     });

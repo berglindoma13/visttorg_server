@@ -9,7 +9,6 @@ import { DeleteAllProductsByCompany,
   DeleteAllCertByCompany,
   GetUniqueProduct,
   GetAllInvalidProductCertsByCompany,
-  GetAllInvalidProductCertsByCompanyAndCertId,
 } from '../helpers/PrismaHelper'
 import { deleteOldProducts, VerifyProduct, WriteAllFiles } from '../helpers/ProductHelper';
 import prismaInstance from '../lib/prisma';
@@ -21,7 +20,7 @@ import { client } from '../lib/sanity';
 
 const BykoAPI = "https://byko.is/umhverfisvottadar?password=cert4env"
 const CompanyID = 1
-const CompanyName = 'Byko'
+const CompanyName = 'BYKO'
 
 var updatedProducts: Array<DatabaseProduct> = [];
 var createdProducts: Array<DatabaseProduct> = [];
@@ -337,7 +336,7 @@ export const GetAllInvalidBykoCertificates = async(req,res) => {
     return {
       _id:`${CompanyName}Cert${cert.id}`,
       _type:"Certificate",
-      productid:`${cert.productid}`,
+      productid:`*${cert.productid}`,
       certfileurl:`${cert.fileurl}`
     }
   })
