@@ -9,9 +9,9 @@ export const UploadValidatedCerts = async(req,res) => {
 
   //Get each individual certificate from Sanity
   const referenceList = CertListItem.Certificates.map(cert => cert._ref)
-  console.log('referencelist', referenceList)
-  client.getDocuments(referenceList).then(async(referenceList: unknown) => {
-    const list: Array<SanityCertificate> = referenceList as Array<SanityCertificate>
+  client.getDocuments(referenceList).then(async(reflist: unknown) => {
+    console.log('reflist', reflist)
+    const list: Array<SanityCertificate> = reflist as Array<SanityCertificate>
 
     await prismaInstance.$transaction(
       list.map(cert => {  

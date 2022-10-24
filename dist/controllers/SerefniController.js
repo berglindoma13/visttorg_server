@@ -219,7 +219,7 @@ const GetAllInvalidSerefniCertificates = async (req, res) => {
             .createIfNotExists(doc)
             .patch(`${CompanyName}CertList`, (p) => p.setIfMissing({ Certificates: [] })
             // Add the items after the last item in the array (append)
-            .insert('after', 'Certificates[-1]', sanityCertReferences))
+            .insert('replace', 'Certificates', sanityCertReferences))
             .commit({ autoGenerateArrayKeys: true })
             .then((updatedCert) => {
             console.log('Hurray, the cert is updated! New document:');
