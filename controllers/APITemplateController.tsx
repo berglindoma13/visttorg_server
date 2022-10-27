@@ -1,39 +1,171 @@
-import reader from 'g-sheets-api';
+import axios from 'axios'
 import { DatabaseProduct, DatabaseProductCertificate, ProductWithPropsProps } from '../types/models'
-import { Request, Response } from 'express';
+import fs from 'fs'
 import { DeleteAllProductsByCompany,
         DeleteAllCertByCompany,
         GetUniqueProduct,
-        GetAllInvalidProductCertsByCompany
-      } from '../helpers/PrismaHelper'
-import fs from 'fs'
-import { deleteOldProducts, WriteAllFiles, VerifyProduct, getAllProductsFromGoogleSheets } from '../helpers/ProductHelper';
-import prismaInstance from '../lib/prisma';
-import { certIdFinder } from '../mappers/certificates/certificateIds';
-import { client } from '../lib/sanity';
+        GetAllInvalidProductCertsByCompany,
+} from '../helpers/PrismaHelper'
+import { Request, Response } from 'express';
+import { getMappedCategory, getMappedCategorySub } from '../helpers/MapCategories'
+import { deleteOldProducts, VerifyProduct, WriteAllFiles } from '../helpers/ProductHelper'
+import prismaInstance from '../lib/prisma'
+import { certIdFinder } from '../mappers/certificates/certificateIds'
+import { client } from '../lib/sanity'
 
-const CompanyID = 6
-const SheetID = '1PIP46MtGWgf-qdxbTyMo8FSd1A_sIljIaoqlI8rjzW4'
-const CompanyName = 'Serefni'
+const APIUrl = "" 
+const CompanyID = 10002
+const CompanyName = ''
 
 var updatedProducts: Array<DatabaseProduct> = [];
 var createdProducts: Array<DatabaseProduct> = [];
 var productsNotValid: Array<DatabaseProduct> = [];
 
-export const InsertAllSerefniProducts = async(req: Request,res: Response) => {
-    // get all data from sheets file
-    getAllProductsFromGoogleSheets(SheetID, ProcessForDatabase, CompanyID);
-    res.end(`All ${CompanyName} products inserted`)
+//REPLACE this with the product type from the company
+interface TemplateProductProps {
+  category: Array<string>
+  certificates: any
+  id: string
+  title: string
+  longDescription: string
+  shortDescription : string
+  images: Array<string>
+  url: string
+  brand: string
+  fsc: string
+  voc: string
+  epd: string
 }
 
-export const DeleteAllSerefniProducts = async(req: Request, res: Response) => {
+//REPLACE this with the mapped certificates and categories
+let TemplateCertMapper: any
+let TemplateCategoryMapper: any
+
+//REPLACE this with the typed response from the api from the company
+interface TemplateResponse {
+  products: Array<any>
+}
+
+const convertTemplateProductToDatabaseProduct = async(product: TemplateProductProps) => {
+  //map the product category to vistbóks category dictionary
+  const prodCategories = product.category.map(cat => {
+    return cat
+  })
+  const mappedCategories = getMappedCategory(prodCategories, TemplateCategoryMapper)
+  const mappedSubCategories = getMappedCategorySub(prodCategories, TemplateCategoryMapper)
+
+  const uniqueMappedCategories = mappedCategories.filter((value, index, self) =>
+    index === self.findIndex((t) => (
+      t.name === value.name
+    ))
+  )
+  
+  const convertedCertificates: Array<string> = product.certificates.map(certificate => { return TemplateCertMapper[certificate.cert] })
+
+  const convertedProduct : DatabaseProduct = {
+    id: product.id !== '' ? `${CompanyID}${product.id}` : product.id,
+    prodName: product.title,
+    longDescription: product.longDescription,
+    shortDescription: product.shortDescription,
+    fl: uniqueMappedCategories,
+    subFl:mappedSubCategories,
+    prodImage: product.images[0], // TODO - FIX THIS WHEN WE HAVE THE OPTION OF MULTIPLE IMAGES
+    url: product.url,
+    brand: product.brand,
+    fscUrl: "",
+    epdUrl: "",
+    vocUrl: "",
+    ceUrl: "",
+    //TODO - FIX CERTIFICATES IF THEY ADD MORE TYPES OF PRODUCTS
+    certificates: [
+      product.fsc !== '' ? {name: "FSC"} : null,
+      product.epd  !== '' ? { name: "EPD"} : null,
+      product.voc  !== '' ? { name: "VOC"} : null,
+      convertedCertificates.includes('SV_ALLOWED') ? { name: "SV_ALLOWED"} : null,
+      convertedCertificates.includes('SV') ? { name: "SV" } : null,
+      convertedCertificates.includes('BREEAM')  ? { name: "BREEAM" } : null,
+      convertedCertificates.includes('BLENGILL')  ? { name: "BLENGILL" } : null,
+      convertedCertificates.includes('EV')  ? { name: "EV" } : null,
+      // results[i].ce  === 'TRUE' ? { name: "CE" } : null
+    ].filter(cert => cert !== null)
+  }
+
+  return convertedProduct
+}
+
+export const InsertAllTemplateProducts = async(req: Request, res: Response) => {
+  const Data: TemplateResponse | undefined = await requestTemplateApi();  
+
+  //Check if it comes back undefined, then there was an error retreiving the data
+  if(!!Data){
+
+    //process all data and insert into database - first convert to databaseProduct Array
+    const allConvertedProducts: Array<DatabaseProduct> = []
+
+    for(var i = 0; i < Data.products.length; i++){
+      const convertedProduct = await convertTemplateProductToDatabaseProduct(Data.products[i])
+      //here is a single product
+      allConvertedProducts.push(convertedProduct)
+    }
+
+    await ProcessForDatabase(allConvertedProducts)
+
+    return res.end("Successful import");
+  }else{
+    return res.end(`${CompanyName} response was invalid`);
+  }
+};
+
+export const GetAllTemplateCategories = async(req: Request, res: Response) => {
+  const Data : TemplateResponse | undefined = await requestTemplateApi();
+  if(!!Data){
+    await ListCategories(Data)
+    //TODO return categories
+    res.end("Successfully listed categories and imported into file");
+  }
+  else{
+    res.end("Failed to list categories");
+  }
+}
+
+export const DeleteAllTemplateProducts = async(req: Request, res: Response) => {
   DeleteAllProductsByCompany(CompanyID)
-  res.end(`All ${CompanyName} products deleted`);
+  res.end(`All ${CompanyName} products deleted`)
 }
 
-export const DeleteAllSerefniCert = async(req: Request, res: Response) => {
+export const DeleteAllTemplateCert = async(req: Request, res: Response) => {
   DeleteAllCertByCompany(CompanyID)
-  res.end(`All ${CompanyName} product certificates deleted`);
+  res.end(`all product certificates deleted for ${CompanyName}`)
+}
+
+const requestTemplateApi = async() => {
+  return axios.get(APIUrl).then(response => {
+    if (response.status === 200) {
+      const data = response;
+      return data.data;
+    }else{
+      console.log(`Error occured : ${response.status} - ${response.statusText}`);
+    } 
+  });
+}
+
+const ListCategories = async(data : TemplateResponse) => {
+  const prodtypelist = data.products.map(product => {
+    return product.category.map(cat => {
+      return cat
+    })
+  }).flat()
+
+  const uniqueArrayProdType = prodtypelist.filter(function(item, pos) {
+    return prodtypelist.indexOf(item) == pos
+  })
+
+  fs.writeFile(`writefiles/${CompanyName}Categories.txt`, uniqueArrayProdType.toString(), function(err) {
+    if(err){
+      return console.error(err)
+    }
+  })
+
 }
 
 const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
@@ -108,7 +240,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
     return productWithProps
   })
   
-  Promise.all(allProductPromises).then(async(productsWithProps) => {
+  return Promise.all(allProductPromises).then(async(productsWithProps) => {
 
     const filteredArray = productsWithProps.filter(prod => prod.productState !== 1)
 
@@ -145,7 +277,8 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               sellingcompany: {
                   connect: { id : CompanyID}
               },
-              categories : {
+              categories :
+              {
                 connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl
               },
               subCategories:{
@@ -202,7 +335,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
             connectedproduct : {
               connect : { 
                 productIdentifier : { productid: cert.productId, companyid: CompanyID}
-              },
+               },
             },
             fileurl : cert.fileurl,
             validDate : cert.validDate
@@ -212,11 +345,11 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
     ) 
   }).then(() => {
     // write all appropriate files
-    WriteAllFiles(createdProducts, updatedProducts, productsNotValid, CompanyName)
+    WriteAllFiles(createdProducts, updatedProducts, productsNotValid, 'SmithNorland')
   });
 }
 
-export const GetAllInvalidSerefniCertificates = async(req, res) => {
+export const GetAllInvalidTemplateCertificates = async(req,res) => {
   const allCerts = await GetAllInvalidProductCertsByCompany(CompanyID)
 
   const SanityCertArray = allCerts.map(cert => {
@@ -253,8 +386,7 @@ export const GetAllInvalidSerefniCertificates = async(req, res) => {
     .createIfNotExists(doc)
     .patch(`${CompanyName}CertList`, (p) => 
       p.setIfMissing({Certificates: []})
-      // Add the items after the last item in the array (append)
-      .insert('replace', 'Certificates', sanityCertReferences)
+      .insert('replace', 'Certificates[-1]', sanityCertReferences)
     )
     .commit({ autoGenerateArrayKeys: true })
     .then((updatedCert) => {

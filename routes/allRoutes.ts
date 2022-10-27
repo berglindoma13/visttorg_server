@@ -21,18 +21,11 @@ allRoutes.get('/', (req: Request, res: Response) => {
 })
 allRoutes.post('/api/fixcerts', UploadValidatedCerts)
 
-
 //BYKO ROUTES - API
 allRoutes.get('/api/byko', InsertAllBykoProducts);
 allRoutes.get('/api/byko/deleteall/products', DeleteAllProducts);
 allRoutes.get('/api/byko/getallcategories', GetAllCategories);
 allRoutes.get('/api/byko/invalidcerts', GetAllInvalidBykoCertificates)
-
-//EBSON ROUTES - GOOGLE SHEETS
-allRoutes.get('/api/ebson', InsertAllEbsonProducts)
-allRoutes.get('/api/ebson/deletecert', DeleteAllEbsonCert)
-allRoutes.get('/api/ebson/deleteproducts', DeleteAllEbsonProducts)
-allRoutes.get('/api/ebson/invalidcerts', GetAllInvalidEbsonCertificates)
 
 //TENGI ROUTES - API
 allRoutes.get('/api/tengi', InsertAllTengiProducts)
@@ -47,18 +40,24 @@ allRoutes.get('/api/shelgason/deletecert', DeleteAllSHelgasonCert)
 allRoutes.get('/api/shelgason/deleteproducts', DeleteAllSHelgasonProducts)
 allRoutes.get('/api/shelgason/invalidcerts', GetAllInvalidSHelgasonCertificates)
 
-//Sérefni ROUTES - API
-allRoutes.get('/api/serefni', InsertAllSerefniProducts)
-allRoutes.get('/api/serefni/deletecert', DeleteAllSerefniCert)
-allRoutes.get('/api/serefni/deleteproducts', DeleteAllSerefniProducts)
-allRoutes.get('/api/serefni/invalidcerts', GetAllInvalidSerefniCertificates)
-
 //Smith&Norland ROUTES - API
 allRoutes.get('/api/smithnorland', InsertAllSmithNorlandProducts)
 allRoutes.get('/api/smithnorland/getallcategories', GetAllSmithNorlandCategories)
 allRoutes.get('/api/smithnorland/deletecert', DeleteAllSmithNorlandCert)
 allRoutes.get('/api/smithnorland/deleteproducts', DeleteAllSmithNorlandProducts)
 allRoutes.get('/api/smithnorland/invalidcerts', GetAllInvalidSmithNorlandCertificates)
+
+//EBSON ROUTES - GOOGLE SHEETS
+allRoutes.get('/api/ebson', InsertAllEbsonProducts)
+allRoutes.get('/api/ebson/deletecert', DeleteAllEbsonCert)
+allRoutes.get('/api/ebson/deleteproducts', DeleteAllEbsonProducts)
+allRoutes.get('/api/ebson/invalidcerts', GetAllInvalidEbsonCertificates)
+
+//Sérefni ROUTES - GOOGLE SHEETS
+allRoutes.get('/api/serefni', InsertAllSerefniProducts)
+allRoutes.get('/api/serefni/deletecert', DeleteAllSerefniCert)
+allRoutes.get('/api/serefni/deleteproducts', DeleteAllSerefniProducts)
+allRoutes.get('/api/serefni/invalidcerts', GetAllInvalidSerefniCertificates)
 
 // allRoutes.get('/api/test', InsertAllTestProducts);
 // allRoutes.get('/api/deletesheets', DeleteAllSheetsProducts);

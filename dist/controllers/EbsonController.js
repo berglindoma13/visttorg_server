@@ -142,9 +142,9 @@ const ProcessForDatabase = async (products) => {
                 }
             });
         }));
-        const arrayWithCertifiateChanges = productsWithProps.filter(prod => prod.productState !== 1 && prod.productState !== 4);
-        // const deletedProductsCerts = await DeleteAllCertByCompany(CompanyID)
-        const allCertificates = arrayWithCertifiateChanges.map(prod => {
+        // const arrayWithCertifiateChanges = productsWithProps.filter(prod => prod.productState !== 1 && prod.productState !== 4)
+        await (0, PrismaHelper_1.DeleteAllCertByCompany)(CompanyID);
+        const allCertificates = filteredArray.map(prod => {
             return prod.validatedCertificates.map(cert => {
                 let fileurl = '';
                 let validdate = null;
@@ -206,7 +206,8 @@ const GetAllInvalidEbsonCertificates = async (req, res) => {
             _id: `${CompanyName}Cert${cert.id}`,
             _type: "Certificate",
             productid: `${cert.productid}`,
-            certfileurl: `${cert.fileurl}`
+            certfileurl: `${cert.fileurl}`,
+            checked: false
         };
     });
     const sanityCertReferences = [];
@@ -228,8 +229,7 @@ const GetAllInvalidEbsonCertificates = async (req, res) => {
             .transaction()
             .createIfNotExists(doc)
             .patch(`${CompanyName}CertList`, (p) => p.setIfMissing({ Certificates: [] })
-            // Add the items after the last item in the array (append)
-            .insert('after', 'Certificates[-1]', sanityCertReferences))
+            .insert('replace', 'Certificates[-1]', sanityCertReferences))
             .commit({ autoGenerateArrayKeys: true })
             .then((updatedCert) => {
             console.log('Hurray, the cert is updated! New document:');

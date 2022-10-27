@@ -197,7 +197,8 @@ const GetAllInvalidSHelgasonCertificates = async (req, res) => {
             _id: `${CompanyName}Cert${cert.id}`,
             _type: "Certificate",
             productid: `${cert.productid}`,
-            certfileurl: `${cert.fileurl}`
+            certfileurl: `${cert.fileurl}`,
+            checked: 'false'
         };
     });
     const sanityCertReferences = [];

@@ -226,7 +226,8 @@ export const GetAllInvalidSHelgasonCertificates = async(req, res) => {
       _id:`${CompanyName}Cert${cert.id}`,
       _type:"Certificate",
       productid:`${cert.productid}`,
-      certfileurl:`${cert.fileurl}`
+      certfileurl:`${cert.fileurl}`,
+      checked: false
     }
   })
 
@@ -255,7 +256,7 @@ export const GetAllInvalidSHelgasonCertificates = async(req, res) => {
     .patch(`${CompanyName}CertList`, (p) => 
       p.setIfMissing({Certificates: []})
       // Add the items after the last item in the array (append)
-      .insert('after', 'Certificates[-1]', sanityCertReferences)
+      .insert('replace', 'Certificates[-1]', sanityCertReferences)
     )
     .commit({ autoGenerateArrayKeys: true })
     .then((updatedCert) => {

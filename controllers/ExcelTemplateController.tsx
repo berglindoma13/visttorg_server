@@ -4,34 +4,35 @@ import { Request, Response } from 'express';
 import { DeleteAllProductsByCompany,
         DeleteAllCertByCompany,
         GetUniqueProduct,
-        GetAllInvalidProductCertsByCompany
+        GetAllInvalidProductCertsByCompany,
       } from '../helpers/PrismaHelper'
 import fs from 'fs'
 import { deleteOldProducts, WriteAllFiles, VerifyProduct, getAllProductsFromGoogleSheets } from '../helpers/ProductHelper';
 import prismaInstance from '../lib/prisma';
-import { certIdFinder } from '../mappers/certificates/certificateIds';
 import { client } from '../lib/sanity';
 
-const CompanyID = 6
-const SheetID = '1PIP46MtGWgf-qdxbTyMo8FSd1A_sIljIaoqlI8rjzW4'
-const CompanyName = 'Serefni'
+//crtl-f Template -> replace with company name
+
+const CompanyID = 1000000
+const SheetID = '----'
+const CompanyName = 'Template'
 
 var updatedProducts: Array<DatabaseProduct> = [];
 var createdProducts: Array<DatabaseProduct> = [];
 var productsNotValid: Array<DatabaseProduct> = [];
 
-export const InsertAllSerefniProducts = async(req: Request,res: Response) => {
+export const InsertAllTemplateProducts = async(req: Request,res: Response) => {
     // get all data from sheets file
     getAllProductsFromGoogleSheets(SheetID, ProcessForDatabase, CompanyID);
     res.end(`All ${CompanyName} products inserted`)
 }
 
-export const DeleteAllSerefniProducts = async(req: Request, res: Response) => {
+export const DeleteAllTemplateProducts = async(req: Request, res: Response) => {
   DeleteAllProductsByCompany(CompanyID)
   res.end(`All ${CompanyName} products deleted`);
 }
 
-export const DeleteAllSerefniCert = async(req: Request, res: Response) => {
+export const DeleteAllTemplateCert = async(req: Request, res: Response) => {
   DeleteAllCertByCompany(CompanyID)
   res.end(`All ${CompanyName} product certificates deleted`);
 }
@@ -84,7 +85,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
       created = true;
       //var certChange = true;
     }
-    
+
     productWithProps.approved = approved
     productWithProps.certChange = certChange
     productWithProps.create = created
@@ -107,7 +108,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
     return productWithProps
   })
-  
+
   Promise.all(allProductPromises).then(async(productsWithProps) => {
 
     const filteredArray = productsWithProps.filter(prod => prod.productState !== 1)
@@ -127,10 +128,10 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
                   connect: { id : CompanyID}
               },
               categories : {
-                connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl            
+                connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl
               },
               subCategories:{
-                connect: productWithProps.product.subFl            
+                connect: productWithProps.product.subFl
               },
               description : productWithProps.product.longDescription,
               shortdescription : productWithProps.product.shortDescription,
@@ -149,7 +150,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
                 connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl
               },
               subCategories:{
-                connect: productWithProps.product.subFl            
+                connect: productWithProps.product.subFl
               },
               description : productWithProps.product.longDescription,
               shortdescription : productWithProps.product.shortDescription,
@@ -164,7 +165,10 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
       })
     )
 
+    // const arrayWithCertifiateChanges = productsWithProps.filter(prod => prod.productState !== 1 && prod.productState !== 4)
+
     await DeleteAllCertByCompany(CompanyID)
+
 
     const allCertificates: Array<DatabaseProductCertificate> = filteredArray.map(prod => {
       return prod.validatedCertificates.map(cert => {
@@ -182,7 +186,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
           fileurl = prod.product.vocUrl
           validdate = prod.validDate[2].date
         }
-        const certItem: DatabaseProductCertificate = { 
+        const certItem: DatabaseProductCertificate = {
           name: cert.name,
           fileurl: fileurl,
           validDate: validdate,
@@ -194,29 +198,39 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
     await prismaInstance.$transaction(
       allCertificates.map(cert => {
-        return prismaInstance.productcertificate.create({
-          data: {
-            certificate : {
-              connect : { id : certIdFinder[cert.name] }
-            },
+        return prismaInstance.productcertificate.upsert({
+          where:{
+            prodcertidentifier: { certificateid: cert.id, productid: cert.productId }
+          },
+          create:{
             connectedproduct : {
-              connect : { 
+              connect : {
                 productIdentifier : { productid: cert.productId, companyid: CompanyID}
-              },
+                },
             },
+            certificate : {
+              connect : {
+                id: cert.id
+                },
+            },
+            fileurl : cert.fileurl,
+            validDate : cert.validDate
+          },
+          update:{
             fileurl : cert.fileurl,
             validDate : cert.validDate
           }
         })
       })
-    ) 
+    )
+
   }).then(() => {
     // write all appropriate files
     WriteAllFiles(createdProducts, updatedProducts, productsNotValid, CompanyName)
   });
 }
 
-export const GetAllInvalidSerefniCertificates = async(req, res) => {
+export const GetAllInvalidTemplateCertificates = async(req,res) => {
   const allCerts = await GetAllInvalidProductCertsByCompany(CompanyID)
 
   const SanityCertArray = allCerts.map(cert => {
@@ -247,14 +261,13 @@ export const GetAllInvalidSerefniCertificates = async(req, res) => {
       _type:"CertificateList",
       CompanyName: CompanyName,
     }
-    
+
     client
     .transaction()
     .createIfNotExists(doc)
-    .patch(`${CompanyName}CertList`, (p) => 
+    .patch(`${CompanyName}CertList`, (p) =>
       p.setIfMissing({Certificates: []})
-      // Add the items after the last item in the array (append)
-      .insert('replace', 'Certificates', sanityCertReferences)
+      .insert('replace', 'Certificates[-1]', sanityCertReferences)
     )
     .commit({ autoGenerateArrayKeys: true })
     .then((updatedCert) => {
