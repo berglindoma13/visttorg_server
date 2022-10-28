@@ -15,6 +15,7 @@ import prismaInstance from '../lib/prisma';
 import { certIdFinder } from '../mappers/certificates/certificateIds';
 import { getMappedCategory, getMappedCategorySub } from '../helpers/MapCategories';
 import { client } from '../lib/sanity';
+import { mapToCertificateSystem } from '../helpers/CertificateValidator';
  
 // BYKO COMPANY ID = 1
 
@@ -66,7 +67,6 @@ const convertBykoProductToDatabaseProduct = async(product: BykoProduct) => {
         product.vocUrl  !== '' ? { name: "VOC"} : null,
         convertedCertificates.includes('SV_ALLOWED') ? { name: "SV_ALLOWED"} : null,
         convertedCertificates.includes('SV') ? { name: "SV" } : null,
-        convertedCertificates.includes('BREEAM')  ? { name: "BREEAM" } : null,
         convertedCertificates.includes('BLENGILL')  ? { name: "BLENGILL" } : null,
         convertedCertificates.includes('EV')  ? { name: "EV" } : null,
         // results[i].ce  === 'TRUE' ? { name: "CE" } : null
@@ -205,6 +205,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
     await prismaInstance.$transaction(
       filteredArray.map(productWithProps => {
+        const systemArray = mapToCertificateSystem(productWithProps.product)
 
         return prismaInstance.product.upsert({
           where: {
@@ -222,6 +223,9 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               },
               subCategories: {
                 connect: productWithProps.product.subFl
+              },
+              certificateSystems:{
+                connect: systemArray
               },
               description : productWithProps.product.longDescription,
               shortdescription : productWithProps.product.shortDescription,
@@ -241,6 +245,9 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               },
               subCategories:{
                 connect: productWithProps.product.subFl            
+              },
+              certificateSystems:{
+                connect: systemArray
               },
               description : productWithProps.product.longDescription,
               shortdescription : productWithProps.product.shortDescription,
@@ -336,7 +343,7 @@ export const GetAllInvalidBykoCertificates = async(req,res) => {
     return {
       _id:`${CompanyName}Cert${cert.id}`,
       _type:"Certificate",
-      productid:`*${cert.productid}`,
+      productid:`${cert.productid}`,
       certfileurl:`${cert.fileurl}`,
       checked: false
     }

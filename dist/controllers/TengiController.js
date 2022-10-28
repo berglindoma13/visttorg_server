@@ -13,6 +13,7 @@ const ProductHelper_1 = require("../helpers/ProductHelper");
 const prisma_1 = __importDefault(require("../lib/prisma"));
 const certificateIds_1 = require("../mappers/certificates/certificateIds");
 const sanity_1 = require("../lib/sanity");
+const CertificateValidator_1 = require("../helpers/CertificateValidator");
 // TENGI COMPANY ID = 3
 const TengiAPI = "https://api.integrator.is/Products/GetMany/?CompanyId=608c19f3591c2b328096b230&ApiKey=b3a6e86d4d4d6612b55d436f7fa60c65d0f8f217c34ead6333407162d308982b&Status=2&Brands=61efc9d1591c275358c86f84";
 const CompanyID = 3;
@@ -186,6 +187,7 @@ const ProcessForDatabase = async (products) => {
     return Promise.all(allProductPromises).then(async (productsWithProps) => {
         const filteredArray = productsWithProps.filter(prod => prod.productState !== 1);
         await prisma_1.default.$transaction(filteredArray.map(productWithProps => {
+            const systemArray = (0, CertificateValidator_1.mapToCertificateSystem)(productWithProps.product);
             return prisma_1.default.product.upsert({
                 where: {
                     productIdentifier: { productid: productWithProps.product.id, companyid: CompanyID }
@@ -202,6 +204,9 @@ const ProcessForDatabase = async (products) => {
                     },
                     subCategories: {
                         connect: productWithProps.product.subFl
+                    },
+                    certificateSystems: {
+                        connect: systemArray
                     },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
@@ -221,6 +226,9 @@ const ProcessForDatabase = async (products) => {
                     },
                     subCategories: {
                         connect: productWithProps.product.subFl
+                    },
+                    certificateSystems: {
+                        connect: systemArray
                     },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
@@ -286,7 +294,8 @@ const GetAllInvalidTengiCertificates = async (req, res) => {
             _id: `${CompanyName}Cert${cert.id}`,
             _type: "Certificate",
             productid: `${cert.productid}`,
-            certfileurl: `${cert.fileurl}`
+            certfileurl: `${cert.fileurl}`,
+            checked: false
         };
     });
     const sanityCertReferences = [];
@@ -308,8 +317,7 @@ const GetAllInvalidTengiCertificates = async (req, res) => {
             .transaction()
             .createIfNotExists(doc)
             .patch(`${CompanyName}CertList`, (p) => p.setIfMissing({ Certificates: [] })
-            // Add the items after the last item in the array (append)
-            .insert('after', 'Certificates[-1]', sanityCertReferences))
+            .insert('replace', 'Certificates[-1]', sanityCertReferences))
             .commit({ autoGenerateArrayKeys: true })
             .then((updatedCert) => {
             console.log('Hurray, the cert is updated! New document:');

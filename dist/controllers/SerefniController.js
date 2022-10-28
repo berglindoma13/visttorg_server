@@ -9,6 +9,7 @@ const ProductHelper_1 = require("../helpers/ProductHelper");
 const prisma_1 = __importDefault(require("../lib/prisma"));
 const certificateIds_1 = require("../mappers/certificates/certificateIds");
 const sanity_1 = require("../lib/sanity");
+const CertificateValidator_1 = require("../helpers/CertificateValidator");
 const CompanyID = 6;
 const SheetID = '1PIP46MtGWgf-qdxbTyMo8FSd1A_sIljIaoqlI8rjzW4';
 const CompanyName = 'Serefni';
@@ -96,6 +97,7 @@ const ProcessForDatabase = async (products) => {
     Promise.all(allProductPromises).then(async (productsWithProps) => {
         const filteredArray = productsWithProps.filter(prod => prod.productState !== 1);
         await prisma_1.default.$transaction(filteredArray.map(productWithProps => {
+            const systemArray = (0, CertificateValidator_1.mapToCertificateSystem)(productWithProps.product);
             return prisma_1.default.product.upsert({
                 where: {
                     productIdentifier: { productid: productWithProps.product.id, companyid: CompanyID }
@@ -112,6 +114,9 @@ const ProcessForDatabase = async (products) => {
                     },
                     subCategories: {
                         connect: productWithProps.product.subFl
+                    },
+                    certificateSystems: {
+                        connect: systemArray
                     },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
@@ -131,6 +136,9 @@ const ProcessForDatabase = async (products) => {
                     },
                     subCategories: {
                         connect: productWithProps.product.subFl
+                    },
+                    certificateSystems: {
+                        connect: systemArray
                     },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
@@ -196,7 +204,8 @@ const GetAllInvalidSerefniCertificates = async (req, res) => {
             _id: `${CompanyName}Cert${cert.id}`,
             _type: "Certificate",
             productid: `${cert.productid}`,
-            certfileurl: `${cert.fileurl}`
+            certfileurl: `${cert.fileurl}`,
+            checked: false
         };
     });
     const sanityCertReferences = [];

@@ -1,4 +1,4 @@
-import { DatabaseCertificate } from '../types/models'
+import { ConnectedCertificateSystem, DatabaseCertificate, DatabaseProduct, ProductWithPropsProps } from '../types/models'
 
 interface CertificateValidatorProps {
   certificates: Array<DatabaseCertificate>
@@ -51,5 +51,20 @@ export const CertificateValidator = ({ certificates, epdUrl, fscUrl, vocUrl, ceU
   })
 
   return ValidCertificates
+}
+
+//1 = BREEAM
+
+export const mapToCertificateSystem = (prod: DatabaseProduct) => {
+  const systemArray: Array<ConnectedCertificateSystem> = []
+
+  // const BREEAMcerts = prod.certificates.filter(cert => (cert.certificateid === 1 && cert.validDate !== null) || (cert.certificateid === 2 && cert.validDate !== null) || (cert.certificateid === 3 && cert.validDate !== null))
+  const BREEAMcerts = prod.certificates.filter(cert => cert.name === 'EPD' || cert.name === 'FSC' || cert.name === 'VOC')
+
+  if(BREEAMcerts.length > 0){
+    systemArray.push({ name: 'BREEAM' })
+  }
+
+  return systemArray
 }
 

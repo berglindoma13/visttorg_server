@@ -8,6 +8,7 @@ const PrismaHelper_1 = require("../helpers/PrismaHelper");
 const ProductHelper_1 = require("../helpers/ProductHelper");
 const prisma_1 = __importDefault(require("../lib/prisma"));
 const sanity_1 = require("../lib/sanity");
+const CertificateValidator_1 = require("../helpers/CertificateValidator");
 // company id 2, get data from google sheets and insert into database from Ebson
 const CompanyID = 2;
 const SheetID = '1mbdkZvGHbBnj4QeOQdfAIQWQ1uOUQdm5aWYmoV-6yeg';
@@ -96,6 +97,7 @@ const ProcessForDatabase = async (products) => {
     Promise.all(allProductPromises).then(async (productsWithProps) => {
         const filteredArray = productsWithProps.filter(prod => prod.productState !== 1);
         await prisma_1.default.$transaction(filteredArray.map(productWithProps => {
+            const systemArray = (0, CertificateValidator_1.mapToCertificateSystem)(productWithProps.product);
             return prisma_1.default.product.upsert({
                 where: {
                     productIdentifier: { productid: productWithProps.product.id, companyid: CompanyID }
@@ -112,6 +114,9 @@ const ProcessForDatabase = async (products) => {
                     },
                     subCategories: {
                         connect: productWithProps.product.subFl
+                    },
+                    certificateSystems: {
+                        connect: systemArray
                     },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
@@ -131,6 +136,9 @@ const ProcessForDatabase = async (products) => {
                     },
                     subCategories: {
                         connect: productWithProps.product.subFl
+                    },
+                    certificateSystems: {
+                        connect: systemArray
                     },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,

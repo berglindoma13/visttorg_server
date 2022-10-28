@@ -9,6 +9,7 @@ const ProductHelper_1 = require("../helpers/ProductHelper");
 const prisma_1 = __importDefault(require("../lib/prisma"));
 const certificateIds_1 = require("../mappers/certificates/certificateIds");
 const sanity_1 = require("../lib/sanity");
+const CertificateValidator_1 = require("../helpers/CertificateValidator");
 const CompanyID = 5;
 const SheetID = '1fMgOGGoI20sqTiapQNC-89F9UrrqnvselMnw-OXlgX8';
 const CompanyName = 'S.Helgason';
@@ -97,6 +98,7 @@ const ProcessForDatabase = async (products) => {
     Promise.all(allProductPromises).then(async (productsWithProps) => {
         const filteredArray = productsWithProps.filter(prod => prod.productState !== 1);
         await prisma_1.default.$transaction(filteredArray.map(productWithProps => {
+            const systemArray = (0, CertificateValidator_1.mapToCertificateSystem)(productWithProps.product);
             return prisma_1.default.product.upsert({
                 where: {
                     productIdentifier: { productid: productWithProps.product.id, companyid: CompanyID }
@@ -113,6 +115,9 @@ const ProcessForDatabase = async (products) => {
                     },
                     subCategories: {
                         connect: productWithProps.product.subFl
+                    },
+                    certificateSystems: {
+                        connect: systemArray
                     },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
@@ -132,6 +137,9 @@ const ProcessForDatabase = async (products) => {
                     },
                     subCategories: {
                         connect: productWithProps.product.subFl
+                    },
+                    certificateSystems: {
+                        connect: systemArray
                     },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
@@ -198,7 +206,7 @@ const GetAllInvalidSHelgasonCertificates = async (req, res) => {
             _type: "Certificate",
             productid: `${cert.productid}`,
             certfileurl: `${cert.fileurl}`,
-            checked: 'false'
+            checked: false
         };
     });
     const sanityCertReferences = [];
@@ -221,7 +229,7 @@ const GetAllInvalidSHelgasonCertificates = async (req, res) => {
             .createIfNotExists(doc)
             .patch(`${CompanyName}CertList`, (p) => p.setIfMissing({ Certificates: [] })
             // Add the items after the last item in the array (append)
-            .insert('after', 'Certificates[-1]', sanityCertReferences))
+            .insert('replace', 'Certificates[-1]', sanityCertReferences))
             .commit({ autoGenerateArrayKeys: true })
             .then((updatedCert) => {
             console.log('Hurray, the cert is updated! New document:');

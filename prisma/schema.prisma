@@ -32,6 +32,7 @@ model product {
   productimageurl  String?
   //productimageref attachedFile?
   certificates     productcertificate[]
+  certificateSystems certificateSystem[]  @relation("ConnectedCertficateSystem")
   // myProducts       myProducts[]
   approved        Boolean?
   createdAt       DateTime?
@@ -56,6 +57,12 @@ model certificate {
   id                 Int                  @id @default(autoincrement())
   name               String
   productcertificate productcertificate[]
+}
+
+model certificateSystem {
+  id                 Int                  @id @default(autoincrement())
+  name               String               @unique
+  products           product[]            @relation("ConnectedCertficateSystem")
 }
 
 model category {

@@ -14,6 +14,7 @@ const prisma_1 = __importDefault(require("../lib/prisma"));
 const certificateIds_1 = require("../mappers/certificates/certificateIds");
 const MapCategories_1 = require("../helpers/MapCategories");
 const sanity_1 = require("../lib/sanity");
+const CertificateValidator_1 = require("../helpers/CertificateValidator");
 // BYKO COMPANY ID = 1
 const BykoAPI = "https://byko.is/umhverfisvottadar?password=cert4env";
 const CompanyID = 1;
@@ -57,7 +58,6 @@ const convertBykoProductToDatabaseProduct = async (product) => {
             product.vocUrl !== '' ? { name: "VOC" } : null,
             convertedCertificates.includes('SV_ALLOWED') ? { name: "SV_ALLOWED" } : null,
             convertedCertificates.includes('SV') ? { name: "SV" } : null,
-            convertedCertificates.includes('BREEAM') ? { name: "BREEAM" } : null,
             convertedCertificates.includes('BLENGILL') ? { name: "BLENGILL" } : null,
             convertedCertificates.includes('EV') ? { name: "EV" } : null,
             // results[i].ce  === 'TRUE' ? { name: "CE" } : null
@@ -178,6 +178,7 @@ const ProcessForDatabase = async (products) => {
     return Promise.all(allProductPromises).then(async (productsWithProps) => {
         const filteredArray = productsWithProps.filter(prod => prod.productState !== 1);
         await prisma_1.default.$transaction(filteredArray.map(productWithProps => {
+            const systemArray = (0, CertificateValidator_1.mapToCertificateSystem)(productWithProps.product);
             return prisma_1.default.product.upsert({
                 where: {
                     productIdentifier: { productid: productWithProps.product.id, companyid: CompanyID }
@@ -194,6 +195,9 @@ const ProcessForDatabase = async (products) => {
                     },
                     subCategories: {
                         connect: productWithProps.product.subFl
+                    },
+                    certificateSystems: {
+                        connect: systemArray
                     },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
@@ -213,6 +217,9 @@ const ProcessForDatabase = async (products) => {
                     },
                     subCategories: {
                         connect: productWithProps.product.subFl
+                    },
+                    certificateSystems: {
+                        connect: systemArray
                     },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
@@ -292,8 +299,9 @@ const GetAllInvalidBykoCertificates = async (req, res) => {
         return {
             _id: `${CompanyName}Cert${cert.id}`,
             _type: "Certificate",
-            productid: `*${cert.productid}`,
-            certfileurl: `${cert.fileurl}`
+            productid: `${cert.productid}`,
+            certfileurl: `${cert.fileurl}`,
+            checked: false
         };
     });
     const sanityCertReferences = [];
@@ -316,7 +324,7 @@ const GetAllInvalidBykoCertificates = async (req, res) => {
             .createIfNotExists(doc)
             .patch(`${CompanyName}CertList`, (p) => p.setIfMissing({ Certificates: [] })
             // Add the items after the last item in the array (append)
-            .insert('after', 'Certificates[-1]', sanityCertReferences))
+            .insert('replace', 'Certificates[-1]', sanityCertReferences))
             .commit({ autoGenerateArrayKeys: true })
             .then((updatedCert) => {
             console.log('Hurray, the cert is updated! New document:');

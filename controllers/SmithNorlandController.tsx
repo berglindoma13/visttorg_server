@@ -14,6 +14,7 @@ import { deleteOldProducts, VerifyProduct, WriteAllFiles } from '../helpers/Prod
 import prismaInstance from '../lib/prisma'
 import { certIdFinder } from '../mappers/certificates/certificateIds'
 import { client } from '../lib/sanity'
+import { mapToCertificateSystem } from '../helpers/CertificateValidator'
 
 // SmithNorland COMPANY ID = 4
 
@@ -226,6 +227,8 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
     await prismaInstance.$transaction(
       filteredArray.map(productWithProps => {
 
+        const systemArray = mapToCertificateSystem(productWithProps.product)
+
         return prismaInstance.product.upsert({
           where: {
             productIdentifier : { productid: productWithProps.product.id, companyid: CompanyID}
@@ -240,8 +243,11 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               categories : {
                 connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl            
               },
-              subCategories:{
-                connect: productWithProps.product.subFl            
+              subCategories: {
+                connect: productWithProps.product.subFl
+              },
+              certificateSystems:{
+                connect: systemArray
               },
               description : productWithProps.product.longDescription,
               shortdescription : productWithProps.product.shortDescription,
@@ -256,12 +262,14 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               sellingcompany: {
                   connect: { id : CompanyID}
               },
-              categories :
-              {
+              categories : {
                 connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl
               },
               subCategories:{
                 connect: productWithProps.product.subFl            
+              },
+              certificateSystems:{
+                connect: systemArray
               },
               description : productWithProps.product.longDescription,
               shortdescription : productWithProps.product.shortDescription,

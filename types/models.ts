@@ -27,6 +27,10 @@ export interface ConnectedSubCategory {
   subCatIdentifier: bla
 }
 
+export interface ConnectedCertificateSystem {
+  name: string
+}
+
 interface bla {
   name: string
   parentCategoryName: string
