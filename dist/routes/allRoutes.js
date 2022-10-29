@@ -17,13 +17,14 @@ const SmithNorlandController_1 = require("../controllers/SmithNorlandController"
 const fs_1 = __importDefault(require("fs"));
 const PrismaHelper_1 = require("../helpers/PrismaHelper");
 const CommonController_1 = require("../controllers/CommonController");
+const testController_1 = require("../controllers/testController");
 exports.allRoutes = (0, express_1.Router)();
 //ALMENNT
 exports.allRoutes.get('/', (req, res) => {
     res.send('Server is up and running here NOW!');
 });
 exports.allRoutes.post('/api/fixcerts', CommonController_1.UploadValidatedCerts);
-// allRoutes.get('/api/certsystemmapper', setProductsToCertificateSystems)
+exports.allRoutes.get('/api/certsystemmapper', CommonController_1.setProductsToCertificateSystems);
 //BYKO ROUTES - API
 exports.allRoutes.get('/api/byko', BykoController_1.InsertAllBykoProducts);
 exports.allRoutes.get('/api/byko/deleteall/products', BykoController_1.DeleteAllProducts);
@@ -56,7 +57,7 @@ exports.allRoutes.get('/api/serefni', SerefniController_1.InsertAllSerefniProduc
 exports.allRoutes.get('/api/serefni/deletecert', SerefniController_1.DeleteAllSerefniCert);
 exports.allRoutes.get('/api/serefni/deleteproducts', SerefniController_1.DeleteAllSerefniProducts);
 exports.allRoutes.get('/api/serefni/invalidcerts', SerefniController_1.GetAllInvalidSerefniCertificates);
-// allRoutes.get('/api/test', InsertAllTestProducts);
+exports.allRoutes.get('/api/test', testController_1.InsertAllTemplateProducts);
 // allRoutes.get('/api/deletesheets', DeleteAllSheetsProducts);
 // allRoutes.get('/api/deletesheetscertificates', DeleteAllSheetsCert);
 // companyRoutes.get('/api/testnewindatabase', ProcessNewInDatabase)

@@ -11,7 +11,8 @@ import { DeleteAllSmithNorlandCert, DeleteAllSmithNorlandProducts, GetAllInvalid
 import fs from 'fs'
 import { DatabaseCategory } from '../types/models';
 import { UpsertAllCategories } from '../helpers/PrismaHelper';
-import { UploadValidatedCerts } from '../controllers/CommonController';
+import { setProductsToCertificateSystems, UploadValidatedCerts } from '../controllers/CommonController';
+import { InsertAllTemplateProducts } from '../controllers/testController';
 
 export const allRoutes = Router();
 
@@ -20,7 +21,7 @@ allRoutes.get('/', (req: Request, res: Response) => {
   res.send('Server is up and running here NOW!')
 })
 allRoutes.post('/api/fixcerts', UploadValidatedCerts)
-// allRoutes.get('/api/certsystemmapper', setProductsToCertificateSystems)
+allRoutes.get('/api/certsystemmapper', setProductsToCertificateSystems)
 
 //BYKO ROUTES - API
 allRoutes.get('/api/byko', InsertAllBykoProducts);
@@ -60,7 +61,7 @@ allRoutes.get('/api/serefni/deletecert', DeleteAllSerefniCert)
 allRoutes.get('/api/serefni/deleteproducts', DeleteAllSerefniProducts)
 allRoutes.get('/api/serefni/invalidcerts', GetAllInvalidSerefniCertificates)
 
-// allRoutes.get('/api/test', InsertAllTestProducts);
+allRoutes.get('/api/test', InsertAllTemplateProducts);
 // allRoutes.get('/api/deletesheets', DeleteAllSheetsProducts);
 // allRoutes.get('/api/deletesheetscertificates', DeleteAllSheetsCert);
 

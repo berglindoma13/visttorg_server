@@ -51,7 +51,7 @@ exports.CertificateValidator = CertificateValidator;
 //1 = BREEAM
 const mapToCertificateSystem = (prod) => {
     const systemArray = [];
-    // const BREEAMcerts = prod.certificates.filter(cert => (cert.certificateid === 1 && cert.validDate !== null) || (cert.certificateid === 2 && cert.validDate !== null) || (cert.certificateid === 3 && cert.validDate !== null))
+    //const BREEAMcerts = prod.certificates.filter(cert => (cert.certificateid === 1 && cert.validDate !== null) || (cert.certificateid === 2 && cert.validDate !== null) || (cert.certificateid === 3 && cert.validDate !== null))
     const BREEAMcerts = prod.certificates.filter(cert => cert.name === 'EPD' || cert.name === 'FSC' || cert.name === 'VOC');
     if (BREEAMcerts.length > 0) {
         systemArray.push({ name: 'BREEAM' });

@@ -11,6 +11,7 @@ import { deleteOldProducts, WriteAllFiles, VerifyProduct, getAllProductsFromGoog
 import prismaInstance from '../lib/prisma';
 import { client } from '../lib/sanity';
 import { mapToCertificateSystem } from '../helpers/CertificateValidator';
+import { certIdFinder } from '../mappers/certificates/certificateIds';
 
 //crtl-f Template -> replace with company name
 
@@ -58,24 +59,25 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
     if (prod !== null){
       approved = !!prod.approved ? prod.approved : false;
+      const now = new Date()
       prod.certificates.map((cert) => {
         if (cert.certificateid == 1) {
           // epd file url is not the same
-          if(cert.fileurl !== product.epdUrl) {
+          if(cert.fileurl !== product.epdUrl || (cert.validDate !== null && cert.validDate <= now)) {
             certChange = true;
             approved = false;
           }
         }
         if (cert.certificateid == 2) {
           // fsc file url is not the same
-          if(cert.fileurl !== product.fscUrl) {
+          if(cert.fileurl !== product.fscUrl || (cert.validDate !== null && cert.validDate <= now)) {
             certChange = true;
             approved = false;
           }
         }
         if (cert.certificateid == 3) {
           // voc file url is not the same
-          if(cert.fileurl !== product.vocUrl) {
+          if(cert.fileurl !== product.vocUrl || (cert.validDate !== null && cert.validDate <= now)) {
             certChange = true;
             approved = false;
           }
@@ -207,31 +209,22 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
     await prismaInstance.$transaction(
       allCertificates.map(cert => {
-        return prismaInstance.productcertificate.upsert({
-          where:{
-            prodcertidentifier: { certificateid: cert.id, productid: cert.productId }
-          },
-          create:{
-            connectedproduct : {
-              connect : {
-                productIdentifier : { productid: cert.productId, companyid: CompanyID}
-                },
-            },
+        return prismaInstance.productcertificate.create({
+          data: {
             certificate : {
-              connect : {
-                id: cert.id
-                },
+              connect : { id : certIdFinder[cert.name] }
             },
-            fileurl : cert.fileurl,
-            validDate : cert.validDate
-          },
-          update:{
+            connectedproduct : {
+              connect : { 
+                productIdentifier : { productid: cert.productId, companyid: CompanyID}
+               },
+            },
             fileurl : cert.fileurl,
             validDate : cert.validDate
           }
         })
       })
-    )
+    ) 
 
   }).then(() => {
     // write all appropriate files

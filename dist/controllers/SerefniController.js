@@ -47,24 +47,25 @@ const ProcessForDatabase = async (products) => {
         var certChange = false;
         if (prod !== null) {
             approved = !!prod.approved ? prod.approved : false;
+            const now = new Date();
             prod.certificates.map((cert) => {
                 if (cert.certificateid == 1) {
                     // epd file url is not the same
-                    if (cert.fileurl !== product.epdUrl) {
+                    if (cert.fileurl !== product.epdUrl || (cert.validDate !== null && cert.validDate <= now)) {
                         certChange = true;
                         approved = false;
                     }
                 }
                 if (cert.certificateid == 2) {
                     // fsc file url is not the same
-                    if (cert.fileurl !== product.fscUrl) {
+                    if (cert.fileurl !== product.fscUrl || (cert.validDate !== null && cert.validDate <= now)) {
                         certChange = true;
                         approved = false;
                     }
                 }
                 if (cert.certificateid == 3) {
                     // voc file url is not the same
-                    if (cert.fileurl !== product.vocUrl) {
+                    if (cert.fileurl !== product.vocUrl || (cert.validDate !== null && cert.validDate <= now)) {
                         certChange = true;
                         approved = false;
                     }

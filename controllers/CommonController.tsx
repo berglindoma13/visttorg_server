@@ -32,31 +32,31 @@ export const UploadValidatedCerts = async(req,res) => {
   res.send('succesfully updated certificates')
 }
 
-// export const setProductsToCertificateSystems = async(req, res) => {
-//   const products = await prismaInstance.product.findMany({
-//     include:{
-//       certificates: {
-//         include: {
-//           certificate : true
-//         }
-//       }
-//     }
-//   })
+export const setProductsToCertificateSystems = async(req, res) => {
+  const products = await prismaInstance.product.findMany({
+    include:{
+      certificates: {
+        include: {
+          certificate : true
+        }
+      }
+    }
+  })
 
-//   prismaInstance.$transaction(
-//     products.map(prod => {
-//         const systemArray = mapToCertificateSystem(prod)
-//         return prismaInstance.product.update({
-//           where: {
-//             productIdentifier: { productid: prod.productid, companyid: prod.companyid }
-//           },
-//           data:{
-//             certificateSystems : {
-//               connect: systemArray
-//             }
-//           }
-//         })
-//       })
-//     )
-//   res.send('successfull')
-// }
+  prismaInstance.$transaction(
+    products.map(prod => {
+        const systemArray = mapToCertificateSystem(prod)
+        return prismaInstance.product.update({
+          where: {
+            productIdentifier: { productid: prod.productid, companyid: prod.companyid }
+          },
+          data:{
+            certificateSystems : {
+              connect: systemArray
+            }
+          }
+        })
+      })
+    )
+  res.send('successfull')
+}

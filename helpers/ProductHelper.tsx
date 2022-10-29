@@ -33,10 +33,6 @@ export const VerifyProduct = async(product : DatabaseProduct, create : boolean, 
       // check valid date when product is created
       if(foundCertWithFiles){
         validDate = await ValidDate(validatedCertificates, product) 
-
-        if(validDate.filter(dat => !!dat.date).length > 0){
-          validatedCertificates.push({ name: 'BREEAM' })
-        }
       } 
     }
    }
@@ -49,10 +45,6 @@ export const VerifyProduct = async(product : DatabaseProduct, create : boolean, 
           // check valid date when the certificates have changed
           if(foundCertWithFiles){
             validDate = await ValidDate(validatedCertificates, product)
-
-            if(validDate.filter(dat => !!dat.date).length > 0){
-              validatedCertificates.push({ name: 'BREEAM' })
-            }
           } 
         }
       }
