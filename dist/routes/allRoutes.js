@@ -17,6 +17,7 @@ const SmithNorlandController_1 = require("../controllers/SmithNorlandController"
 const fs_1 = __importDefault(require("fs"));
 const PrismaHelper_1 = require("../helpers/PrismaHelper");
 const CommonController_1 = require("../controllers/CommonController");
+const SendEmail_1 = require("../helpers/SendEmail");
 exports.allRoutes = (0, express_1.Router)();
 //ALMENNT
 exports.allRoutes.get('/', (req, res) => {
@@ -72,6 +73,7 @@ exports.allRoutes.get('/updatecategories', (req, res) => {
 });
 //add to postlist
 exports.allRoutes.post('/api/postlist', Postlist_1.Postlist);
-// allRoutes.get('/api/sendmail', SendEmail)
+//send email
+exports.allRoutes.get('/api/sendmail', SendEmail_1.SendEmailAPI);
 //login function
 exports.allRoutes.post('/api/login', loginController_1.Login);

@@ -12,6 +12,7 @@ import fs from 'fs'
 import { DatabaseCategory } from '../types/models';
 import { UpsertAllCategories } from '../helpers/PrismaHelper';
 import { UploadValidatedCerts } from '../controllers/CommonController';
+import { SendEmailAPI } from '../helpers/SendEmail';
 
 export const allRoutes = Router();
 
@@ -84,7 +85,9 @@ allRoutes.get('/updatecategories', (req, res) => {
 
 //add to postlist
 allRoutes.post('/api/postlist', Postlist)
-// allRoutes.get('/api/sendmail', SendEmail)
+
+//send email
+allRoutes.get('/api/sendmail', SendEmailAPI)
 
 //login function
 allRoutes.post('/api/login', Login)
