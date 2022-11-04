@@ -18,22 +18,19 @@ const fs_1 = __importDefault(require("fs"));
 const PrismaHelper_1 = require("../helpers/PrismaHelper");
 const CommonController_1 = require("../controllers/CommonController");
 const SendEmail_1 = require("../helpers/SendEmail");
+const testController_1 = require("../controllers/testController");
 exports.allRoutes = (0, express_1.Router)();
 //ALMENNT
 exports.allRoutes.get('/', (req, res) => {
     res.send('Server is up and running here NOW!');
 });
 exports.allRoutes.post('/api/fixcerts', CommonController_1.UploadValidatedCerts);
+exports.allRoutes.get('/api/certsystemmapper', CommonController_1.setProductsToCertificateSystems);
 //BYKO ROUTES - API
 exports.allRoutes.get('/api/byko', BykoController_1.InsertAllBykoProducts);
 exports.allRoutes.get('/api/byko/deleteall/products', BykoController_1.DeleteAllProducts);
 exports.allRoutes.get('/api/byko/getallcategories', BykoController_1.GetAllCategories);
 exports.allRoutes.get('/api/byko/invalidcerts', BykoController_1.GetAllInvalidBykoCertificates);
-//EBSON ROUTES - GOOGLE SHEETS
-exports.allRoutes.get('/api/ebson', EbsonController_1.InsertAllEbsonProducts);
-exports.allRoutes.get('/api/ebson/deletecert', EbsonController_1.DeleteAllEbsonCert);
-exports.allRoutes.get('/api/ebson/deleteproducts', EbsonController_1.DeleteAllEbsonProducts);
-exports.allRoutes.get('/api/ebson/invalidcerts', EbsonController_1.GetAllInvalidEbsonCertificates);
 //TENGI ROUTES - API
 exports.allRoutes.get('/api/tengi', TengiController_1.InsertAllTengiProducts);
 exports.allRoutes.get('/api/tengi/getallcategories', TengiController_1.GetAllTengiCategories);
@@ -45,18 +42,23 @@ exports.allRoutes.get('/api/shelgason', ShelgasonController_1.InsertAllSHelgason
 exports.allRoutes.get('/api/shelgason/deletecert', ShelgasonController_1.DeleteAllSHelgasonCert);
 exports.allRoutes.get('/api/shelgason/deleteproducts', ShelgasonController_1.DeleteAllSHelgasonProducts);
 exports.allRoutes.get('/api/shelgason/invalidcerts', ShelgasonController_1.GetAllInvalidSHelgasonCertificates);
-//Sérefni ROUTES - API
-exports.allRoutes.get('/api/serefni', SerefniController_1.InsertAllSerefniProducts);
-exports.allRoutes.get('/api/serefni/deletecert', SerefniController_1.DeleteAllSerefniCert);
-exports.allRoutes.get('/api/serefni/deleteproducts', SerefniController_1.DeleteAllSerefniProducts);
-exports.allRoutes.get('/api/serefni/invalidcerts', SerefniController_1.GetAllInvalidSerefniCertificates);
 //Smith&Norland ROUTES - API
 exports.allRoutes.get('/api/smithnorland', SmithNorlandController_1.InsertAllSmithNorlandProducts);
 exports.allRoutes.get('/api/smithnorland/getallcategories', SmithNorlandController_1.GetAllSmithNorlandCategories);
 exports.allRoutes.get('/api/smithnorland/deletecert', SmithNorlandController_1.DeleteAllSmithNorlandCert);
 exports.allRoutes.get('/api/smithnorland/deleteproducts', SmithNorlandController_1.DeleteAllSmithNorlandProducts);
 exports.allRoutes.get('/api/smithnorland/invalidcerts', SmithNorlandController_1.GetAllInvalidSmithNorlandCertificates);
-// allRoutes.get('/api/test', InsertAllTestProducts);
+//EBSON ROUTES - GOOGLE SHEETS
+exports.allRoutes.get('/api/ebson', EbsonController_1.InsertAllEbsonProducts);
+exports.allRoutes.get('/api/ebson/deletecert', EbsonController_1.DeleteAllEbsonCert);
+exports.allRoutes.get('/api/ebson/deleteproducts', EbsonController_1.DeleteAllEbsonProducts);
+exports.allRoutes.get('/api/ebson/invalidcerts', EbsonController_1.GetAllInvalidEbsonCertificates);
+//Sérefni ROUTES - GOOGLE SHEETS
+exports.allRoutes.get('/api/serefni', SerefniController_1.InsertAllSerefniProducts);
+exports.allRoutes.get('/api/serefni/deletecert', SerefniController_1.DeleteAllSerefniCert);
+exports.allRoutes.get('/api/serefni/deleteproducts', SerefniController_1.DeleteAllSerefniProducts);
+exports.allRoutes.get('/api/serefni/invalidcerts', SerefniController_1.GetAllInvalidSerefniCertificates);
+exports.allRoutes.get('/api/test', testController_1.InsertAllTemplateProducts);
 // allRoutes.get('/api/deletesheets', DeleteAllSheetsProducts);
 // allRoutes.get('/api/deletesheetscertificates', DeleteAllSheetsCert);
 // companyRoutes.get('/api/testnewindatabase', ProcessNewInDatabase)

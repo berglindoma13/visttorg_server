@@ -7,7 +7,9 @@ exports.GetAllInvalidEbsonCertificates = exports.DeleteAllEbsonCert = exports.De
 const PrismaHelper_1 = require("../helpers/PrismaHelper");
 const ProductHelper_1 = require("../helpers/ProductHelper");
 const prisma_1 = __importDefault(require("../lib/prisma"));
+const certificateIds_1 = require("../mappers/certificates/certificateIds");
 const sanity_1 = require("../lib/sanity");
+const CertificateValidator_1 = require("../helpers/CertificateValidator");
 // company id 2, get data from google sheets and insert into database from Ebson
 const CompanyID = 2;
 const SheetID = '1mbdkZvGHbBnj4QeOQdfAIQWQ1uOUQdm5aWYmoV-6yeg';
@@ -46,24 +48,25 @@ const ProcessForDatabase = async (products) => {
         var certChange = false;
         if (prod !== null) {
             approved = !!prod.approved ? prod.approved : false;
+            const now = new Date();
             prod.certificates.map((cert) => {
                 if (cert.certificateid == 1) {
                     // epd file url is not the same
-                    if (cert.fileurl !== product.epdUrl) {
+                    if (cert.fileurl !== product.epdUrl || (cert.validDate !== null && cert.validDate <= now)) {
                         certChange = true;
                         approved = false;
                     }
                 }
                 if (cert.certificateid == 2) {
                     // fsc file url is not the same
-                    if (cert.fileurl !== product.fscUrl) {
+                    if (cert.fileurl !== product.fscUrl || (cert.validDate !== null && cert.validDate <= now)) {
                         certChange = true;
                         approved = false;
                     }
                 }
                 if (cert.certificateid == 3) {
                     // voc file url is not the same
-                    if (cert.fileurl !== product.vocUrl) {
+                    if (cert.fileurl !== product.vocUrl || (cert.validDate !== null && cert.validDate <= now)) {
                         certChange = true;
                         approved = false;
                     }
@@ -96,6 +99,7 @@ const ProcessForDatabase = async (products) => {
     Promise.all(allProductPromises).then(async (productsWithProps) => {
         const filteredArray = productsWithProps.filter(prod => prod.productState !== 1);
         await prisma_1.default.$transaction(filteredArray.map(productWithProps => {
+            const systemArray = (0, CertificateValidator_1.mapToCertificateSystem)(productWithProps.product);
             return prisma_1.default.product.upsert({
                 where: {
                     productIdentifier: { productid: productWithProps.product.id, companyid: CompanyID }
@@ -112,6 +116,9 @@ const ProcessForDatabase = async (products) => {
                     },
                     subCategories: {
                         connect: productWithProps.product.subFl
+                    },
+                    certificateSystems: {
+                        connect: systemArray
                     },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
@@ -132,6 +139,9 @@ const ProcessForDatabase = async (products) => {
                     subCategories: {
                         connect: productWithProps.product.subFl
                     },
+                    certificateSystems: {
+                        connect: systemArray
+                    },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
                     productimageurl: productWithProps.product.prodImage,
@@ -142,9 +152,9 @@ const ProcessForDatabase = async (products) => {
                 }
             });
         }));
-        const arrayWithCertifiateChanges = productsWithProps.filter(prod => prod.productState !== 1 && prod.productState !== 4);
-        // const deletedProductsCerts = await DeleteAllCertByCompany(CompanyID)
-        const allCertificates = arrayWithCertifiateChanges.map(prod => {
+        // const arrayWithCertifiateChanges = productsWithProps.filter(prod => prod.productState !== 1 && prod.productState !== 4)
+        await (0, PrismaHelper_1.DeleteAllCertByCompany)(CompanyID);
+        const allCertificates = filteredArray.map(prod => {
             return prod.validatedCertificates.map(cert => {
                 let fileurl = '';
                 let validdate = null;
@@ -170,25 +180,16 @@ const ProcessForDatabase = async (products) => {
             });
         }).flat();
         await prisma_1.default.$transaction(allCertificates.map(cert => {
-            return prisma_1.default.productcertificate.upsert({
-                where: {
-                    prodcertidentifier: { certificateid: cert.id, productid: cert.productId }
-                },
-                create: {
+            return prisma_1.default.productcertificate.create({
+                data: {
+                    certificate: {
+                        connect: { id: certificateIds_1.certIdFinder[cert.name] }
+                    },
                     connectedproduct: {
                         connect: {
                             productIdentifier: { productid: cert.productId, companyid: CompanyID }
                         },
                     },
-                    certificate: {
-                        connect: {
-                            id: cert.id
-                        },
-                    },
-                    fileurl: cert.fileurl,
-                    validDate: cert.validDate
-                },
-                update: {
                     fileurl: cert.fileurl,
                     validDate: cert.validDate
                 }
@@ -206,7 +207,8 @@ const GetAllInvalidEbsonCertificates = async (req, res) => {
             _id: `${CompanyName}Cert${cert.id}`,
             _type: "Certificate",
             productid: `${cert.productid}`,
-            certfileurl: `${cert.fileurl}`
+            certfileurl: `${cert.fileurl}`,
+            checked: false
         };
     });
     const sanityCertReferences = [];
@@ -228,8 +230,7 @@ const GetAllInvalidEbsonCertificates = async (req, res) => {
             .transaction()
             .createIfNotExists(doc)
             .patch(`${CompanyName}CertList`, (p) => p.setIfMissing({ Certificates: [] })
-            // Add the items after the last item in the array (append)
-            .insert('after', 'Certificates[-1]', sanityCertReferences))
+            .insert('replace', 'Certificates[-1]', sanityCertReferences))
             .commit({ autoGenerateArrayKeys: true })
             .then((updatedCert) => {
             console.log('Hurray, the cert is updated! New document:');

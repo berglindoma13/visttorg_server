@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CertificateValidator = void 0;
+exports.mapToCertificateSystem = exports.CertificateValidator = void 0;
 const CertificateValidator = ({ certificates, epdUrl, fscUrl, vocUrl, ceUrl }) => {
     const ValidCertificates = [];
     certificates.map((certificate) => {
@@ -48,3 +48,14 @@ const CertificateValidator = ({ certificates, epdUrl, fscUrl, vocUrl, ceUrl }) =
     return ValidCertificates;
 };
 exports.CertificateValidator = CertificateValidator;
+//1 = BREEAM
+const mapToCertificateSystem = (prod) => {
+    const systemArray = [];
+    //const BREEAMcerts = prod.certificates.filter(cert => (cert.certificateid === 1 && cert.validDate !== null) || (cert.certificateid === 2 && cert.validDate !== null) || (cert.certificateid === 3 && cert.validDate !== null))
+    const BREEAMcerts = prod.certificates.filter(cert => cert.name === 'EPD' || cert.name === 'FSC' || cert.name === 'VOC');
+    if (BREEAMcerts.length > 0) {
+        systemArray.push({ name: 'BREEAM' });
+    }
+    return systemArray;
+};
+exports.mapToCertificateSystem = mapToCertificateSystem;

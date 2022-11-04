@@ -1,146 +1,42 @@
-import axios from 'axios'
+import reader from 'g-sheets-api';
 import { DatabaseProduct, DatabaseProductCertificate, ProductWithPropsProps } from '../types/models'
-import fs from 'fs'
+import { Request, Response } from 'express';
 import { DeleteAllProductsByCompany,
         DeleteAllCertByCompany,
         GetUniqueProduct,
         GetAllInvalidProductCertsByCompany,
- } from '../helpers/PrismaHelper'
-import { TengiProduct, TengiResponse } from '../types/tengi'
-import { Request, Response } from 'express';
-import { getMappedCategory, getMappedCategorySub } from '../helpers/MapCategories'
-import TengiCategoryMapper from '../mappers/categories/tengi'
-import { deleteOldProducts, VerifyProduct, WriteAllFiles } from '../helpers/ProductHelper'
-import prismaInstance from '../lib/prisma'
-import { certIdFinder } from '../mappers/certificates/certificateIds'
-import { client } from '../lib/sanity'
-import { mapToCertificateSystem } from '../helpers/CertificateValidator'
+      } from '../helpers/PrismaHelper'
+import fs from 'fs'
+import { deleteOldProducts, WriteAllFiles, VerifyProduct, getAllProductsFromGoogleSheets } from '../helpers/ProductHelper';
+import prismaInstance from '../lib/prisma';
+import { client } from '../lib/sanity';
+import { mapToCertificateSystem } from '../helpers/CertificateValidator';
+import { certIdFinder } from '../mappers/certificates/certificateIds';
 
-// TENGI COMPANY ID = 3
+//crtl-f Template -> replace with company name
 
-const TengiAPI = "https://api.integrator.is/Products/GetMany/?CompanyId=608c19f3591c2b328096b230&ApiKey=b3a6e86d4d4d6612b55d436f7fa60c65d0f8f217c34ead6333407162d308982b&Status=2&Brands=61efc9d1591c275358c86f84" 
-const CompanyID = 3
-const CompanyName = 'Tengi'
-
+const CompanyID = 1000000
+const SheetID = '----'
+const CompanyName = 'Template'
 
 var updatedProducts: Array<DatabaseProduct> = [];
 var createdProducts: Array<DatabaseProduct> = [];
 var productsNotValid: Array<DatabaseProduct> = [];
 
-const convertTengiProductToDatabaseProduct = async(product: TengiProduct) => {
-
-  
-  //map the product category to vistbóks category dictionary
-  const prodCategories = product.StandardFields.Categories.map(cat => {
-    return cat.Name
-  })
-  const mappedCategories = getMappedCategory(prodCategories, TengiCategoryMapper)
-  const mappedSubCategories = getMappedCategorySub(prodCategories, TengiCategoryMapper)
-
-  //Map certificates and validate them before adding to database 
-  //TODO WHEN THE FIELD IS ADDED TO THE API
-  // const convertedCertificates: Array<string> = product.certificates.map(certificate => { return BykoCertificateMapper[certificate.cert] })
-
-  const convertedProduct : DatabaseProduct = {
-    id: product.StandardFields.SKU !== '' ? `${CompanyID}${product.StandardFields.SKU}` : product.StandardFields.SKU,
-    prodName: product.StandardFields.Name,
-    longDescription: product.StandardFields.Description,
-    shortDescription: product.StandardFields.ShortDescription,
-    fl: mappedCategories,
-    subFl: mappedSubCategories,
-    prodImage: product.Images[0].Url, // TODO - FIX THIS WHEN WE HAVE THE OPTION OF MULTIPLE IMAGES
-    url: product.CustomFields.ProductUrl,
-    brand: product.StandardFields.Brands[0].Name,
-    fscUrl: "",
-    epdUrl: "",
-    vocUrl: "",
-    ceUrl: "",
-    //TODO - FIX CERTIFICATES WHEN THEY ARE PUT IN THE API FROM TENGI, AUTOMATICALLY ACCEPTING NOW
-    certificates: [
-      { name: "SV_ALLOWED"},
-    ].filter(cert => cert !== null)
-  }
-
-  // console.log('convertedProduct', convertedProduct)
-
-  return convertedProduct
+export const InsertAllTemplateProducts = async(req: Request,res: Response) => {
+    // get all data from sheets file
+    getAllProductsFromGoogleSheets(SheetID, ProcessForDatabase, CompanyID);
+    res.end(`All ${CompanyName} products inserted`)
 }
 
-export const InsertAllTengiProducts = async(req: Request, res: Response) => {
-  const tengiData : TengiResponse | undefined = await requestTengiApi();  
-
-  //Check if it comes back undefined, then there was an error retreiving the data
-  if(!!tengiData){
-
-    //process all data and insert into database - first convert to databaseProduct Array
-    const allConvertedTengiProducts: Array<DatabaseProduct> = []
-
-    for(var i = 0; i < tengiData.Data.length; i++){
-      const convertedProduct = await convertTengiProductToDatabaseProduct(tengiData.Data[i])
-      //here is a single product
-      allConvertedTengiProducts.push(convertedProduct)
-    }
-
-    await ProcessForDatabase(allConvertedTengiProducts)
-
-    return res.end("Successful import");
-  }else{
-    return res.end("Tengi response was invalid");
-  }
-};
-
-export const GetAllTengiCategories = async(req: Request, res: Response) => {
-  const Data : TengiResponse | undefined = await requestTengiApi();
-  if(!!Data){
-    await ListCategories(Data)
-    //TODO return categories
-    res.end("Successfully listed categories and imported into file");
-  }
-  else{
-    res.end("Failed to list categories");
-  }
-}
-
-export const DeleteAllTengiProducts = async(req,res) => {
-  // delete all products with company id 3
+export const DeleteAllTemplateProducts = async(req: Request, res: Response) => {
   DeleteAllProductsByCompany(CompanyID)
-  res.end("All Tengi products deleted")
+  res.end(`All ${CompanyName} products deleted`);
 }
 
-export const DeleteAllTengiCert = async(req,res) => {
-  // delete all product certificates connected to company id 3
+export const DeleteAllTemplateCert = async(req: Request, res: Response) => {
   DeleteAllCertByCompany(CompanyID)
-  res.end("all product certificates deleted for Tengi")
-}
-
-const requestTengiApi = async() => {
-return axios.get(TengiAPI).then(response => {
-  if (response.status === 200) {
-    const data = response;
-    return data.data;
-  }else{
-    console.log(`Error occured : ${response.status} - ${response.statusText}`);
-  } 
-});
-}
-
-const ListCategories = async(data : TengiResponse) => {
-  const prodtypelist = data.Data.map(product => {
-    return product.StandardFields.Categories.map(cat => {
-      return cat.Name
-    })
-  }).flat()
-
-  const uniqueArrayProdType = prodtypelist.filter(function(item, pos) {
-    return prodtypelist.indexOf(item) == pos
-  })
-
-  fs.writeFile('writefiles/TengiCategories.txt', uniqueArrayProdType.toString(), function(err) {
-    if(err){
-      return console.error(err)
-    }
-  })
-
+  res.end(`All ${CompanyName} product certificates deleted`);
 }
 
 const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
@@ -192,7 +88,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
       created = true;
       //var certChange = true;
     }
-    
+
     productWithProps.approved = approved
     productWithProps.certChange = certChange
     productWithProps.create = created
@@ -215,8 +111,8 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
     return productWithProps
   })
-  
-  return Promise.all(allProductPromises).then(async(productsWithProps) => {
+
+  Promise.all(allProductPromises).then(async(productsWithProps) => {
 
     const filteredArray = productsWithProps.filter(prod => prod.productState !== 1)
 
@@ -280,7 +176,10 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
       })
     )
 
+    // const arrayWithCertifiateChanges = productsWithProps.filter(prod => prod.productState !== 1 && prod.productState !== 4)
+
     await DeleteAllCertByCompany(CompanyID)
+
 
     const allCertificates: Array<DatabaseProductCertificate> = filteredArray.map(prod => {
       return prod.validatedCertificates.map(cert => {
@@ -298,7 +197,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
           fileurl = prod.product.vocUrl
           validdate = prod.validDate[2].date
         }
-        const certItem: DatabaseProductCertificate = { 
+        const certItem: DatabaseProductCertificate = {
           name: cert.name,
           fileurl: fileurl,
           validDate: validdate,
@@ -317,8 +216,8 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
             },
             connectedproduct : {
               connect : { 
-                productIdentifier: { productid: cert.productId, companyid: CompanyID }
-              },
+                productIdentifier : { productid: cert.productId, companyid: CompanyID}
+               },
             },
             fileurl : cert.fileurl,
             validDate : cert.validDate
@@ -326,14 +225,14 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
         })
       })
     ) 
+
   }).then(() => {
     // write all appropriate files
-    WriteAllFiles(createdProducts, updatedProducts, productsNotValid, 'Tengi')
+    WriteAllFiles(createdProducts, updatedProducts, productsNotValid, CompanyName)
   });
 }
 
-
-export const GetAllInvalidTengiCertificates = async(req,res) => {
+export const GetAllInvalidTemplateCertificates = async(req,res) => {
   const allCerts = await GetAllInvalidProductCertsByCompany(CompanyID)
 
   const SanityCertArray = allCerts.map(cert => {
@@ -364,11 +263,11 @@ export const GetAllInvalidTengiCertificates = async(req,res) => {
       _type:"CertificateList",
       CompanyName: CompanyName,
     }
-    
+
     client
     .transaction()
     .createIfNotExists(doc)
-    .patch(`${CompanyName}CertList`, (p) => 
+    .patch(`${CompanyName}CertList`, (p) =>
       p.setIfMissing({Certificates: []})
       .insert('replace', 'Certificates[-1]', sanityCertReferences)
     )

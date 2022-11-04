@@ -12,6 +12,7 @@ import { deleteOldProducts, WriteAllFiles, VerifyProduct, getAllProductsFromGoog
 import prismaInstance from '../lib/prisma';
 import { certIdFinder } from '../mappers/certificates/certificateIds';
 import { client } from '../lib/sanity';
+import { mapToCertificateSystem } from '../helpers/CertificateValidator';
 
 // company id 2, get data from google sheets and insert into database from Ebson
 const CompanyID = 2
@@ -58,24 +59,25 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
     if (prod !== null){
       approved = !!prod.approved ? prod.approved : false;
+      const now = new Date()
       prod.certificates.map((cert) => {
         if (cert.certificateid == 1) {
           // epd file url is not the same
-          if(cert.fileurl !== product.epdUrl) {
+          if(cert.fileurl !== product.epdUrl || (cert.validDate !== null && cert.validDate <= now)) {
             certChange = true;
             approved = false;
           }
         }
         if (cert.certificateid == 2) {
           // fsc file url is not the same
-          if(cert.fileurl !== product.fscUrl) {
+          if(cert.fileurl !== product.fscUrl || (cert.validDate !== null && cert.validDate <= now)) {
             certChange = true;
             approved = false;
           }
         }
         if (cert.certificateid == 3) {
           // voc file url is not the same
-          if(cert.fileurl !== product.vocUrl) {
+          if(cert.fileurl !== product.vocUrl || (cert.validDate !== null && cert.validDate <= now)) {
             certChange = true;
             approved = false;
           }
@@ -117,6 +119,8 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
     await prismaInstance.$transaction(
       filteredArray.map(productWithProps => {
 
+        const systemArray = mapToCertificateSystem(productWithProps.product)
+
         return prismaInstance.product.upsert({
           where: {
             productIdentifier : { productid: productWithProps.product.id, companyid: CompanyID}
@@ -131,8 +135,11 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               categories : {
                 connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl            
               },
-              subCategories:{
-                connect: productWithProps.product.subFl            
+              subCategories: {
+                connect: productWithProps.product.subFl
+              },
+              certificateSystems:{
+                connect: systemArray
               },
               description : productWithProps.product.longDescription,
               shortdescription : productWithProps.product.shortDescription,
@@ -153,6 +160,9 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               subCategories:{
                 connect: productWithProps.product.subFl            
               },
+              certificateSystems:{
+                connect: systemArray
+              },
               description : productWithProps.product.longDescription,
               shortdescription : productWithProps.product.shortDescription,
               productimageurl : productWithProps.product.prodImage,
@@ -166,64 +176,55 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
       })
     )
 
-    const arrayWithCertifiateChanges = productsWithProps.filter(prod => prod.productState !== 1 && prod.productState !== 4)
+    // const arrayWithCertifiateChanges = productsWithProps.filter(prod => prod.productState !== 1 && prod.productState !== 4)
 
-    // const deletedProductsCerts = await DeleteAllCertByCompany(CompanyID)
+    await DeleteAllCertByCompany(CompanyID)
 
 
-      const allCertificates: Array<DatabaseProductCertificate> = arrayWithCertifiateChanges.map(prod => {
-        return prod.validatedCertificates.map(cert => {
-          let fileurl = ''
-          let validdate = null
-          if(cert.name === 'EPD'){
-            fileurl = prod.product.epdUrl
-            validdate = prod.validDate[0].date
-          }
-          else if(cert.name === 'FSC'){
-            fileurl = prod.product.fscUrl
-            validdate = prod.validDate[1].date
-          }
-          else if(cert.name === 'VOC'){
-            fileurl = prod.product.vocUrl
-            validdate = prod.validDate[2].date
-          }
-          const certItem: DatabaseProductCertificate = { 
-            name: cert.name,
-            fileurl: fileurl,
-            validDate: validdate,
-            productId: prod.product.id
-          }
-          return certItem
-        })
-      }).flat()
-  
-      await prismaInstance.$transaction(
-        allCertificates.map(cert => {
-          return prismaInstance.productcertificate.upsert({
-            where:{
-              prodcertidentifier: { certificateid: cert.id, productid: cert.productId }
+    const allCertificates: Array<DatabaseProductCertificate> = filteredArray.map(prod => {
+      return prod.validatedCertificates.map(cert => {
+        let fileurl = ''
+        let validdate = null
+        if(cert.name === 'EPD'){
+          fileurl = prod.product.epdUrl
+          validdate = prod.validDate[0].date
+        }
+        else if(cert.name === 'FSC'){
+          fileurl = prod.product.fscUrl
+          validdate = prod.validDate[1].date
+        }
+        else if(cert.name === 'VOC'){
+          fileurl = prod.product.vocUrl
+          validdate = prod.validDate[2].date
+        }
+        const certItem: DatabaseProductCertificate = { 
+          name: cert.name,
+          fileurl: fileurl,
+          validDate: validdate,
+          productId: prod.product.id
+        }
+        return certItem
+      })
+    }).flat()
+
+    await prismaInstance.$transaction(
+      allCertificates.map(cert => {
+        return prismaInstance.productcertificate.create({
+          data: {
+            certificate : {
+              connect : { id : certIdFinder[cert.name] }
             },
-            create:{
-              connectedproduct : {
-                connect : { 
-                  productIdentifier : { productid: cert.productId, companyid: CompanyID}
-                 },
-              },
-              certificate : {
-                connect : { 
-                  id: cert.id
-                 },
-              },
-              fileurl : cert.fileurl,
-              validDate : cert.validDate
+            connectedproduct : {
+              connect : { 
+                productIdentifier : { productid: cert.productId, companyid: CompanyID}
+               },
             },
-            update:{
-              fileurl : cert.fileurl,
-              validDate : cert.validDate
-            }
-          })
+            fileurl : cert.fileurl,
+            validDate : cert.validDate
+          }
         })
-      ) 
+      })
+    ) 
     
   }).then(() => {
     // write all appropriate files
@@ -239,7 +240,8 @@ export const GetAllInvalidEbsonCertificates = async(req,res) => {
       _id:`${CompanyName}Cert${cert.id}`,
       _type:"Certificate",
       productid:`${cert.productid}`,
-      certfileurl:`${cert.fileurl}`
+      certfileurl:`${cert.fileurl}`,
+      checked: false
     }
   })
 
@@ -267,8 +269,7 @@ export const GetAllInvalidEbsonCertificates = async(req,res) => {
     .createIfNotExists(doc)
     .patch(`${CompanyName}CertList`, (p) => 
       p.setIfMissing({Certificates: []})
-      // Add the items after the last item in the array (append)
-      .insert('after', 'Certificates[-1]', sanityCertReferences)
+      .insert('replace', 'Certificates[-1]', sanityCertReferences)
     )
     .commit({ autoGenerateArrayKeys: true })
     .then((updatedCert) => {

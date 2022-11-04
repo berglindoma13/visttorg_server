@@ -1,202 +1,245 @@
-// import reader from 'g-sheets-api';
-// import { DatabaseProduct, DatabaseProductCertificate, ProductWithPropsProps } from '../types/models'
-// import { Request, Response } from 'express';
-// import { DeleteAllProductsByCompany,
-//         DeleteAllCertByCompany,
-//         GetUniqueProduct,
-//         GetAllInvalidProductCertsByCompany
-//       } from '../helpers/PrismaHelper'
-// import { SheetProduct } from '../types/sheets';
-// import { deleteOldProducts, WriteAllFiles, VerifyProduct, getAllProductsFromGoogleSheets } from '../helpers/ProductHelper';
-// import prismaInstance from '../lib/prisma';
-// import { certIdFinder } from '../mappers/certificates/certificateIds';
-// // company id 2, get data from google sheets and insert into database from Ebson
-// const CompanyID = 100
-// const SheetID = '1xyt08puk_-Ox2s-oZESp6iO1sCK8OAQsK1Z9GaovfqQ'
-// const CompanyName = 'Test'
-// var updatedProducts: Array<DatabaseProduct> = [];
-// var createdProducts: Array<DatabaseProduct> = [];
-// var productsNotValid: Array<DatabaseProduct> = [];
-// var invalidCertificates = []
-// export const InsertAllTestProducts = async(req: Request,res: Response) => {
-//     // get all data from sheets file
-//     getAllProductsFromGoogleSheets(SheetID, ProcessForDatabase, CompanyID);
-//     res.end(`All ${CompanyName} products inserted`)
-// }
-// export const DeleteAllTestProducts = async(req: Request, res: Response) => {
-//   DeleteAllProductsByCompany(CompanyID)
-//   res.end(`All ${CompanyName} products deleted`);
-// }
-// export const DeleteAllTestCert = async(req: Request, res: Response) => {
-//   DeleteAllCertByCompany(CompanyID)
-//   res.end(`All ${CompanyName} product certificates deleted`);
-// }
-// const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
-//   // check if any product in the list is in database but not coming in from company api anymore
-//   deleteOldProducts(products, CompanyID)
-//   //Reset global lists
-//   updatedProducts = [];
-//   createdProducts = [];
-//   productsNotValid = []
-//   const allProductPromises = products.map(async(product) => {
-//     const productWithProps:ProductWithPropsProps = { approved: false, certChange: false, create: false, product: null, productState: 1, validDate: null, validatedCertificates:[]}
-//     const prod = await GetUniqueProduct(product.id)
-//     var approved = false;
-//     var created = false
-//     var certChange = false
-//     if (prod !== null){
-//       approved = !!prod.approved ? prod.approved : false;
-//       prod.certificates.map((cert) => {
-//         if (cert.certificateid == 1) {
-//           // epd file url is not the same
-//           if(cert.fileurl !== product.epdUrl) {
-//             certChange = true;
-//             approved = false;
-//           }
-//         }
-//         if (cert.certificateid == 2) {
-//           // fsc file url is not the same
-//           if(cert.fileurl !== product.fscUrl) {
-//             certChange = true;
-//             approved = false;
-//           }
-//         }
-//         if (cert.certificateid == 3) {
-//           // voc file url is not the same
-//           if(cert.fileurl !== product.vocUrl) {
-//             certChange = true;
-//             approved = false;
-//           }
-//         }
-//       })
-//     }
-//     else {
-//       created = true;
-//       //var certChange = true;
-//     }
-//     productWithProps.approved = approved
-//     productWithProps.certChange = certChange
-//     productWithProps.create = created
-//     productWithProps.product = product
-//     const productInfo = await VerifyProduct(product, created,  certChange)
-//     console.log('productInfo', productInfo)
-//     productWithProps.productState = productInfo.productState
-//     productWithProps.validDate = productInfo.validDate
-//     productWithProps.validatedCertificates = productInfo.validatedCertificates
-//     if(productInfo.productState === 1){
-//       productsNotValid.push(product)
-//     }else if(productInfo.productState === 2){
-//       createdProducts.push(product)
-//     }
-//     else if(productInfo.productState === 3){
-//       updatedProducts.push(product)
-//     }
-//     return productWithProps
-//   })
-//   Promise.all(allProductPromises).then(async(productsWithProps) => {
-//     const filteredArray = productsWithProps.filter(prod => prod.productState !== 1)
-//     await prismaInstance.$transaction(
-//       filteredArray.map(productWithProps => {
-//         return prismaInstance.product.upsert({
-//           where: {
-//             productid : productWithProps.product.id
-//           },
-//           update: {
-//               approved: productWithProps.approved,
-//               title: productWithProps.product.prodName,
-//               productid : productWithProps.product.id,
-//               sellingcompany: {
-//                   connect: { id : CompanyID}
-//               },
-//               categories : {
-//                 connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl            
-//               },
-//               description : productWithProps.product.longDescription,
-//               shortdescription : productWithProps.product.shortDescription,
-//               productimageurl : productWithProps.product.prodImage,
-//               url : productWithProps.product.url,
-//               brand : productWithProps.product.brand,
-//               updatedAt: new Date()
-//           },
-//           create: {
-//               title: productWithProps.product.prodName,
-//               productid : productWithProps.product.id,
-//               sellingcompany: {
-//                   connect: { id : CompanyID}
-//               },
-//               categories : {
-//                 connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl
-//               },
-//               description : productWithProps.product.longDescription,
-//               shortdescription : productWithProps.product.shortDescription,
-//               productimageurl : productWithProps.product.prodImage,
-//               url : productWithProps.product.url,
-//               brand : productWithProps.product.brand,
-//               createdAt: new Date(),
-//               updatedAt: new Date()
-//           }
-//         })
-//       })
-//     )
-//     const allCertificates: Array<DatabaseProductCertificate> = filteredArray.map(prod => {
-//       return prod.validatedCertificates.map(cert => {
-//         let fileurl = ''
-//         let validdate = null
-//         if(cert.name === 'EPD'){
-//           fileurl = prod.product.epdUrl
-//           validdate = prod.validDate[0].date
-//         }
-//         else if(cert.name === 'FSC'){
-//           fileurl = prod.product.fscUrl
-//           validdate = prod.validDate[1].date
-//         }
-//         else if(cert.name === 'VOC'){
-//           fileurl = prod.product.vocUrl
-//           validdate = prod.validDate[2].date
-//         }
-//         const certItem: DatabaseProductCertificate = { 
-//           name: cert.name,
-//           fileurl: fileurl,
-//           validDate: validdate,
-//           productId: prod.product.id
-//         }
-//         return certItem
-//       })
-//     }).flat()
-//     const certsWithFilesAndNotValidDate = allCertificates.filter(cert => cert.fileurl !== '' && cert.validDate === null)
-//     const prismaCertificates = await prismaInstance.$transaction(
-//       allCertificates.map(cert => {
-//         return prismaInstance.productcertificate.create({
-//           data: {
-//             certificate : {
-//               connect : { id : certIdFinder[cert.name] }
-//             },
-//             connectedproduct : {
-//               connect : { productid : cert.productId },
-//             },
-//             fileurl : cert.fileurl,
-//             validDate : cert.validDate
-//           }
-//         })
-//       })
-//     ) 
-//     console.log('prismaCertificates', prismaCertificates)
-//     const invalidPrismaCerts = prismaCertificates.filter(pcert => {
-//       let found = false
-//       certsWithFilesAndNotValidDate.map(ncert => {
-//         if(pcert.fileurl === ncert.fileurl){
-//           found = true
-//         }
-//       })
-//       return found
-//     })
-//     console.log('invalidPrismaCerts', invalidPrismaCerts)
-//     invalidCertificates = invalidPrismaCerts
-//   }).then(() => {
-//     // write all appropriate files
-//     WriteAllFiles(createdProducts, updatedProducts, productsNotValid, CompanyName, invalidCertificates)
-//   });
-// }
-// export const GetAllInvalidCertificates = () => {
-//   GetAllInvalidProductCertsByCompany(CompanyID)
-// }
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GetAllInvalidTemplateCertificates = exports.DeleteAllTemplateCert = exports.DeleteAllTemplateProducts = exports.InsertAllTemplateProducts = void 0;
+const PrismaHelper_1 = require("../helpers/PrismaHelper");
+const ProductHelper_1 = require("../helpers/ProductHelper");
+const prisma_1 = __importDefault(require("../lib/prisma"));
+const sanity_1 = require("../lib/sanity");
+const CertificateValidator_1 = require("../helpers/CertificateValidator");
+const certificateIds_1 = require("../mappers/certificates/certificateIds");
+//crtl-f Template -> replace with company name
+const CompanyID = 100;
+const SheetID = '1xyt08puk_-Ox2s-oZESp6iO1sCK8OAQsK1Z9GaovfqQ';
+const CompanyName = 'Test';
+var updatedProducts = [];
+var createdProducts = [];
+var productsNotValid = [];
+const InsertAllTemplateProducts = async (req, res) => {
+    // get all data from sheets file
+    (0, ProductHelper_1.getAllProductsFromGoogleSheets)(SheetID, ProcessForDatabase, CompanyID);
+    res.end(`All ${CompanyName} products inserted`);
+};
+exports.InsertAllTemplateProducts = InsertAllTemplateProducts;
+const DeleteAllTemplateProducts = async (req, res) => {
+    (0, PrismaHelper_1.DeleteAllProductsByCompany)(CompanyID);
+    res.end(`All ${CompanyName} products deleted`);
+};
+exports.DeleteAllTemplateProducts = DeleteAllTemplateProducts;
+const DeleteAllTemplateCert = async (req, res) => {
+    (0, PrismaHelper_1.DeleteAllCertByCompany)(CompanyID);
+    res.end(`All ${CompanyName} product certificates deleted`);
+};
+exports.DeleteAllTemplateCert = DeleteAllTemplateCert;
+const ProcessForDatabase = async (products) => {
+    // check if any product in the list is in database but not coming in from company api anymore
+    (0, ProductHelper_1.deleteOldProducts)(products, CompanyID);
+    //Reset global lists
+    updatedProducts = [];
+    createdProducts = [];
+    productsNotValid = [];
+    const allProductPromises = products.map(async (product) => {
+        const productWithProps = { approved: false, certChange: false, create: false, product: null, productState: 1, validDate: null, validatedCertificates: [] };
+        const prod = await (0, PrismaHelper_1.GetUniqueProduct)(product.id, CompanyID);
+        var approved = false;
+        var created = false;
+        var certChange = false;
+        if (prod !== null) {
+            approved = !!prod.approved ? prod.approved : false;
+            const now = new Date();
+            prod.certificates.map((cert) => {
+                if (cert.certificateid == 1) {
+                    // epd file url is not the same
+                    if (cert.fileurl !== product.epdUrl || (cert.validDate !== null && cert.validDate <= now)) {
+                        certChange = true;
+                        approved = false;
+                    }
+                }
+                if (cert.certificateid == 2) {
+                    // fsc file url is not the same
+                    if (cert.fileurl !== product.fscUrl || (cert.validDate !== null && cert.validDate <= now)) {
+                        certChange = true;
+                        approved = false;
+                    }
+                }
+                if (cert.certificateid == 3) {
+                    // voc file url is not the same
+                    if (cert.fileurl !== product.vocUrl || (cert.validDate !== null && cert.validDate <= now)) {
+                        certChange = true;
+                        approved = false;
+                    }
+                }
+            });
+        }
+        else {
+            created = true;
+            //var certChange = true;
+        }
+        productWithProps.approved = approved;
+        productWithProps.certChange = certChange;
+        productWithProps.create = created;
+        productWithProps.product = product;
+        const productInfo = await (0, ProductHelper_1.VerifyProduct)(product, created, certChange);
+        productWithProps.productState = productInfo.productState;
+        productWithProps.validDate = productInfo.validDate;
+        productWithProps.validatedCertificates = productInfo.validatedCertificates;
+        if (productInfo.productState === 1) {
+            productsNotValid.push(product);
+        }
+        else if (productInfo.productState === 2) {
+            createdProducts.push(product);
+        }
+        else if (productInfo.productState === 3) {
+            updatedProducts.push(product);
+        }
+        return productWithProps;
+    });
+    Promise.all(allProductPromises).then(async (productsWithProps) => {
+        const filteredArray = productsWithProps.filter(prod => prod.productState !== 1);
+        await prisma_1.default.$transaction(filteredArray.map(productWithProps => {
+            const systemArray = (0, CertificateValidator_1.mapToCertificateSystem)(productWithProps.product);
+            return prisma_1.default.product.upsert({
+                where: {
+                    productIdentifier: { productid: productWithProps.product.id, companyid: CompanyID }
+                },
+                update: {
+                    approved: productWithProps.approved,
+                    title: productWithProps.product.prodName,
+                    productid: productWithProps.product.id,
+                    sellingcompany: {
+                        connect: { id: CompanyID }
+                    },
+                    categories: {
+                        connect: typeof productWithProps.product.fl === 'string' ? { name: productWithProps.product.fl } : productWithProps.product.fl
+                    },
+                    subCategories: {
+                        connect: productWithProps.product.subFl
+                    },
+                    certificateSystems: {
+                        connect: systemArray
+                    },
+                    description: productWithProps.product.longDescription,
+                    shortdescription: productWithProps.product.shortDescription,
+                    productimageurl: productWithProps.product.prodImage,
+                    url: productWithProps.product.url,
+                    brand: productWithProps.product.brand,
+                    updatedAt: new Date()
+                },
+                create: {
+                    title: productWithProps.product.prodName,
+                    productid: productWithProps.product.id,
+                    sellingcompany: {
+                        connect: { id: CompanyID }
+                    },
+                    categories: {
+                        connect: typeof productWithProps.product.fl === 'string' ? { name: productWithProps.product.fl } : productWithProps.product.fl
+                    },
+                    subCategories: {
+                        connect: productWithProps.product.subFl
+                    },
+                    certificateSystems: {
+                        connect: systemArray
+                    },
+                    description: productWithProps.product.longDescription,
+                    shortdescription: productWithProps.product.shortDescription,
+                    productimageurl: productWithProps.product.prodImage,
+                    url: productWithProps.product.url,
+                    brand: productWithProps.product.brand,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                }
+            });
+        }));
+        // const arrayWithCertifiateChanges = productsWithProps.filter(prod => prod.productState !== 1 && prod.productState !== 4)
+        await (0, PrismaHelper_1.DeleteAllCertByCompany)(CompanyID);
+        const allCertificates = filteredArray.map(prod => {
+            return prod.validatedCertificates.map(cert => {
+                let fileurl = '';
+                let validdate = null;
+                if (cert.name === 'EPD') {
+                    fileurl = prod.product.epdUrl;
+                    validdate = prod.validDate[0].date;
+                }
+                else if (cert.name === 'FSC') {
+                    fileurl = prod.product.fscUrl;
+                    validdate = prod.validDate[1].date;
+                }
+                else if (cert.name === 'VOC') {
+                    fileurl = prod.product.vocUrl;
+                    validdate = prod.validDate[2].date;
+                }
+                const certItem = {
+                    name: cert.name,
+                    fileurl: fileurl,
+                    validDate: validdate,
+                    productId: prod.product.id
+                };
+                return certItem;
+            });
+        }).flat();
+        await prisma_1.default.$transaction(allCertificates.map(cert => {
+            return prisma_1.default.productcertificate.create({
+                data: {
+                    certificate: {
+                        connect: { id: certificateIds_1.certIdFinder[cert.name] }
+                    },
+                    connectedproduct: {
+                        connect: {
+                            productIdentifier: { productid: cert.productId, companyid: CompanyID }
+                        },
+                    },
+                    fileurl: cert.fileurl,
+                    validDate: cert.validDate
+                }
+            });
+        }));
+    }).then(() => {
+        // write all appropriate files
+        (0, ProductHelper_1.WriteAllFiles)(createdProducts, updatedProducts, productsNotValid, CompanyName);
+    });
+};
+const GetAllInvalidTemplateCertificates = async (req, res) => {
+    const allCerts = await (0, PrismaHelper_1.GetAllInvalidProductCertsByCompany)(CompanyID);
+    const SanityCertArray = allCerts.map(cert => {
+        return {
+            _id: `${CompanyName}Cert${cert.id}`,
+            _type: "Certificate",
+            productid: `${cert.productid}`,
+            certfileurl: `${cert.fileurl}`,
+            checked: false
+        };
+    });
+    const sanityCertReferences = [];
+    const SanityPromises = SanityCertArray.map(sanityCert => {
+        return sanity_1.client.createIfNotExists(sanityCert).then(createdCert => {
+            sanityCertReferences.push({ "_type": "reference", "_ref": createdCert._id });
+        }).catch(error => {
+            console.log('error', error);
+        });
+    });
+    Promise.all(SanityPromises).then(() => {
+        //SANITY.IO CREATE CERTIFICATELIST IF IT DOES NOT EXIST
+        const doc = {
+            _id: `${CompanyName}CertList`,
+            _type: "CertificateList",
+            CompanyName: CompanyName,
+        };
+        sanity_1.client
+            .transaction()
+            .createIfNotExists(doc)
+            .patch(`${CompanyName}CertList`, (p) => p.setIfMissing({ Certificates: [] })
+            .insert('replace', 'Certificates[-1]', sanityCertReferences))
+            .commit({ autoGenerateArrayKeys: true })
+            .then((updatedCert) => {
+            console.log('Hurray, the cert is updated! New document:');
+            console.log(updatedCert);
+        })
+            .catch((err) => {
+            console.error('Oh no, the update failed: ', err.message);
+        });
+    });
+    res.end("Successfully logged all invalid certs");
+};
+exports.GetAllInvalidTemplateCertificates = GetAllInvalidTemplateCertificates;

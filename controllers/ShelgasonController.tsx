@@ -11,6 +11,7 @@ import { deleteOldProducts, WriteAllFiles, VerifyProduct, getAllProductsFromGoog
 import prismaInstance from '../lib/prisma';
 import { certIdFinder } from '../mappers/certificates/certificateIds';
 import { client } from '../lib/sanity';
+import { mapToCertificateSystem } from '../helpers/CertificateValidator';
 
 const CompanyID = 5
 const SheetID = '1fMgOGGoI20sqTiapQNC-89F9UrrqnvselMnw-OXlgX8'
@@ -58,24 +59,25 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
     if (prod !== null){
       approved = !!prod.approved ? prod.approved : false;
+      const now = new Date()
       prod.certificates.map((cert) => {
         if (cert.certificateid == 1) {
           // epd file url is not the same
-          if(cert.fileurl !== product.epdUrl) {
+          if(cert.fileurl !== product.epdUrl || (cert.validDate !== null && cert.validDate <= now)) {
             certChange = true;
             approved = false;
           }
         }
         if (cert.certificateid == 2) {
           // fsc file url is not the same
-          if(cert.fileurl !== product.fscUrl) {
+          if(cert.fileurl !== product.fscUrl || (cert.validDate !== null && cert.validDate <= now)) {
             certChange = true;
             approved = false;
           }
         }
         if (cert.certificateid == 3) {
           // voc file url is not the same
-          if(cert.fileurl !== product.vocUrl) {
+          if(cert.fileurl !== product.vocUrl || (cert.validDate !== null && cert.validDate <= now)) {
             certChange = true;
             approved = false;
           }
@@ -117,6 +119,8 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
     await prismaInstance.$transaction(
       filteredArray.map(productWithProps => {
 
+        const systemArray = mapToCertificateSystem(productWithProps.product)
+
         return prismaInstance.product.upsert({
           where: {
             productIdentifier : { productid: productWithProps.product.id, companyid: CompanyID}
@@ -131,8 +135,11 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               categories : {
                 connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl            
               },
-              subCategories:{
-                connect: productWithProps.product.subFl            
+              subCategories: {
+                connect: productWithProps.product.subFl
+              },
+              certificateSystems:{
+                connect: systemArray
               },
               description : productWithProps.product.longDescription,
               shortdescription : productWithProps.product.shortDescription,
@@ -152,6 +159,9 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
               },
               subCategories:{
                 connect: productWithProps.product.subFl            
+              },
+              certificateSystems:{
+                connect: systemArray
               },
               description : productWithProps.product.longDescription,
               shortdescription : productWithProps.product.shortDescription,
@@ -226,7 +236,8 @@ export const GetAllInvalidSHelgasonCertificates = async(req, res) => {
       _id:`${CompanyName}Cert${cert.id}`,
       _type:"Certificate",
       productid:`${cert.productid}`,
-      certfileurl:`${cert.fileurl}`
+      certfileurl:`${cert.fileurl}`,
+      checked: false
     }
   })
 
@@ -255,7 +266,7 @@ export const GetAllInvalidSHelgasonCertificates = async(req, res) => {
     .patch(`${CompanyName}CertList`, (p) => 
       p.setIfMissing({Certificates: []})
       // Add the items after the last item in the array (append)
-      .insert('after', 'Certificates[-1]', sanityCertReferences)
+      .insert('replace', 'Certificates[-1]', sanityCertReferences)
     )
     .commit({ autoGenerateArrayKeys: true })
     .then((updatedCert) => {

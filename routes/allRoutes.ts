@@ -11,8 +11,9 @@ import { DeleteAllSmithNorlandCert, DeleteAllSmithNorlandProducts, GetAllInvalid
 import fs from 'fs'
 import { DatabaseCategory } from '../types/models';
 import { UpsertAllCategories } from '../helpers/PrismaHelper';
-import { UploadValidatedCerts } from '../controllers/CommonController';
 import { SendEmailAPI } from '../helpers/SendEmail';
+import { setProductsToCertificateSystems, UploadValidatedCerts } from '../controllers/CommonController';
+import { InsertAllTemplateProducts } from '../controllers/testController';
 
 export const allRoutes = Router();
 
@@ -21,19 +22,13 @@ allRoutes.get('/', (req: Request, res: Response) => {
   res.send('Server is up and running here NOW!')
 })
 allRoutes.post('/api/fixcerts', UploadValidatedCerts)
-
+allRoutes.get('/api/certsystemmapper', setProductsToCertificateSystems)
 
 //BYKO ROUTES - API
 allRoutes.get('/api/byko', InsertAllBykoProducts);
 allRoutes.get('/api/byko/deleteall/products', DeleteAllProducts);
 allRoutes.get('/api/byko/getallcategories', GetAllCategories);
 allRoutes.get('/api/byko/invalidcerts', GetAllInvalidBykoCertificates)
-
-//EBSON ROUTES - GOOGLE SHEETS
-allRoutes.get('/api/ebson', InsertAllEbsonProducts)
-allRoutes.get('/api/ebson/deletecert', DeleteAllEbsonCert)
-allRoutes.get('/api/ebson/deleteproducts', DeleteAllEbsonProducts)
-allRoutes.get('/api/ebson/invalidcerts', GetAllInvalidEbsonCertificates)
 
 //TENGI ROUTES - API
 allRoutes.get('/api/tengi', InsertAllTengiProducts)
@@ -48,12 +43,6 @@ allRoutes.get('/api/shelgason/deletecert', DeleteAllSHelgasonCert)
 allRoutes.get('/api/shelgason/deleteproducts', DeleteAllSHelgasonProducts)
 allRoutes.get('/api/shelgason/invalidcerts', GetAllInvalidSHelgasonCertificates)
 
-//Sérefni ROUTES - API
-allRoutes.get('/api/serefni', InsertAllSerefniProducts)
-allRoutes.get('/api/serefni/deletecert', DeleteAllSerefniCert)
-allRoutes.get('/api/serefni/deleteproducts', DeleteAllSerefniProducts)
-allRoutes.get('/api/serefni/invalidcerts', GetAllInvalidSerefniCertificates)
-
 //Smith&Norland ROUTES - API
 allRoutes.get('/api/smithnorland', InsertAllSmithNorlandProducts)
 allRoutes.get('/api/smithnorland/getallcategories', GetAllSmithNorlandCategories)
@@ -61,7 +50,19 @@ allRoutes.get('/api/smithnorland/deletecert', DeleteAllSmithNorlandCert)
 allRoutes.get('/api/smithnorland/deleteproducts', DeleteAllSmithNorlandProducts)
 allRoutes.get('/api/smithnorland/invalidcerts', GetAllInvalidSmithNorlandCertificates)
 
-// allRoutes.get('/api/test', InsertAllTestProducts);
+//EBSON ROUTES - GOOGLE SHEETS
+allRoutes.get('/api/ebson', InsertAllEbsonProducts)
+allRoutes.get('/api/ebson/deletecert', DeleteAllEbsonCert)
+allRoutes.get('/api/ebson/deleteproducts', DeleteAllEbsonProducts)
+allRoutes.get('/api/ebson/invalidcerts', GetAllInvalidEbsonCertificates)
+
+//Sérefni ROUTES - GOOGLE SHEETS
+allRoutes.get('/api/serefni', InsertAllSerefniProducts)
+allRoutes.get('/api/serefni/deletecert', DeleteAllSerefniCert)
+allRoutes.get('/api/serefni/deleteproducts', DeleteAllSerefniProducts)
+allRoutes.get('/api/serefni/invalidcerts', GetAllInvalidSerefniCertificates)
+
+allRoutes.get('/api/test', InsertAllTemplateProducts);
 // allRoutes.get('/api/deletesheets', DeleteAllSheetsProducts);
 // allRoutes.get('/api/deletesheetscertificates', DeleteAllSheetsCert);
 

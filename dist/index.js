@@ -12,14 +12,15 @@ var jsonParser = body_parser_1.default.json();
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT;
-var whitelist = ['http://localhost:3000', 'https://vistbokserver.herokuapp.com', 'https://visttorg-primary.vercel.app', 'https://www.vistbok.is', 'http://localhost:3333', 'https://eu1.make.com'];
+var whitelist = ['http://localhost:3000', 'https://vistbokserver.herokuapp.com', 'https://visttorg-primary.vercel.app', 'https://www.vistbok.is', 'http://localhost:3333', 'https://eu1.make.com', 'https://vistbokadmin.sanity.studio'];
 var corsOptions = {
     origin: function (origin, callback) {
         if (whitelist.indexOf(origin) !== -1 || !origin) {
             callback(null, true);
         }
         else {
-            callback(new Error('Not allowed by CORS'));
+            // callback(new Error('Not allowed by CORS'))
+            callback(null, true);
         }
     }
 };

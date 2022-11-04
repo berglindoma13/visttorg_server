@@ -13,6 +13,7 @@ const ProductHelper_1 = require("../helpers/ProductHelper");
 const prisma_1 = __importDefault(require("../lib/prisma"));
 const certificateIds_1 = require("../mappers/certificates/certificateIds");
 const sanity_1 = require("../lib/sanity");
+const CertificateValidator_1 = require("../helpers/CertificateValidator");
 // SmithNorland COMPANY ID = 4
 const SmithNorlandAPI = "https://www.sminor.is/visttorg-products";
 const CompanyID = 4;
@@ -138,24 +139,25 @@ const ProcessForDatabase = async (products) => {
         var certChange = false;
         if (prod !== null) {
             approved = !!prod.approved ? prod.approved : false;
+            const now = new Date();
             prod.certificates.map((cert) => {
                 if (cert.certificateid == 1) {
                     // epd file url is not the same
-                    if (cert.fileurl !== product.epdUrl) {
+                    if (cert.fileurl !== product.epdUrl || (cert.validDate !== null && cert.validDate <= now)) {
                         certChange = true;
                         approved = false;
                     }
                 }
                 if (cert.certificateid == 2) {
                     // fsc file url is not the same
-                    if (cert.fileurl !== product.fscUrl) {
+                    if (cert.fileurl !== product.fscUrl || (cert.validDate !== null && cert.validDate <= now)) {
                         certChange = true;
                         approved = false;
                     }
                 }
                 if (cert.certificateid == 3) {
                     // voc file url is not the same
-                    if (cert.fileurl !== product.vocUrl) {
+                    if (cert.fileurl !== product.vocUrl || (cert.validDate !== null && cert.validDate <= now)) {
                         certChange = true;
                         approved = false;
                     }
@@ -188,6 +190,7 @@ const ProcessForDatabase = async (products) => {
     return Promise.all(allProductPromises).then(async (productsWithProps) => {
         const filteredArray = productsWithProps.filter(prod => prod.productState !== 1);
         await prisma_1.default.$transaction(filteredArray.map(productWithProps => {
+            const systemArray = (0, CertificateValidator_1.mapToCertificateSystem)(productWithProps.product);
             return prisma_1.default.product.upsert({
                 where: {
                     productIdentifier: { productid: productWithProps.product.id, companyid: CompanyID }
@@ -204,6 +207,9 @@ const ProcessForDatabase = async (products) => {
                     },
                     subCategories: {
                         connect: productWithProps.product.subFl
+                    },
+                    certificateSystems: {
+                        connect: systemArray
                     },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
@@ -223,6 +229,9 @@ const ProcessForDatabase = async (products) => {
                     },
                     subCategories: {
                         connect: productWithProps.product.subFl
+                    },
+                    certificateSystems: {
+                        connect: systemArray
                     },
                     description: productWithProps.product.longDescription,
                     shortdescription: productWithProps.product.shortDescription,
@@ -288,7 +297,8 @@ const GetAllInvalidSmithNorlandCertificates = async (req, res) => {
             _id: `${CompanyName}Cert${cert.id}`,
             _type: "Certificate",
             productid: `${cert.productid}`,
-            certfileurl: `${cert.fileurl}`
+            certfileurl: `${cert.fileurl}`,
+            checked: false
         };
     });
     const sanityCertReferences = [];
@@ -310,8 +320,7 @@ const GetAllInvalidSmithNorlandCertificates = async (req, res) => {
             .transaction()
             .createIfNotExists(doc)
             .patch(`${CompanyName}CertList`, (p) => p.setIfMissing({ Certificates: [] })
-            // Add the items after the last item in the array (append)
-            .insert('after', 'Certificates[-1]', sanityCertReferences))
+            .insert('replace', 'Certificates[-1]', sanityCertReferences))
             .commit({ autoGenerateArrayKeys: true })
             .then((updatedCert) => {
             console.log('Hurray, the cert is updated! New document:');
