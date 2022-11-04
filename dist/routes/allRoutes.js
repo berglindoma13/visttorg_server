@@ -16,8 +16,8 @@ const SerefniController_1 = require("../controllers/SerefniController");
 const SmithNorlandController_1 = require("../controllers/SmithNorlandController");
 const fs_1 = __importDefault(require("fs"));
 const PrismaHelper_1 = require("../helpers/PrismaHelper");
-const CommonController_1 = require("../controllers/CommonController");
 const SendEmail_1 = require("../helpers/SendEmail");
+const CommonController_1 = require("../controllers/CommonController");
 const testController_1 = require("../controllers/testController");
 exports.allRoutes = (0, express_1.Router)();
 //ALMENNT
