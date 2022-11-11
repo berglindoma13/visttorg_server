@@ -12,10 +12,14 @@ const loginController_1 = require("../controllers/loginController");
 const TengiController_1 = require("../controllers/TengiController");
 const ShelgasonController_1 = require("../controllers/ShelgasonController");
 const SerefniController_1 = require("../controllers/SerefniController");
+const BmvallaController_1 = require("../controllers/BmvallaController");
+const GksController_1 = require("../controllers/GksController");
+const BirgissonController_1 = require("../controllers/BirgissonController");
 // import { InsertAllTestProducts } from '../controllers/testController';
 const SmithNorlandController_1 = require("../controllers/SmithNorlandController");
 const fs_1 = __importDefault(require("fs"));
 const PrismaHelper_1 = require("../helpers/PrismaHelper");
+const SendEmail_1 = require("../helpers/SendEmail");
 const CommonController_1 = require("../controllers/CommonController");
 const testController_1 = require("../controllers/testController");
 exports.allRoutes = (0, express_1.Router)();
@@ -57,6 +61,21 @@ exports.allRoutes.get('/api/serefni', SerefniController_1.InsertAllSerefniProduc
 exports.allRoutes.get('/api/serefni/deletecert', SerefniController_1.DeleteAllSerefniCert);
 exports.allRoutes.get('/api/serefni/deleteproducts', SerefniController_1.DeleteAllSerefniProducts);
 exports.allRoutes.get('/api/serefni/invalidcerts', SerefniController_1.GetAllInvalidSerefniCertificates);
+//BMVallá ROUTES - GOOGLE SHEETS
+exports.allRoutes.get('/api/bmvalla', BmvallaController_1.InsertAllBMVallaProducts);
+exports.allRoutes.get('/api/bmvalla/deletecert', BmvallaController_1.DeleteAllBMVallaCert);
+exports.allRoutes.get('/api/bmvalla/deleteproducts', BmvallaController_1.DeleteAllBMVallaProducts);
+exports.allRoutes.get('/api/bmvalla/invalidcerts', BmvallaController_1.GetAllInvalidBMVallaCertificates);
+//GKS ROUTES - GOOGLE SHEETS
+exports.allRoutes.get('/api/gks', GksController_1.InsertAllGksProducts);
+exports.allRoutes.get('/api/gks/deletecert', GksController_1.DeleteAllGksCert);
+exports.allRoutes.get('/api/gks/deleteproducts', GksController_1.DeleteAllGksProducts);
+exports.allRoutes.get('/api/gks/invalidcerts', GksController_1.GetAllInvalidGksCertificates);
+//Birgisson ROUTES - GOOGLE SHEETS
+exports.allRoutes.get('/api/birgisson', BirgissonController_1.InsertAllBirgissonProducts);
+exports.allRoutes.get('/api/birgisson/deletecert', BirgissonController_1.DeleteAllBirgissonCert);
+exports.allRoutes.get('/api/birgisson/deleteproducts', BirgissonController_1.DeleteAllBirgissonProducts);
+exports.allRoutes.get('/api/birgisson/invalidcerts', BirgissonController_1.GetAllInvalidBirgissonCertificates);
 exports.allRoutes.get('/api/test', testController_1.InsertAllTemplateProducts);
 // allRoutes.get('/api/deletesheets', DeleteAllSheetsProducts);
 // allRoutes.get('/api/deletesheetscertificates', DeleteAllSheetsCert);
@@ -74,6 +93,7 @@ exports.allRoutes.get('/updatecategories', (req, res) => {
 });
 //add to postlist
 exports.allRoutes.post('/api/postlist', Postlist_1.Postlist);
-// allRoutes.get('/api/sendmail', SendEmail)
+//send email
+exports.allRoutes.get('/api/sendmail', SendEmail_1.SendEmailAPI);
 //login function
 exports.allRoutes.post('/api/login', loginController_1.Login);

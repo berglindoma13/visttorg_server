@@ -6,11 +6,15 @@ import { Login } from '../controllers/loginController';
 import { DeleteAllTengiCert, DeleteAllTengiProducts, GetAllInvalidTengiCertificates, GetAllTengiCategories, InsertAllTengiProducts } from '../controllers/TengiController';
 import { DeleteAllSHelgasonCert, DeleteAllSHelgasonProducts, GetAllInvalidSHelgasonCertificates, InsertAllSHelgasonProducts } from '../controllers/ShelgasonController';
 import { DeleteAllSerefniCert, DeleteAllSerefniProducts, GetAllInvalidSerefniCertificates, InsertAllSerefniProducts } from '../controllers/SerefniController';
+import { DeleteAllBMVallaCert, DeleteAllBMVallaProducts, GetAllInvalidBMVallaCertificates, InsertAllBMVallaProducts } from '../controllers/BmvallaController';
+import { DeleteAllGksCert, DeleteAllGksProducts, GetAllInvalidGksCertificates, InsertAllGksProducts } from '../controllers/GksController';
+import { DeleteAllBirgissonCert, DeleteAllBirgissonProducts, GetAllInvalidBirgissonCertificates, InsertAllBirgissonProducts } from '../controllers/BirgissonController';
 // import { InsertAllTestProducts } from '../controllers/testController';
 import { DeleteAllSmithNorlandCert, DeleteAllSmithNorlandProducts, GetAllInvalidSmithNorlandCertificates, GetAllSmithNorlandCategories, InsertAllSmithNorlandProducts } from '../controllers/SmithNorlandController';
 import fs from 'fs'
 import { DatabaseCategory } from '../types/models';
 import { UpsertAllCategories } from '../helpers/PrismaHelper';
+import { SendEmailAPI } from '../helpers/SendEmail';
 import { setProductsToCertificateSystems, UploadValidatedCerts } from '../controllers/CommonController';
 import { InsertAllTemplateProducts } from '../controllers/testController';
 
@@ -61,6 +65,25 @@ allRoutes.get('/api/serefni/deletecert', DeleteAllSerefniCert)
 allRoutes.get('/api/serefni/deleteproducts', DeleteAllSerefniProducts)
 allRoutes.get('/api/serefni/invalidcerts', GetAllInvalidSerefniCertificates)
 
+//BMVallá ROUTES - GOOGLE SHEETS
+allRoutes.get('/api/bmvalla', InsertAllBMVallaProducts)
+allRoutes.get('/api/bmvalla/deletecert', DeleteAllBMVallaCert)
+allRoutes.get('/api/bmvalla/deleteproducts', DeleteAllBMVallaProducts)
+allRoutes.get('/api/bmvalla/invalidcerts', GetAllInvalidBMVallaCertificates)
+
+//GKS ROUTES - GOOGLE SHEETS
+allRoutes.get('/api/gks', InsertAllGksProducts)
+allRoutes.get('/api/gks/deletecert', DeleteAllGksCert)
+allRoutes.get('/api/gks/deleteproducts', DeleteAllGksProducts)
+allRoutes.get('/api/gks/invalidcerts', GetAllInvalidGksCertificates)
+
+//Birgisson ROUTES - GOOGLE SHEETS
+allRoutes.get('/api/birgisson', InsertAllBirgissonProducts)
+allRoutes.get('/api/birgisson/deletecert', DeleteAllBirgissonCert)
+allRoutes.get('/api/birgisson/deleteproducts', DeleteAllBirgissonProducts)
+allRoutes.get('/api/birgisson/invalidcerts', GetAllInvalidBirgissonCertificates)
+
+
 allRoutes.get('/api/test', InsertAllTemplateProducts);
 // allRoutes.get('/api/deletesheets', DeleteAllSheetsProducts);
 // allRoutes.get('/api/deletesheetscertificates', DeleteAllSheetsCert);
@@ -85,7 +108,9 @@ allRoutes.get('/updatecategories', (req, res) => {
 
 //add to postlist
 allRoutes.post('/api/postlist', Postlist)
-// allRoutes.get('/api/sendmail', SendEmail)
+
+//send email
+allRoutes.get('/api/sendmail', SendEmailAPI)
 
 //login function
 allRoutes.post('/api/login', Login)
