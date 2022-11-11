@@ -36,9 +36,6 @@ const convertSmithNorlandProductToDatabaseProduct = async(product: SmithNorlandP
   const mappedCategories = getMappedCategory(prodCategories, SmithNorlandCategoryMapper)
   const mappedSubCategories = getMappedCategorySub(prodCategories, SmithNorlandCategoryMapper)
 
-  console.log('prodCategories', prodCategories)
-  console.log('mappedSubCategories', mappedSubCategories)
-
   const uniqueMappedCategories = mappedCategories.filter((value, index, self) =>
     index === self.findIndex((t) => (
       t.name === value.name
@@ -49,13 +46,13 @@ const convertSmithNorlandProductToDatabaseProduct = async(product: SmithNorlandP
   // const convertedCertificates: Array<string> = product.certificates.map(certificate => { return BykoCertificateMapper[certificate.cert] })
 
   const convertedProduct : DatabaseProduct = {
-    id: product.id !== '' ? `${CompanyID}${product.id}` : product.id,
-    prodName: product.title,
-    longDescription: product.long_description,
-    shortDescription: product.short_description,
-    fl: uniqueMappedCategories,
-    subFl:mappedSubCategories,
-    prodImage: product.images[0], // TODO - FIX THIS WHEN WE HAVE THE OPTION OF MULTIPLE IMAGES
+    productid: product.id !== '' ? `${CompanyID}${product.id}` : product.id,
+    title: product.title,
+    description: product.long_description,
+    shortdescription: product.short_description,
+    categories: uniqueMappedCategories,
+    subCategories:mappedSubCategories,
+    productimageurl: product.images[0], // TODO - FIX THIS WHEN WE HAVE THE OPTION OF MULTIPLE IMAGES
     url: product.url,
     brand: product.brand,
     fscUrl: "",
@@ -160,7 +157,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
   const allProductPromises = products.map(async(product) => {
     const productWithProps:ProductWithPropsProps = { approved: false, certChange: false, create: false, product: null, productState: 1, validDate: null, validatedCertificates:[]}
-    const prod = await GetUniqueProduct(product.id, CompanyID)
+    const prod = await GetUniqueProduct(product.productid, CompanyID)
 
     var approved = false;
     var created = false
@@ -232,49 +229,49 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
         return prismaInstance.product.upsert({
           where: {
-            productIdentifier : { productid: productWithProps.product.id, companyid: CompanyID}
+            productIdentifier : { productid: productWithProps.product.productid, companyid: CompanyID}
           },
           update: {
               approved: productWithProps.approved,
-              title: productWithProps.product.prodName,
-              productid : productWithProps.product.id,
+              title: productWithProps.product.title,
+              productid : productWithProps.product.productid,
               sellingcompany: {
                   connect: { id : CompanyID}
               },
               categories : {
-                connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl            
+                connect: typeof productWithProps.product.categories === 'string' ? { name : productWithProps.product.categories} : productWithProps.product.categories            
               },
               subCategories: {
-                connect: productWithProps.product.subFl
+                connect: productWithProps.product.subCategories
               },
               certificateSystems:{
                 connect: systemArray
               },
-              description : productWithProps.product.longDescription,
-              shortdescription : productWithProps.product.shortDescription,
-              productimageurl : productWithProps.product.prodImage,
+              description : productWithProps.product.description,
+              shortdescription : productWithProps.product.shortdescription,
+              productimageurl : productWithProps.product.productimageurl,
               url : productWithProps.product.url,
               brand : productWithProps.product.brand,
               updatedAt: new Date()
           },
           create: {
-              title: productWithProps.product.prodName,
-              productid : productWithProps.product.id,
+              title: productWithProps.product.title,
+              productid : productWithProps.product.productid,
               sellingcompany: {
                   connect: { id : CompanyID}
               },
               categories : {
-                connect: typeof productWithProps.product.fl === 'string' ? { name : productWithProps.product.fl} : productWithProps.product.fl
+                connect: typeof productWithProps.product.categories === 'string' ? { name : productWithProps.product.categories} : productWithProps.product.categories
               },
               subCategories:{
-                connect: productWithProps.product.subFl            
+                connect: productWithProps.product.subCategories            
               },
               certificateSystems:{
                 connect: systemArray
               },
-              description : productWithProps.product.longDescription,
-              shortdescription : productWithProps.product.shortDescription,
-              productimageurl : productWithProps.product.prodImage,
+              description : productWithProps.product.description,
+              shortdescription : productWithProps.product.shortdescription,
+              productimageurl : productWithProps.product.productimageurl,
               url : productWithProps.product.url,
               brand : productWithProps.product.brand,
               createdAt: new Date(),
@@ -307,7 +304,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
           name: cert.name,
           fileurl: fileurl,
           validDate: validdate,
-          productId: prod.product.id
+          productId: prod.product.productid
         }
         return certItem
       })

@@ -23,7 +23,7 @@ export const VerifyProduct = async(product : DatabaseProduct, create : boolean, 
    
    var productState = 1
    // no valid certificates for this product
-   if(validatedCertificates.length === 0 || product.id === ""){
+   if(validatedCertificates.length === 0 || product.productid === ""){
      return { productState, validDate: null };
    }
  
@@ -38,9 +38,9 @@ export const VerifyProduct = async(product : DatabaseProduct, create : boolean, 
    }
    else if(certChange === true) {
       //delete all productcertificates so they wont be duplicated and so they are up to date
-      DeleteProductCertificates(product.id)
+      DeleteProductCertificates(product.productid)
       if(validatedCertificates.length !== 0 ) {
-        if (product.id !== "") {
+        if (product.productid !== "") {
           productState = 3
           // check valid date when the certificates have changed
           if(foundCertWithFiles){
@@ -60,7 +60,7 @@ export const deleteOldProducts = async(products : Array<DatabaseProduct>, compan
   // get all current products from this company
   const currentProducts = await GetAllProductsByCompanyid(companyId)
   const productsNoLongerInDatabase = currentProducts.filter(curr_prod => {
-    const matches = products.filter(product => { return curr_prod.productid == product.id })
+    const matches = products.filter(product => { return curr_prod.productid == product.productid })
     //product was not found in list
     return matches.length === 0
   })
@@ -113,13 +113,13 @@ export const getAllProductsFromGoogleSheets = (sheetId: string, callBack: any, c
       const mappedCategories: Array<ConnectedCategory> = allCat.map(cat => { return { name: cat } })
   
       const temp_prod : DatabaseProduct = {
-          id: results[i].nr !== ''  ? `${companyID}${results[i].nr}` : results[i].nr,
-          prodName: results[i].name,
-          longDescription: results[i].long,
-          shortDescription: results[i].short,
-          fl:mappedCategories,
-          subFl: [],
-          prodImage: results[i].pic,
+          productid: results[i].nr !== ''  ? `${companyID}${results[i].nr}` : results[i].nr,
+          title: results[i].name,
+          description: results[i].long,
+          shortdescription: results[i].short,
+          categories:mappedCategories,
+          subCategories: [],
+          productimageurl: results[i].pic,
           url: results[i].link,
           brand: results[i].mark,
           fscUrl: results[i].fsclink,
