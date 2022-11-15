@@ -25,7 +25,7 @@ allRoutes.get('/', (req: Request, res: Response) => {
   res.send('Server is up and running here NOW!')
 })
 allRoutes.post('/api/fixcerts', UploadValidatedCerts)
-allRoutes.get('/api/certsystemmapper', setProductsToCertificateSystems)
+// allRoutes.get('/api/certsystemmapper', setProductsToCertificateSystems)
 
 //BYKO ROUTES - API
 allRoutes.get('/api/byko', InsertAllBykoProducts);

@@ -2,14 +2,26 @@ export interface DatabaseCertificate {
   name: string
 }
 
+export interface DatabaseCertificateSystem {
+  name: string
+}
+
+export interface DatabaseCompany {
+  name: string
+  websiteurl: string
+  email: string
+}
+
+
 export interface DatabaseProduct {
-  id: string,
-  prodName: string,
-  longDescription: string,
-  shortDescription: string,
-  fl: string | Array<ConnectedCategory>,
-  subFl: Array<ConnectedSubCategory>,
-  prodImage: string,
+  productid: string,
+  title: string,
+  description: string,
+  shortdescription: string,
+  categories: string | Array<ConnectedCategory>,
+  subCategories: Array<ConnectedSubCategory>,
+  sellingcompany?: DatabaseCompany
+  productimageurl: string,
   url: string,
   brand: string,
   fscUrl: string,
@@ -17,6 +29,7 @@ export interface DatabaseProduct {
   vocUrl: string,
   ceUrl: string,
   certificates: Array<DatabaseCertificate>
+  certificateSystems?: Array<DatabaseCertificateSystem>
 }
 
 export interface ConnectedCategory {
@@ -24,14 +37,14 @@ export interface ConnectedCategory {
 }
 
 export interface ConnectedSubCategory {
-  subCatIdentifier: bla
+  subCatIdentifier: ConnectedSubCatIdentifier
 }
 
 export interface ConnectedCertificateSystem {
   name: string
 }
 
-interface bla {
+interface ConnectedSubCatIdentifier {
   name: string
   parentCategoryName: string
 }

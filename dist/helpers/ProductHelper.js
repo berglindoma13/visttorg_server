@@ -22,7 +22,7 @@ const VerifyProduct = async (product, create, certChange) => {
     const foundCertWithFiles = validatedCertificates.filter(cert => cert.name === 'EPD' || cert.name === 'FSC' || cert.name === 'VOC').length > 0;
     var productState = 1;
     // no valid certificates for this product
-    if (validatedCertificates.length === 0 || product.id === "") {
+    if (validatedCertificates.length === 0 || product.productid === "") {
         return { productState, validDate: null };
     }
     if (create === true) {
@@ -36,9 +36,9 @@ const VerifyProduct = async (product, create, certChange) => {
     }
     else if (certChange === true) {
         //delete all productcertificates so they wont be duplicated and so they are up to date
-        (0, PrismaHelper_1.DeleteProductCertificates)(product.id);
+        (0, PrismaHelper_1.DeleteProductCertificates)(product.productid);
         if (validatedCertificates.length !== 0) {
-            if (product.id !== "") {
+            if (product.productid !== "") {
                 productState = 3;
                 // check valid date when the certificates have changed
                 if (foundCertWithFiles) {
@@ -56,7 +56,7 @@ const deleteOldProducts = async (products, companyId) => {
     // get all current products from this company
     const currentProducts = await (0, PrismaHelper_1.GetAllProductsByCompanyid)(companyId);
     const productsNoLongerInDatabase = currentProducts.filter(curr_prod => {
-        const matches = products.filter(product => { return curr_prod.productid == product.id; });
+        const matches = products.filter(product => { return curr_prod.productid == product.productid; });
         //product was not found in list
         return matches.length === 0;
     });
@@ -101,13 +101,13 @@ const getAllProductsFromGoogleSheets = (sheetId, callBack, companyID) => {
             const allCat = results[i].fl.split(',');
             const mappedCategories = allCat.map(cat => { return { name: cat }; });
             const temp_prod = {
-                id: results[i].nr !== '' ? `${companyID}${results[i].nr}` : results[i].nr,
-                prodName: results[i].name,
-                longDescription: results[i].long,
-                shortDescription: results[i].short,
-                fl: mappedCategories,
-                subFl: [],
-                prodImage: results[i].pic,
+                productid: results[i].nr !== '' ? `${companyID}${results[i].nr}` : results[i].nr,
+                title: results[i].name,
+                description: results[i].long,
+                shortdescription: results[i].short,
+                categories: mappedCategories,
+                subCategories: [],
+                productimageurl: results[i].pic,
                 url: results[i].link,
                 brand: results[i].mark,
                 fscUrl: results[i].fsclink,
