@@ -28,7 +28,7 @@ export const UploadValidatedCerts = async(req,res) => {
       })
     )
   })
-
+  // sendaInvalidEmail fallið kalla það það
   res.send('succesfully updated certificates')
 }
 
