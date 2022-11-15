@@ -28,7 +28,7 @@ exports.allRoutes.get('/', (req, res) => {
     res.send('Server is up and running here NOW!');
 });
 exports.allRoutes.post('/api/fixcerts', CommonController_1.UploadValidatedCerts);
-exports.allRoutes.get('/api/certsystemmapper', CommonController_1.setProductsToCertificateSystems);
+// allRoutes.get('/api/certsystemmapper', setProductsToCertificateSystems)
 //BYKO ROUTES - API
 exports.allRoutes.get('/api/byko', BykoController_1.InsertAllBykoProducts);
 exports.allRoutes.get('/api/byko/deleteall/products', BykoController_1.DeleteAllProducts);
