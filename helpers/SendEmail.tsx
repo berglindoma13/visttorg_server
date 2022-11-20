@@ -2,19 +2,12 @@ const nodemailer = require("nodemailer");
 const Email = require('email-templates');
 import prismaInstance from "../lib/prisma"
 
-// const path = require('path');
-
-// import "../emailTemplates/invalidProducts.html";
-
-// import "../emailTemplates/invalidProducts/"
-
 export const SendEmailAPI = async(req: any, res: any) => {
-    // SendEmail();
-    sendInvalidEmail();
+    GetInvalidProductsAndSendEmail();
     return res.status(200).send('email sent')
 }
 
-const sendInvalidEmail = async() => {
+const GetInvalidProductsAndSendEmail = async() => {
 
     const filterValidDate = (val) => {
         if(val.certificateid === 1 || val.certificateid === 2 || val.certificateid === 3) {
@@ -36,29 +29,51 @@ const sendInvalidEmail = async() => {
         }
     })
 
-    // remove certificates that are not valid 
+    // get all companies
+    const Companies = await prismaInstance.company.findMany()
+
+    // remove certificates that are not valid
     const filteredProductList = AllProducts.map(prod => {
         const filteredCertificates = prod.certificates.filter(filterValidDate)
         prod.certificates = filteredCertificates;
         return prod
     })
 
-    // only get the products with no valid certificates
-    const InvalidProducts = filteredProductList.filter(prod => prod.certificates.length == 0)
+    const invalidProducts = []
+    // only get the products with no valid certificates and add them to a new array
+    filteredProductList.filter(prod => {
+        if(prod.certificates.length == 0) {
+            invalidProducts.push({compid: prod.companyid, productid: prod.productid})
+        }
+    })
 
-    const invalidCompId = InvalidProducts.filter(prod => prod.companyid == 1)
+    const invalidProductsByCompany  = []
+    Companies.map(comp => {
+        var comp_temp_invalidproducts = []
+        invalidProducts.map(prod => {
+            if (comp.id == prod.compid) {
+                comp_temp_invalidproducts .push(prod.productid)
+            }
+        })
+        invalidProductsByCompany.push({compid: comp.id, products: comp_temp_invalidproducts, to: comp.contact });
+    })
 
-    console.log("loka filtered list length", AllProducts)
+    // send email to companies with invalid products
+    invalidProductsByCompany.forEach(i => {
+        if(i.products.length !== 0) {
+            SendEmail(i.products, i.to)
+        } 
+    })
 }
 
-const SendEmail = async() => {
+
+const SendEmail = async(productlist, emailTo) => {
     // send email from test mail now - change so it sends from visttorg and to the correct email
     const hostname = "smtp.gmail.com";
     const username = "mariavinna123@gmail.com"; 
     const password = "cxapowxvwkejbrzl"; // const password = "marraom123%";
 
-    var list = ["bla", "tveir", "þrír"];
-    var test = list.toString();
+    var test = productlist.toString();
    
     const transporter = nodemailer.createTransport({
         service: "gmail",
@@ -84,7 +99,7 @@ const SendEmail = async() => {
     emailTemplate.send({
         template: '../emailTemplates/invalidProducts',
         message: {
-            to: "maria.omarsd99@gmail.com",  
+            to: emailTo,  
         },
     }).catch(console.error)
     // console.log("Message sent: %s", info.response);

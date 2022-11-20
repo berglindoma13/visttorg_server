@@ -25,7 +25,7 @@ var corsOptions = {
 
 app.use(cors(corsOptions))
 app.use(jsonParser)
-app.use(express.static('images'))
+app.use("/images", express.static('images'))
 
 app.use('/', routes)
 

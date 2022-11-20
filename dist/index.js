@@ -26,7 +26,7 @@ var corsOptions = {
 };
 app.use((0, cors_1.default)(corsOptions));
 app.use(jsonParser);
-app.use(express_1.default.static('images'));
+app.use("/images", express_1.default.static('images'));
 app.use('/', routes_1.routes);
 app.listen(port, () => {
     console.log(`⚡️[server]: Server is running at https://localhost:${port}`);

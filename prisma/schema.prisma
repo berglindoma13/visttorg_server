@@ -15,6 +15,7 @@ model company {
   name          String
   websiteurl    String
   products      product[]
+  contact       String?
 }
 
 model product {
