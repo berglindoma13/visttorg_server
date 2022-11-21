@@ -7,14 +7,18 @@ export const SendEmailAPI = async(req: any, res: any) => {
     return res.status(200).send('email sent')
 }
 
+export const SendEmailToCompanies = async() => {
+    GetInvalidProductsAndSendEmail()
+}
+
 const GetInvalidProductsAndSendEmail = async() => {
 
     const filterValidDate = (val) => {
         if(val.certificateid === 1 || val.certificateid === 2 || val.certificateid === 3) {
-          return !!val.validDate && val.validDate > new Date()
+            return val.validDate == null || val.validDate < new Date()
         }
         else {
-          return true
+          return false
         }
     }
 
@@ -32,7 +36,7 @@ const GetInvalidProductsAndSendEmail = async() => {
     // get all companies
     const Companies = await prismaInstance.company.findMany()
 
-    // remove certificates that are not valid
+    // remove valid certificates from product and only leave the invalid ones
     const filteredProductList = AllProducts.map(prod => {
         const filteredCertificates = prod.certificates.filter(filterValidDate)
         prod.certificates = filteredCertificates;
@@ -40,9 +44,9 @@ const GetInvalidProductsAndSendEmail = async() => {
     })
 
     const invalidProducts = []
-    // only get the products with no valid certificates and add them to a new array
+    // get the products with invalid certificates and add them to a new array
     filteredProductList.filter(prod => {
-        if(prod.certificates.length == 0) {
+        if(prod.certificates.length > 0) {
             invalidProducts.push({compid: prod.companyid, productid: prod.productid})
         }
     })
@@ -57,7 +61,7 @@ const GetInvalidProductsAndSendEmail = async() => {
         })
         invalidProductsByCompany.push({compid: comp.id, products: comp_temp_invalidproducts, to: comp.contact });
     })
-
+    
     // send email to companies with invalid products
     invalidProductsByCompany.forEach(i => {
         if(i.products.length !== 0) {

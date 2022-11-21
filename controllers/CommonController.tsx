@@ -3,7 +3,7 @@ import { mapToCertificateSystem } from "../helpers/CertificateValidator"
 import prismaInstance from "../lib/prisma"
 import { client } from "../lib/sanity"
 import { SanityCertificate, SanityCertificateListItem, SanityCertificateReference } from "../types/sanity"
-
+import { SendEmailToCompanies } from "../helpers/SendEmail"
 
 export const UploadValidatedCerts = async(req,res) => {
   //Get the list item from Sanity
@@ -29,6 +29,7 @@ export const UploadValidatedCerts = async(req,res) => {
     )
   })
   // sendaInvalidEmail fallið kalla það það
+  SendEmailToCompanies();
   res.send('succesfully updated certificates')
 }
 

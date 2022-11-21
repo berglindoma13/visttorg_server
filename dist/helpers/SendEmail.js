@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SendEmailAPI = void 0;
+exports.SendEmailToCompanies = exports.SendEmailAPI = void 0;
 const nodemailer = require("nodemailer");
 const Email = require('email-templates');
 const prisma_1 = __importDefault(require("../lib/prisma"));
@@ -12,13 +12,17 @@ const SendEmailAPI = async (req, res) => {
     return res.status(200).send('email sent');
 };
 exports.SendEmailAPI = SendEmailAPI;
+const SendEmailToCompanies = async () => {
+    GetInvalidProductsAndSendEmail();
+};
+exports.SendEmailToCompanies = SendEmailToCompanies;
 const GetInvalidProductsAndSendEmail = async () => {
     const filterValidDate = (val) => {
         if (val.certificateid === 1 || val.certificateid === 2 || val.certificateid === 3) {
-            return !!val.validDate && val.validDate > new Date();
+            return val.validDate == null || val.validDate < new Date();
         }
         else {
-            return true;
+            return false;
         }
     };
     // get all products and their certificates
@@ -33,16 +37,16 @@ const GetInvalidProductsAndSendEmail = async () => {
     });
     // get all companies
     const Companies = await prisma_1.default.company.findMany();
-    // remove certificates that are not valid
+    // remove valid certificates from product and only leave the invalid ones
     const filteredProductList = AllProducts.map(prod => {
         const filteredCertificates = prod.certificates.filter(filterValidDate);
         prod.certificates = filteredCertificates;
         return prod;
     });
     const invalidProducts = [];
-    // only get the products with no valid certificates and add them to a new array
+    // get the products with invalid certificates and add them to a new array
     filteredProductList.filter(prod => {
-        if (prod.certificates.length == 0) {
+        if (prod.certificates.length > 0) {
             invalidProducts.push({ compid: prod.companyid, productid: prod.productid });
         }
     });
