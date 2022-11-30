@@ -47,7 +47,11 @@ const GetInvalidProductsAndSendEmail = async() => {
     // get the products with invalid certificates and add them to a new array
     filteredProductList.filter(prod => {
         if(prod.certificates.length > 0) {
-            invalidProducts.push({compid: prod.companyid, productid: prod.productid})
+            // get only the name of the invalid certificate for each product
+            const invalCerts = prod.certificates.map(cert => {
+                return cert.certificate.name
+            })
+            invalidProducts.push({compid: prod.companyid, name: prod.title, invalidCertificates: invalCerts})
         }
     })
 
@@ -56,12 +60,14 @@ const GetInvalidProductsAndSendEmail = async() => {
         var comp_temp_invalidproducts = []
         invalidProducts.map(prod => {
             if (comp.id == prod.compid) {
-                comp_temp_invalidproducts .push(prod.productid)
+                // push the name of the product along with the name of the invalid certificates for that product
+                var temp = " - Name: " + prod.name + ", Invalid Certificate/s: " + prod.invalidCertificates + "\n";
+                comp_temp_invalidproducts.push(temp)
             }
         })
         invalidProductsByCompany.push({compid: comp.id, products: comp_temp_invalidproducts, to: comp.contact });
     })
-    
+
     // send email to companies with invalid products
     invalidProductsByCompany.forEach(i => {
         if(i.products.length !== 0) {
@@ -73,11 +79,18 @@ const GetInvalidProductsAndSendEmail = async() => {
 
 const SendEmail = async(productlist, emailTo) => {
     // send email from test mail now - change so it sends from visttorg and to the correct email
-    const hostname = "smtp.gmail.com";
-    const username = "mariavinna123@gmail.com"; 
-    const password = "cxapowxvwkejbrzl"; // const password = "marraom123%";
+    const hostname = "smtp.gmail.com"; 
+    const username = "vistbok@visttorg.is"; 
+    // app-specific password:
+        // google account --> manage account --> security
+        // 2-step authentication turned on
+        // go to app password (below 2-step authentication)
+        // choose an app and device and press generate 
+    const password = "tufefmdhichptsrm"; 
 
-    var test = productlist.toString();
+
+    // create a string object from the product list to send to the companies
+    var fileToSend = productlist.toString();
    
     const transporter = nodemailer.createTransport({
         service: "gmail",
@@ -95,7 +108,7 @@ const SendEmail = async(productlist, emailTo) => {
         message: {
             attachments: [{
                 filename: 'Vorur.txt',
-                content: test,
+                content: fileToSend,
             }]
         }
     });
