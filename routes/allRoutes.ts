@@ -17,6 +17,8 @@ import { UpsertAllCategories } from '../helpers/PrismaHelper';
 import { SendEmailAPI } from '../helpers/SendEmail';
 import { setProductsToCertificateSystems, UploadValidatedCerts } from '../controllers/CommonController';
 import { InsertAllTemplateProducts } from '../controllers/testController';
+import { DeleteAllFagefniCert, DeleteAllFagefniProducts, GetAllInvalidFagefniCertificates, InsertAllFagefniProducts } from '../controllers/FagefniController';
+import { DeleteAllHTHCert, DeleteAllHTHProducts, GetAllInvalidHTHCertificates, InsertAllHTHProducts } from '../controllers/HTHController';
 
 export const allRoutes = Router();
 
@@ -82,6 +84,18 @@ allRoutes.get('/api/birgisson', InsertAllBirgissonProducts)
 allRoutes.get('/api/birgisson/deletecert', DeleteAllBirgissonCert)
 allRoutes.get('/api/birgisson/deleteproducts', DeleteAllBirgissonProducts)
 allRoutes.get('/api/birgisson/invalidcerts', GetAllInvalidBirgissonCertificates)
+
+//FAGEFNI ROUTES - GOOGLE SHEETS
+allRoutes.get('/api/fagefni', InsertAllFagefniProducts)
+allRoutes.get('/api/fagefni/deletecert', DeleteAllFagefniCert)
+allRoutes.get('/api/fagefni/deleteproducts', DeleteAllFagefniProducts)
+allRoutes.get('/api/fagefni/invalidcerts', GetAllInvalidFagefniCertificates)
+
+//HTH ROUTES - GOOGLE SHEETS
+allRoutes.get('/api/hth', InsertAllHTHProducts)
+allRoutes.get('/api/hth/deletecert', DeleteAllHTHCert)
+allRoutes.get('/api/hth/deleteproducts', DeleteAllHTHProducts)
+allRoutes.get('/api/hth/invalidcerts', GetAllInvalidHTHCertificates)
 
 
 allRoutes.get('/api/test', InsertAllTemplateProducts);

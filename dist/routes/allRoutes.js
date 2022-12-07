@@ -22,6 +22,7 @@ const PrismaHelper_1 = require("../helpers/PrismaHelper");
 const SendEmail_1 = require("../helpers/SendEmail");
 const CommonController_1 = require("../controllers/CommonController");
 const testController_1 = require("../controllers/testController");
+const FagefniController_1 = require("../controllers/FagefniController");
 exports.allRoutes = (0, express_1.Router)();
 //ALMENNT
 exports.allRoutes.get('/', (req, res) => {
@@ -76,6 +77,11 @@ exports.allRoutes.get('/api/birgisson', BirgissonController_1.InsertAllBirgisson
 exports.allRoutes.get('/api/birgisson/deletecert', BirgissonController_1.DeleteAllBirgissonCert);
 exports.allRoutes.get('/api/birgisson/deleteproducts', BirgissonController_1.DeleteAllBirgissonProducts);
 exports.allRoutes.get('/api/birgisson/invalidcerts', BirgissonController_1.GetAllInvalidBirgissonCertificates);
+//FAGEFNI ROUTES - GOOGLE SHEETS
+exports.allRoutes.get('/api/fagefni', FagefniController_1.InsertAllFagefniProducts);
+exports.allRoutes.get('/api/fagefni/deletecert', FagefniController_1.DeleteAllFagefniCert);
+exports.allRoutes.get('/api/fagefni/deleteproducts', FagefniController_1.DeleteAllFagefniProducts);
+exports.allRoutes.get('/api/fagefni/invalidcerts', FagefniController_1.GetAllInvalidFagefniCertificates);
 exports.allRoutes.get('/api/test', testController_1.InsertAllTemplateProducts);
 // allRoutes.get('/api/deletesheets', DeleteAllSheetsProducts);
 // allRoutes.get('/api/deletesheetscertificates', DeleteAllSheetsCert);
