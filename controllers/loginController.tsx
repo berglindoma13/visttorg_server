@@ -1,8 +1,12 @@
+import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken'
 import prismaInstance from '../lib/prisma';
+import bcrypt from 'bcryptjs'
+
+const salt = bcrypt.genSaltSync(10)
 
 /* Login function */
-export const Login = (req, res) => {
+export const Login = async(req: Request, res: Response) => {
   //TODO WHEN ISLAND.IS IS CONNECTED
   // const { token } = req.body;
   //new IslandISLogin({ audienceUrl: process.env.BACKEND_URL});    
@@ -21,52 +25,68 @@ export const Login = (req, res) => {
   //   console.log(err);
   // });
 
-  const { username, password } = req.body
+  const { email, password } = req.body.data
 
-  const foundUser = prismaInstance.vistbokUser.findUnique({
+  const foundUser = await prismaInstance.vistbokUser.findUnique({
     where: {
-      username: username
+      email: email
     }
   })
 
 
   if(!!foundUser){
-    var token = jwt.sign({ username: username }, 'thisisasuperprivatekey000111');
-     
-    return res.status(200).send(JSON.stringify(token))
+
+    console.log('foundUser', foundUser)
+
+    if(bcrypt.compareSync(password, foundUser.password) === true){
+      var token = jwt.sign({ email: email, password: foundUser.password, fullname: foundUser.fullname, jobtitle: foundUser.jobtitle, company: foundUser.company }, 'thisisasuperprivatekey000111');
+       
+      return res.status(200).send(JSON.stringify(token))
+    }else{
+      return res.status(401).end('password does not match user') 
+    }
+
   }
   else{
-    return res.status(500).send('user not found')
+    return res.status(404).send('user not found')
   }
 };
 
 /* Register function */
-export const Register = (req, res) => {
+export const Register = async(req: Request, res: Response) => {
 
-  const { username, password } = req.body
+  const { email, password, fullname, jobtitle, company } = req.body.data
+
+  const hashedPassword = bcrypt.hashSync(password, salt)
 
   // check if user already exists
-  const foundUser = prismaInstance.vistbokUser.findUnique({
+  const foundUser = await prismaInstance.vistbokUser.findUnique({
     where: {
-      username: username
+      email: email
     }
   })
 
   //user was found
   if(!!foundUser){
     
-    return res.status(500).send('user already exists')
+    return res.status(403).end('user already exists')
   }
   //user was not found - create
   else{
     
-    prismaInstance.vistbokUser.create({
+    await prismaInstance.vistbokUser.create({
       data:{
-        username: username,
-        password: password
+        email: email,
+        password: hashedPassword,
+        fullname: fullname,
+        jobtitle: jobtitle,
+        company: company
+
       }
     })
     
-    return res.status(200).send('user created')
+    var token = jwt.sign({ email: email, password: hashedPassword, fullname: fullname, jobtitle: jobtitle, company: company }, 'thisisasuperprivatekey000111');
+     
+    return res.status(200).send(JSON.stringify(token))
   }
 };

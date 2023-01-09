@@ -9,6 +9,8 @@ import { DeleteAllProductsByCompany,
   DeleteAllCertByCompany,
   GetUniqueProduct,
   GetAllInvalidProductCertsByCompany,
+  DeleteProduct,
+  DeleteProductCertificates,
 } from '../helpers/PrismaHelper'
 import { deleteOldProducts, VerifyProduct, WriteAllFiles } from '../helpers/ProductHelper';
 import prismaInstance from '../lib/prisma';
@@ -85,9 +87,13 @@ export const InsertAllBykoProducts = async(req: Request, res: Response) => {
     //process all data and insert into database - first convert to databaseProduct Array
     const allConvertedBykoProducts = []
     for(var i = 0; i < bykoData.productList.length; i++){
-      const convertedProduct = await convertBykoProductToDatabaseProduct(bykoData.productList[i])
       //here is a single product
-      allConvertedBykoProducts.push(convertedProduct)
+      const convertedProduct = await convertBykoProductToDatabaseProduct(bykoData.productList[i])
+
+      //if the product has any matching categories -> add it
+      if(convertedProduct.categories.length !== 0){
+        allConvertedBykoProducts.push(convertedProduct)
+      }
     }
 
     await ProcessForDatabase(allConvertedBykoProducts)
@@ -135,6 +141,8 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
   updatedProducts = [];
   createdProducts = [];
   productsNotValid = []
+
+  console.log('processing product list')
 
 
   const allProductPromises = products.map(async(product) => {
@@ -204,6 +212,8 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
     const filteredArray = productsWithProps.filter(prod => prod.productState !== 1)
 
+    console.log('starting transaction for products')
+
     await prismaInstance.$transaction(
       filteredArray.map(productWithProps => {
         const systemArray = mapToCertificateSystem(productWithProps.product)
@@ -263,7 +273,10 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
       })
     )
 
+    console.log('starting to delete all certs')
     await DeleteAllCertByCompany(CompanyID)
+
+    console.log('done deleting and starting to create new ones')
 
     const allCertificates: Array<DatabaseProductCertificate> = filteredArray.map(prod => {
       return prod.validatedCertificates.map(cert => {
@@ -310,7 +323,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
       })
     ) 
   }).then(() => {
-
+    console.log('done and gone into then')
     // write all appropriate files
     WriteAllFiles(createdProducts, updatedProducts, productsNotValid, CompanyName)
   });

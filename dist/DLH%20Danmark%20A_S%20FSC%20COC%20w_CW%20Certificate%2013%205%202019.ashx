@@ -3,17 +3,17 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />		<title>DLH</title>
+<meta name='robots' content='max-image-preview:large' />
 <link rel='dns-prefetch' href='//www.googletagmanager.com' />
 <link rel='dns-prefetch' href='//fonts.googleapis.com' />
-<link rel='dns-prefetch' href='//s.w.org' />
 <link rel="alternate" type="application/rss+xml" title="DLH &raquo; Feed" href="https://dlh.com/feed/" />
 <link rel="alternate" type="application/rss+xml" title="DLH &raquo; Comments Feed" href="https://dlh.com/comments/feed/" />
-		<script type="text/javascript">
-			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/12.0.0-1\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/12.0.0-1\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/dlh.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=5.4.11"}};
-			/*! This file is auto-generated */
-			!function(e,a,t){var n,r,o,i=a.createElement("canvas"),p=i.getContext&&i.getContext("2d");function s(e,t){var a=String.fromCharCode;p.clearRect(0,0,i.width,i.height),p.fillText(a.apply(this,e),0,0);e=i.toDataURL();return p.clearRect(0,0,i.width,i.height),p.fillText(a.apply(this,t),0,0),e===i.toDataURL()}function c(e){var t=a.createElement("script");t.src=e,t.defer=t.type="text/javascript",a.getElementsByTagName("head")[0].appendChild(t)}for(o=Array("flag","emoji"),t.supports={everything:!0,everythingExceptFlag:!0},r=0;r<o.length;r++)t.supports[o[r]]=function(e){if(!p||!p.fillText)return!1;switch(p.textBaseline="top",p.font="600 32px Arial",e){case"flag":return s([127987,65039,8205,9895,65039],[127987,65039,8203,9895,65039])?!1:!s([55356,56826,55356,56819],[55356,56826,8203,55356,56819])&&!s([55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447],[55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447]);case"emoji":return!s([55357,56424,55356,57342,8205,55358,56605,8205,55357,56424,55356,57340],[55357,56424,55356,57342,8203,55358,56605,8203,55357,56424,55356,57340])}return!1}(o[r]),t.supports.everything=t.supports.everything&&t.supports[o[r]],"flag"!==o[r]&&(t.supports.everythingExceptFlag=t.supports.everythingExceptFlag&&t.supports[o[r]]);t.supports.everythingExceptFlag=t.supports.everythingExceptFlag&&!t.supports.flag,t.DOMReady=!1,t.readyCallback=function(){t.DOMReady=!0},t.supports.everything||(n=function(){t.readyCallback()},a.addEventListener?(a.addEventListener("DOMContentLoaded",n,!1),e.addEventListener("load",n,!1)):(e.attachEvent("onload",n),a.attachEvent("onreadystatechange",function(){"complete"===a.readyState&&t.readyCallback()})),(n=t.source||{}).concatemoji?c(n.concatemoji):n.wpemoji&&n.twemoji&&(c(n.twemoji),c(n.wpemoji)))}(window,document,window._wpemojiSettings);
-		</script>
-		<style type="text/css">
+<script type="text/javascript">
+window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/14.0.0\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/14.0.0\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/dlh.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=6.1.1"}};
+/*! This file is auto-generated */
+!function(e,a,t){var n,r,o,i=a.createElement("canvas"),p=i.getContext&&i.getContext("2d");function s(e,t){var a=String.fromCharCode,e=(p.clearRect(0,0,i.width,i.height),p.fillText(a.apply(this,e),0,0),i.toDataURL());return p.clearRect(0,0,i.width,i.height),p.fillText(a.apply(this,t),0,0),e===i.toDataURL()}function c(e){var t=a.createElement("script");t.src=e,t.defer=t.type="text/javascript",a.getElementsByTagName("head")[0].appendChild(t)}for(o=Array("flag","emoji"),t.supports={everything:!0,everythingExceptFlag:!0},r=0;r<o.length;r++)t.supports[o[r]]=function(e){if(p&&p.fillText)switch(p.textBaseline="top",p.font="600 32px Arial",e){case"flag":return s([127987,65039,8205,9895,65039],[127987,65039,8203,9895,65039])?!1:!s([55356,56826,55356,56819],[55356,56826,8203,55356,56819])&&!s([55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447],[55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447]);case"emoji":return!s([129777,127995,8205,129778,127999],[129777,127995,8203,129778,127999])}return!1}(o[r]),t.supports.everything=t.supports.everything&&t.supports[o[r]],"flag"!==o[r]&&(t.supports.everythingExceptFlag=t.supports.everythingExceptFlag&&t.supports[o[r]]);t.supports.everythingExceptFlag=t.supports.everythingExceptFlag&&!t.supports.flag,t.DOMReady=!1,t.readyCallback=function(){t.DOMReady=!0},t.supports.everything||(n=function(){t.readyCallback()},a.addEventListener?(a.addEventListener("DOMContentLoaded",n,!1),e.addEventListener("load",n,!1)):(e.attachEvent("onload",n),a.attachEvent("onreadystatechange",function(){"complete"===a.readyState&&t.readyCallback()})),(e=t.source||{}).concatemoji?c(e.concatemoji):e.wpemoji&&e.twemoji&&(c(e.twemoji),c(e.wpemoji)))}(window,document,window._wpemojiSettings);
+</script>
+<style type="text/css">
 img.wp-smiley,
 img.emoji {
 	display: inline !important;
@@ -21,7 +21,7 @@ img.emoji {
 	box-shadow: none !important;
 	height: 1em !important;
 	width: 1em !important;
-	margin: 0 .07em !important;
+	margin: 0 0.07em !important;
 	vertical-align: -0.1em !important;
 	background: none !important;
 	padding: 0 !important;
@@ -29,57 +29,64 @@ img.emoji {
 </style>
 			<style type="text/css">
 		</style>
-		<link rel='stylesheet' id='airi-bootstrap-css'  href='https://dlh.com/wp-content/themes/airi/css/bootstrap/bootstrap.min.css?ver=1' type='text/css' media='all' />
-<link rel='stylesheet' id='wp-block-library-css'  href='https://dlh.com/wp-includes/css/dist/block-library/style.min.css?ver=5.4.11' type='text/css' media='all' />
-<link rel='stylesheet' id='cookie-law-info-css'  href='https://dlh.com/wp-content/plugins/cookie-law-info/public/css/cookie-law-info-public.css?ver=1.9.1' type='text/css' media='all' />
-<link rel='stylesheet' id='cookie-law-info-gdpr-css'  href='https://dlh.com/wp-content/plugins/cookie-law-info/public/css/cookie-law-info-gdpr.css?ver=1.9.1' type='text/css' media='all' />
-<link rel='stylesheet' id='fts-feeds-css'  href='https://dlh.com/wp-content/plugins/feed-them-social/feeds/css/styles.css?ver=2.8.9' type='text/css' media='' />
-<link rel='stylesheet' id='airi-style-css'  href='https://dlh.com/wp-content/themes/airi/style.css?ver=5.4.11' type='text/css' media='all' />
+		<link rel='stylesheet' id='airi-bootstrap-css' href='https://dlh.com/wp-content/themes/airi/css/bootstrap/bootstrap.min.css?ver=1' type='text/css' media='all' />
+<link rel='stylesheet' id='wp-block-library-css' href='https://dlh.com/wp-includes/css/dist/block-library/style.min.css?ver=6.1.1' type='text/css' media='all' />
+<link rel='stylesheet' id='classic-theme-styles-css' href='https://dlh.com/wp-includes/css/classic-themes.min.css?ver=1' type='text/css' media='all' />
+<style id='global-styles-inline-css' type='text/css'>
+body{--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--duotone--dark-grayscale: url('#wp-duotone-dark-grayscale');--wp--preset--duotone--grayscale: url('#wp-duotone-grayscale');--wp--preset--duotone--purple-yellow: url('#wp-duotone-purple-yellow');--wp--preset--duotone--blue-red: url('#wp-duotone-blue-red');--wp--preset--duotone--midnight: url('#wp-duotone-midnight');--wp--preset--duotone--magenta-yellow: url('#wp-duotone-magenta-yellow');--wp--preset--duotone--purple-green: url('#wp-duotone-purple-green');--wp--preset--duotone--blue-orange: url('#wp-duotone-blue-orange');--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;}:where(.is-layout-flex){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+.wp-block-navigation a:where(:not(.wp-element-button)){color: inherit;}
+:where(.wp-block-columns.is-layout-flex){gap: 2em;}
+.wp-block-pullquote{font-size: 1.5em;line-height: 1.6;}
+</style>
+<link rel='stylesheet' id='cookie-law-info-css' href='https://dlh.com/wp-content/plugins/cookie-law-info/public/css/cookie-law-info-public.css?ver=1.9.1' type='text/css' media='all' />
+<link rel='stylesheet' id='cookie-law-info-gdpr-css' href='https://dlh.com/wp-content/plugins/cookie-law-info/public/css/cookie-law-info-gdpr.css?ver=1.9.1' type='text/css' media='all' />
+<link rel='stylesheet' id='fts-feeds-css' href='https://dlh.com/wp-content/plugins/feed-them-social/feeds/css/styles.css?ver=2.8.9' type='text/css' media='' />
+<link rel='stylesheet' id='airi-style-css' href='https://dlh.com/wp-content/themes/airi/style.css?ver=6.1.1' type='text/css' media='all' />
 <style id='airi-style-inline-css' type='text/css'>
 h1,h2,h3,h4,h5,h6,.site-title{font-family:Quicksand;font-weight:;font-backup:;font-style:normal;}.editor-block-list__layout h1,.editor-block-list__layout h2,.editor-block-list__layout h3,.editor-block-list__layout h4,.editor-block-list__layout h5,.editor-block-list__layout h6,.editor-post-title__block .editor-post-title__input{font-family:Quicksand;font-weight:;font-backup:;font-style:normal;}body{font-family:Work Sans;font-weight:400;font-size:18px;}.editor-block-list__layout,.editor-block-list__layout .editor-block-list__block{font-family:Work Sans;font-weight:400;}.site-title{font-size:33px;}.site-description{font-size:18px;}.main-navigation ul ul li{font-size:16px;}.blog-loop .entry-title{font-size:42px;}.single-post .entry-title{font-size:34px;color:#191919;}.widget-area .widget-title{font-size:20px;}.widget-area .widget{font-size:18px;}.sidebar-column .widget-title{font-size:18px;}.sidebar-column .widget{font-size:17px;}.site-info{font-size:10px;}.woocommerce div.product .woocommerce-tabs ul.tabs li.active a,.product div.entry-summary p.price, .product div.entry-summary span.price,.athemes-blog:not(.airi_athemes_blog_skin) .posted-on a,.athemes-blog:not(.airi_athemes_blog_skin) .byline a:hover,.testimonials-section.style1:before,.single-post .read-more-link .gt,.blog-loop .read-more-link .gt,.single-post .posted-on a,.blog-loop .posted-on a,.entry-title a:hover,.airi_recent_entries .post-date,.menuStyle3 .top-bar .contact-item .fa,.menuStyle4 .contact-area .contact-block .contact-icon,.widget_categories li:hover::before,.widget_categories li:hover a{color:#4b714c;}.product .single_add_to_cart_button.button.alt,.menuStyle4 .contact-area .contact-block .contact-icon,button,.button,input[type="button"],input[type="reset"],input[type="submit"]{border-color:#4b714c;}.woocommerce-checkout button.button.alt,.woocommerce-checkout button.button.alt:hover,.woocommerce-cart .cart-collaterals .cart_totals .button:hover,.woocommerce-cart .cart-collaterals .cart_totals .button,.product .single_add_to_cart_button.button.alt:hover,.product .single_add_to_cart_button.button.alt,.woocommerce ul.products li.product .button,.menuStyle2 .main-navigation a:hover:after, .menuStyle2 .main-navigation .current-menu-item:after,.comments-area .comment-reply-link:hover,.menuStyle4 .main-navigation .header-cta:before,.menuStyle4 .main-navigation .header-cta,button,.button,input[type="button"],input[type="reset"],input[type="submit"],.menuStyle3 .main-navigation a:hover:after,.menuStyle3 .main-navigation .current-menu-item:after{background-color:#4b714c;}.menuStyle1 .site-title a{color:#ec0d0d;}.menuStyle1 .sticky-wrapper.is-sticky .site-title a{color:#191919;}.menuStyle1 .site-description{color:#ffffff;}.menuStyle1 .sticky-wrapper.is-sticky .site-description{color:#191919;}.menuStyle1 .main-navigation a, .menuStyle1 .fa-search{color:#ffffff;}.menuStyle1 .sticky-wrapper.is-sticky .main-navigation a, .menuStyle1 .sticky-wrapper.is-sticky .fa-search{color:#ffffff;}.menuStyle1 .site-header, .menuStyle1.page-template-template_page-builder .site-header{background-color:rgba(75,113,76,0);}.menuStyle1 .is-sticky .site-header{background-color:#4b714c;}.menuStyle2 .site-title a{color:#ffffff;}.menuStyle2 .sticky-wrapper.is-sticky .site-title a{color:#191919;}.menuStyle2 .site-description{color:#707070;}.menuStyle2 .sticky-wrapper.is-sticky .site-description{color:#707070;}.menuStyle2 .main-navigation a{color:#191919;}.menuStyle2 .sticky-wrapper.is-sticky .main-navigation a{color:#191919;}.menuStyle2 .site-header{background-color:rgba(255,255,255,0);}.menuStyle2 .is-sticky .site-header{background-color:#4d6351;}.menuStyle3 .top-bar{background-color:#fff;}.menuStyle3 .top-bar a, .menuStyle3 .top-bar .contact-item.header-social .fa, .menuStyle3 .top-bar .contact-item.header-social a{color:#191919;}.menuStyle3 .site-title a{color:#ffffff;}.menuStyle3 .sticky-wrapper.is-sticky .site-title a{color:#191919;}.menuStyle3 .site-description{color:#ffffff;}.menuStyle3 .sticky-wrapper.is-sticky .site-description{color:#191919;}.menuStyle3 .main-navigation a{color:#ffffff;}.menuStyle3 .sticky-wrapper.is-sticky .main-navigation a{color:#191919;}.menuStyle3 .bottom-bar, .menuStyle3.page-template-template_page-builder .bottom-bar{background-color:transparent;}.menuStyle3 .is-sticky .bottom-bar{background-color:#ffffff;}.menuStyle4 .site-title a{color:#191919;}.menuStyle4 .site-description{color:#707070;}.menuStyle4 .main-navigation{background-color:#0e304e;}.menuStyle4 .main-navigation li a{color:#fff;}.menuStyle4 .site-header{background-color:#fff;}.menuStyle4 .contact-area .contact-block span:first-of-type{color:#595959;}.menuStyle4 .contact-area .contact-block span:last-of-type{color:#0e304e;}#site-navigation ul ul li a{color:#ffffff;}#site-navigation ul ul li{background-color:#4b714c;}.menuStyle1 .mobile-menu-toggle_lines, .menuStyle1 .mobile-menu-toggle_lines:before, .menuStyle1 .mobile-menu-toggle_lines:after,.menuStyle1 .mobile-menu-toggle_lines,.mobile-menu-toggle_lines:before, .mobile-menu-toggle_lines:after,.mobile-menu-toggle_lines,.menuStyle3 .mobile-menu-toggle_lines,.menuStyle3 .mobile-menu-toggle_lines:before, .menuStyle3 .mobile-menu-toggle_lines:after{background:#ffffff;}.entry-title a{color:#191919;}.single-post .post-cat, .blog-loop .post-cat{background-color:#eff1f4;}.single-post .entry-meta, .blog-loop .entry-meta{color:#bfbfbf;}.single-post .entry-meta .byline a, .blog-loop .entry-meta .byline a{color:#595959;}.single-post .entry-content, .blog-loop .entry-content{color:#595959;}.widget .widget-title{color:#4d6351;}.widget{color:#ffffff;}.widget a{color:#ffffff;}
 </style>
-<link rel='stylesheet' id='airi-font-awesome-css'  href='https://dlh.com/wp-content/themes/airi/css/font-awesome/css/font-awesome.min.css?ver=5.4.11' type='text/css' media='all' />
-<link rel='stylesheet' id='airi-fonts-css'  href='//fonts.googleapis.com/css?family=Work+Sans:400,500,600' type='text/css' media='all' />
-<link rel='stylesheet' id='607335511c9ca3c21e0a21547e766c09-css'  href='//fonts.googleapis.com/css?family=Quicksand:700' type='text/css' media='all' />
-<link rel='stylesheet' id='aaa08318714772daa18bb4bc7b24e575-css'  href='//fonts.googleapis.com/css?family=Work+Sans:regular' type='text/css' media='all' />
-<link rel='stylesheet' id='elementor-icons-css'  href='https://dlh.com/wp-content/plugins/elementor/assets/lib/eicons/css/elementor-icons.min.css?ver=5.13.0' type='text/css' media='all' />
-<link rel='stylesheet' id='elementor-frontend-legacy-css'  href='https://dlh.com/wp-content/plugins/elementor/assets/css/frontend-legacy.min.css?ver=3.4.7' type='text/css' media='all' />
-<link rel='stylesheet' id='elementor-frontend-css'  href='https://dlh.com/wp-content/plugins/elementor/assets/css/frontend.min.css?ver=3.4.7' type='text/css' media='all' />
+<link rel='stylesheet' id='airi-font-awesome-css' href='https://dlh.com/wp-content/themes/airi/css/font-awesome/css/font-awesome.min.css?ver=6.1.1' type='text/css' media='all' />
+<link rel='stylesheet' id='airi-fonts-css' href='//fonts.googleapis.com/css?family=Work+Sans:400,500,600' type='text/css' media='all' />
+<link rel='stylesheet' id='607335511c9ca3c21e0a21547e766c09-css' href='//fonts.googleapis.com/css?family=Quicksand:700' type='text/css' media='all' />
+<link rel='stylesheet' id='aaa08318714772daa18bb4bc7b24e575-css' href='//fonts.googleapis.com/css?family=Work+Sans:regular' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-icons-css' href='https://dlh.com/wp-content/plugins/elementor/assets/lib/eicons/css/elementor-icons.min.css?ver=5.13.0' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-frontend-legacy-css' href='https://dlh.com/wp-content/plugins/elementor/assets/css/frontend-legacy.min.css?ver=3.4.7' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-frontend-css' href='https://dlh.com/wp-content/plugins/elementor/assets/css/frontend.min.css?ver=3.4.7' type='text/css' media='all' />
 <style id='elementor-frontend-inline-css' type='text/css'>
 @font-face{font-family:eicons;src:url(https://dlh.com/wp-content/plugins/elementor/assets/lib/eicons/fonts/eicons.eot?5.10.0);src:url(https://dlh.com/wp-content/plugins/elementor/assets/lib/eicons/fonts/eicons.eot?5.10.0#iefix) format("embedded-opentype"),url(https://dlh.com/wp-content/plugins/elementor/assets/lib/eicons/fonts/eicons.woff2?5.10.0) format("woff2"),url(https://dlh.com/wp-content/plugins/elementor/assets/lib/eicons/fonts/eicons.woff?5.10.0) format("woff"),url(https://dlh.com/wp-content/plugins/elementor/assets/lib/eicons/fonts/eicons.ttf?5.10.0) format("truetype"),url(https://dlh.com/wp-content/plugins/elementor/assets/lib/eicons/fonts/eicons.svg?5.10.0#eicon) format("svg");font-weight:400;font-style:normal}
 </style>
-<link rel='stylesheet' id='elementor-post-6-css'  href='https://dlh.com/wp-content/uploads/elementor/css/post-6.css?ver=1664276169' type='text/css' media='all' />
-<link rel='stylesheet' id='elementor-pro-css'  href='https://dlh.com/wp-content/plugins/elementor-pro/assets/css/frontend.min.css?ver=3.5.0' type='text/css' media='all' />
-<link rel='stylesheet' id='she-header-style-css'  href='https://dlh.com/wp-content/plugins/sticky-header-effects-for-elementor/assets/css/she-header-style.css?ver=1.4.3' type='text/css' media='all' />
-<link rel='stylesheet' id='elementskit-css-widgetarea-control-editor-css'  href='https://dlh.com/wp-content/plugins/elementskit-lite/modules/controls/assets/css/widgetarea-editor.css?ver=2.0.10' type='text/css' media='all' />
-<link rel='stylesheet' id='elementor-post-4301-css'  href='https://dlh.com/wp-content/uploads/elementor/css/post-4301.css?ver=1664437368' type='text/css' media='all' />
-<link rel='stylesheet' id='elementor-post-4657-css'  href='https://dlh.com/wp-content/uploads/elementor/css/post-4657.css?ver=1664276169' type='text/css' media='all' />
-<link rel='stylesheet' id='elementor-post-4938-css'  href='https://dlh.com/wp-content/uploads/elementor/css/post-4938.css?ver=1664434907' type='text/css' media='all' />
-<link rel='stylesheet' id='elementor-post-4956-css'  href='https://dlh.com/wp-content/uploads/elementor/css/post-4956.css?ver=1664436321' type='text/css' media='all' />
-<link rel='stylesheet' id='elementor-icons-ekiticons-css'  href='https://dlh.com/wp-content/plugins/elementskit-lite/modules/controls/assets/css/ekiticons.css?ver=5.9.0' type='text/css' media='all' />
-<link rel='stylesheet' id='ekit-widget-styles-css'  href='https://dlh.com/wp-content/plugins/elementskit-lite/widgets/init/assets/css/widget-styles.css?ver=2.0.10' type='text/css' media='all' />
-<link rel='stylesheet' id='ekit-responsive-css'  href='https://dlh.com/wp-content/plugins/elementskit-lite/widgets/init/assets/css/responsive.css?ver=2.0.10' type='text/css' media='all' />
-<link rel='stylesheet' id='google-fonts-1-css'  href='https://fonts.googleapis.com/css?family=Roboto%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CRoboto+Slab%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CAverage%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CBrawler%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic&#038;display=auto&#038;ver=5.4.11' type='text/css' media='all' />
-<link rel='stylesheet' id='elementor-icons-shared-0-css'  href='https://dlh.com/wp-content/plugins/elementor/assets/lib/font-awesome/css/fontawesome.min.css?ver=5.15.3' type='text/css' media='all' />
-<link rel='stylesheet' id='elementor-icons-fa-solid-css'  href='https://dlh.com/wp-content/plugins/elementor/assets/lib/font-awesome/css/solid.min.css?ver=5.15.3' type='text/css' media='all' />
-<link rel='stylesheet' id='elementor-icons-fa-brands-css'  href='https://dlh.com/wp-content/plugins/elementor/assets/lib/font-awesome/css/brands.min.css?ver=5.15.3' type='text/css' media='all' />
-<script type='text/javascript' src='https://dlh.com/wp-includes/js/jquery/jquery.js?ver=1.12.4-wp'></script>
-<script type='text/javascript' src='https://dlh.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.1'></script>
-<script type='text/javascript'>
+<link rel='stylesheet' id='elementor-post-6-css' href='https://dlh.com/wp-content/uploads/elementor/css/post-6.css?ver=1664276169' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-pro-css' href='https://dlh.com/wp-content/plugins/elementor-pro/assets/css/frontend.min.css?ver=3.5.0' type='text/css' media='all' />
+<link rel='stylesheet' id='she-header-style-css' href='https://dlh.com/wp-content/plugins/sticky-header-effects-for-elementor/assets/css/she-header-style.css?ver=1.4.3' type='text/css' media='all' />
+<link rel='stylesheet' id='elementskit-css-widgetarea-control-editor-css' href='https://dlh.com/wp-content/plugins/elementskit-lite/modules/controls/assets/css/widgetarea-editor.css?ver=2.0.10' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-post-4301-css' href='https://dlh.com/wp-content/uploads/elementor/css/post-4301.css?ver=1669729200' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-post-4657-css' href='https://dlh.com/wp-content/uploads/elementor/css/post-4657.css?ver=1664276169' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-post-4938-css' href='https://dlh.com/wp-content/uploads/elementor/css/post-4938.css?ver=1664434907' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-post-4956-css' href='https://dlh.com/wp-content/uploads/elementor/css/post-4956.css?ver=1669300593' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-icons-ekiticons-css' href='https://dlh.com/wp-content/plugins/elementskit-lite/modules/controls/assets/css/ekiticons.css?ver=5.9.0' type='text/css' media='all' />
+<link rel='stylesheet' id='ekit-widget-styles-css' href='https://dlh.com/wp-content/plugins/elementskit-lite/widgets/init/assets/css/widget-styles.css?ver=2.0.10' type='text/css' media='all' />
+<link rel='stylesheet' id='ekit-responsive-css' href='https://dlh.com/wp-content/plugins/elementskit-lite/widgets/init/assets/css/responsive.css?ver=2.0.10' type='text/css' media='all' />
+<link rel='stylesheet' id='google-fonts-1-css' href='https://fonts.googleapis.com/css?family=Roboto%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CRoboto+Slab%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CBrawler%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic&#038;display=auto&#038;ver=6.1.1' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-icons-shared-0-css' href='https://dlh.com/wp-content/plugins/elementor/assets/lib/font-awesome/css/fontawesome.min.css?ver=5.15.3' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-icons-fa-solid-css' href='https://dlh.com/wp-content/plugins/elementor/assets/lib/font-awesome/css/solid.min.css?ver=5.15.3' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-icons-fa-brands-css' href='https://dlh.com/wp-content/plugins/elementor/assets/lib/font-awesome/css/brands.min.css?ver=5.15.3' type='text/css' media='all' />
+<script type='text/javascript' src='https://dlh.com/wp-includes/js/jquery/jquery.min.js?ver=3.6.1' id='jquery-core-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.3.2' id='jquery-migrate-js'></script>
+<script type='text/javascript' id='cookie-law-info-js-extra'>
 /* <![CDATA[ */
 var Cli_Data = {"nn_cookie_ids":[],"cookielist":[],"ccpaEnabled":"","ccpaRegionBased":"","ccpaBarEnabled":"","ccpaType":"gdpr","js_blocking":"","custom_integration":"","triggerDomRefresh":""};
 var cli_cookiebar_settings = {"animate_speed_hide":"500","animate_speed_show":"500","background":"#FFF","border":"#b1a6a6c2","border_on":"","button_1_button_colour":"#000","button_1_button_hover":"#000000","button_1_link_colour":"#fff","button_1_as_button":"1","button_1_new_win":"","button_2_button_colour":"#333","button_2_button_hover":"#292929","button_2_link_colour":"#444","button_2_as_button":"","button_2_hidebar":"","button_3_button_colour":"#000","button_3_button_hover":"#000000","button_3_link_colour":"#fff","button_3_as_button":"1","button_3_new_win":"","button_4_button_colour":"#000","button_4_button_hover":"#000000","button_4_link_colour":"#62a329","button_4_as_button":"","font_family":"inherit","header_fix":"","notify_animate_hide":"1","notify_animate_show":"","notify_div_id":"#cookie-law-info-bar","notify_position_horizontal":"right","notify_position_vertical":"bottom","scroll_close":"","scroll_close_reload":"","accept_close_reload":"","reject_close_reload":"","showagain_tab":"","showagain_background":"#fff","showagain_border":"#000","showagain_div_id":"#cookie-law-info-again","showagain_x_position":"100px","text":"#000","show_once_yn":"","show_once":"10000","logging_on":"","as_popup":"","popup_overlay":"1","bar_heading_text":"","cookie_bar_as":"banner","popup_showagain_position":"bottom-right","widget_position":"left"};
 var log_object = {"ajax_url":"https:\/\/dlh.com\/wp-admin\/admin-ajax.php"};
 /* ]]> */
 </script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/cookie-law-info/public/js/cookie-law-info-public.js?ver=1.9.1'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/feed-them-social/feeds/js/powered-by.js?ver=2.8.9'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/feed-them-social/feeds/js/fts-global.js?ver=2.8.9'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/sticky-header-effects-for-elementor/assets/js/she-header.js?ver=1.4.3'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/cookie-law-info/public/js/cookie-law-info-public.js?ver=1.9.1' id='cookie-law-info-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/feed-them-social/feeds/js/powered-by.js?ver=2.8.9' id='fts_powered_by_js-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/feed-them-social/feeds/js/fts-global.js?ver=2.8.9' id='fts-global-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/sticky-header-effects-for-elementor/assets/js/she-header.js?ver=1.4.3' id='she-header-js'></script>
 
 <!-- Google Analytics snippet added by Site Kit -->
-<script type='text/javascript' src='https://www.googletagmanager.com/gtag/js?id=UA-211283934-1' async></script>
-<script type='text/javascript'>
+<script type='text/javascript' src='https://www.googletagmanager.com/gtag/js?id=UA-211283934-1' id='google_gtagjs-js' async></script>
+<script type='text/javascript' id='google_gtagjs-js-after'>
 window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}
 gtag('set', 'linker', {"domains":["dlh.com"]} );
 gtag("js", new Date());
@@ -89,10 +96,9 @@ gtag("config", "G-X8HWTPW5SC");
 </script>
 
 <!-- End Google Analytics snippet added by Site Kit -->
-<link rel='https://api.w.org/' href='https://dlh.com/wp-json/' />
-<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://dlh.com/xmlrpc.php?rsd" />
-<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://dlh.com/wp-includes/wlwmanifest.xml" /> 
-<meta name="generator" content="WordPress 5.4.11" />
+<link rel="https://api.w.org/" href="https://dlh.com/wp-json/" /><link rel="alternate" type="application/json" href="https://dlh.com/wp-json/wp/v2/pages/4301" /><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://dlh.com/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://dlh.com/wp-includes/wlwmanifest.xml" />
+<meta name="generator" content="WordPress 6.1.1" />
 <link rel="canonical" href="https://dlh.com/" />
 <link rel='shortlink' href='https://dlh.com/' />
 <link rel="alternate" type="application/json+oembed" href="https://dlh.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fdlh.com%2F" />
@@ -141,7 +147,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-widget-container">
 								<div class="elementor-image">
 													<a href="https://dlh.com">
-							<img width="250" height="250" src="https://dlh.com/wp-content/uploads/2022/08/DLH-Fritz├©e_Hvit_uden-baggrund_3.png" class="attachment-full size-full" alt="" srcset="https://dlh.com/wp-content/uploads/2022/08/DLH-Fritz├©e_Hvit_uden-baggrund_3.png 250w, https://dlh.com/wp-content/uploads/2022/08/DLH-Fritz├©e_Hvit_uden-baggrund_3-150x150.png 150w" sizes="(max-width: 250px) 100vw, 250px" />								</a>
+							<img width="250" height="250" src="https://dlh.com/wp-content/uploads/2022/08/DLH-Fritz├©e_Hvit_uden-baggrund_3.png" class="attachment-full size-full" alt="" loading="lazy" srcset="https://dlh.com/wp-content/uploads/2022/08/DLH-Fritz├©e_Hvit_uden-baggrund_3.png 250w, https://dlh.com/wp-content/uploads/2022/08/DLH-Fritz├©e_Hvit_uden-baggrund_3-150x150.png 150w" sizes="(max-width: 250px) 100vw, 250px" />								</a>
 														</div>
 						</div>
 				</div>
@@ -334,7 +340,7 @@ gtag("config", "G-X8HWTPW5SC");
 					<div class="elementor-button-wrapper">
 			<a href="/interior/multi-bog/" class="elementor-button-link elementor-button elementor-size-sm elementor-animation-bob" role="button">
 						<span class="elementor-button-content-wrapper">
-						<span class="elementor-button-text">Multi bøg</span>
+						<span class="elementor-button-text">Multibøg</span>
 		</span>
 					</a>
 		</div>
@@ -351,7 +357,7 @@ gtag("config", "G-X8HWTPW5SC");
 					<div class="elementor-button-wrapper">
 			<a href="/interior/massive-traebordplader/" class="elementor-button-link elementor-button elementor-size-sm elementor-animation-bob" role="button">
 						<span class="elementor-button-content-wrapper">
-						<span class="elementor-button-text">Massive træbordplader</span>
+						<span class="elementor-button-text">Massive bordplader</span>
 		</span>
 					</a>
 		</div>
@@ -427,7 +433,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementskit-nav-identity-panel">
 					<div class="elementskit-site-title">
 						<a class="elementskit-nav-logo" href="https://dlh.com" target="_self" rel="">
-							<img src="https://dlh.com/wp-content/plugins/elementor/assets/images/placeholder.png" alt="">
+							<img decoding="async" src="https://dlh.com/wp-content/plugins/elementor/assets/images/placeholder.png" alt="">
 						</a>
 					</div>
 					<button class="elementskit-menu-close elementskit-menu-toggler" type="button">X</button>
@@ -563,7 +569,7 @@ gtag("config", "G-X8HWTPW5SC");
 					<div class="elementor-button-wrapper">
 			<a href="https://dlh.com/produkter/interior/dlh-termogulv/" class="elementor-button-link elementor-button elementor-size-sm elementor-animation-bob" role="button">
 						<span class="elementor-button-content-wrapper">
-						<span class="elementor-button-text">DLH Termogulv</span>
+						<span class="elementor-button-text">DLH Thermogulv</span>
 		</span>
 					</a>
 		</div>
@@ -591,7 +597,7 @@ gtag("config", "G-X8HWTPW5SC");
 					<div class="elementor-button-wrapper">
 			<a href="/produkter/konstruktion/traefiber-plader/" class="elementor-button-link elementor-button elementor-size-sm elementor-animation-bob" role="button">
 						<span class="elementor-button-content-wrapper">
-						<span class="elementor-button-text">Træfiber plader</span>
+						<span class="elementor-button-text">Træfiberplader</span>
 		</span>
 					</a>
 		</div>
@@ -622,7 +628,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementskit-nav-identity-panel">
 					<div class="elementskit-site-title">
 						<a class="elementskit-nav-logo" href="https://dlh.com" target="_self" rel="">
-							<img src="https://dlh.com/wp-content/plugins/elementor/assets/images/placeholder.png" alt="">
+							<img decoding="async" src="https://dlh.com/wp-content/plugins/elementor/assets/images/placeholder.png" alt="">
 						</a>
 					</div>
 					<button class="elementskit-menu-close elementskit-menu-toggler" type="button">X</button>
@@ -729,7 +735,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementskit-nav-identity-panel">
 					<div class="elementskit-site-title">
 						<a class="elementskit-nav-logo" href="https://dlh.com" target="_self" rel="">
-							<img src="https://dlh.com/wp-content/plugins/elementor/assets/images/placeholder.png" alt="">
+							<img decoding="async" src="https://dlh.com/wp-content/plugins/elementor/assets/images/placeholder.png" alt="">
 						</a>
 					</div>
 					<button class="elementskit-menu-close elementskit-menu-toggler" type="button">X</button>
@@ -772,10 +778,10 @@ gtag("config", "G-X8HWTPW5SC");
 								</div>
 					</div>
 		</section>
-				<section class="elementor-section elementor-inner-section elementor-element elementor-element-3d4f066 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="3d4f066" data-element_type="section">
+				<section class="elementor-section elementor-inner-section elementor-element elementor-element-ce66530 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="ce66530" data-element_type="section">
 						<div class="elementor-container elementor-column-gap-default">
 							<div class="elementor-row">
-					<div class="elementor-column elementor-col-100 elementor-inner-column elementor-element elementor-element-8f3c226" data-id="8f3c226" data-element_type="column">
+					<div class="elementor-column elementor-col-100 elementor-inner-column elementor-element elementor-element-f7b028b" data-id="f7b028b" data-element_type="column">
 			<div class="elementor-column-wrap elementor-element-populated">
 							<div class="elementor-widget-wrap">
 						<div class="elementor-element elementor-element-5728c75 elementor-widget elementor-widget-text-editor" data-id="5728c75" data-element_type="widget" data-widget_type="text-editor.default">
@@ -790,6 +796,38 @@ gtag("config", "G-X8HWTPW5SC");
 								</div>
 					</div>
 		</section>
+				<section class="elementor-section elementor-inner-section elementor-element elementor-element-5bbaddb elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="5bbaddb" data-element_type="section">
+						<div class="elementor-container elementor-column-gap-default">
+							<div class="elementor-row">
+					<div class="elementor-column elementor-col-33 elementor-inner-column elementor-element elementor-element-6d39e8a" data-id="6d39e8a" data-element_type="column">
+			<div class="elementor-column-wrap">
+							<div class="elementor-widget-wrap">
+								</div>
+					</div>
+		</div>
+				<div class="elementor-column elementor-col-33 elementor-inner-column elementor-element elementor-element-cefab20" data-id="cefab20" data-element_type="column">
+			<div class="elementor-column-wrap elementor-element-populated">
+							<div class="elementor-widget-wrap">
+						<div class="elementor-element elementor-element-536fd9a elementor-widget elementor-widget-image" data-id="536fd9a" data-element_type="widget" data-widget_type="image.default">
+				<div class="elementor-widget-container">
+								<div class="elementor-image">
+													<a href="https://dlh.com/wp-content/uploads/2022/11/Jul-2022-2023.jpg" data-elementor-open-lightbox="yes" data-elementor-lightbox-title="Jul 2022-2023">
+							<img decoding="async" width="1024" height="721" src="https://dlh.com/wp-content/uploads/2022/11/Jul-2022-2023-1024x721.jpg" class="attachment-large size-large" alt="" loading="lazy" srcset="https://dlh.com/wp-content/uploads/2022/11/Jul-2022-2023-1024x721.jpg 1024w, https://dlh.com/wp-content/uploads/2022/11/Jul-2022-2023-300x211.jpg 300w, https://dlh.com/wp-content/uploads/2022/11/Jul-2022-2023-768x541.jpg 768w, https://dlh.com/wp-content/uploads/2022/11/Jul-2022-2023-720x507.jpg 720w, https://dlh.com/wp-content/uploads/2022/11/Jul-2022-2023.jpg 1116w" sizes="(max-width: 1024px) 100vw, 1024px" />								</a>
+														</div>
+						</div>
+				</div>
+						</div>
+					</div>
+		</div>
+				<div class="elementor-column elementor-col-33 elementor-inner-column elementor-element elementor-element-7c38adc" data-id="7c38adc" data-element_type="column">
+			<div class="elementor-column-wrap">
+							<div class="elementor-widget-wrap">
+								</div>
+					</div>
+		</div>
+								</div>
+					</div>
+		</section>
 				<div class="elementor-element elementor-element-e18b1cd elementor-widget elementor-widget-spacer" data-id="e18b1cd" data-element_type="widget" data-widget_type="spacer.default">
 				<div class="elementor-widget-container">
 					<div class="elementor-spacer">
@@ -797,22 +835,6 @@ gtag("config", "G-X8HWTPW5SC");
 		</div>
 				</div>
 				</div>
-				<section class="elementor-section elementor-inner-section elementor-element elementor-element-bb81d4d elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="bb81d4d" data-element_type="section">
-						<div class="elementor-container elementor-column-gap-default">
-							<div class="elementor-row">
-					<div class="elementor-column elementor-col-100 elementor-inner-column elementor-element elementor-element-e50aa35" data-id="e50aa35" data-element_type="column">
-			<div class="elementor-column-wrap elementor-element-populated">
-							<div class="elementor-widget-wrap">
-						<div class="elementor-element elementor-element-4dc886d elementor-widget elementor-widget-heading" data-id="4dc886d" data-element_type="widget" data-widget_type="heading.default">
-				<div class="elementor-widget-container">
-			<h2 class="elementor-heading-title elementor-size-default">Nyheder</h2>		</div>
-				</div>
-						</div>
-					</div>
-		</div>
-								</div>
-					</div>
-		</section>
 				<section class="elementor-section elementor-inner-section elementor-element elementor-element-1280fa9 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="1280fa9" data-element_type="section">
 						<div class="elementor-container elementor-column-gap-default">
 							<div class="elementor-row">
@@ -823,7 +845,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-widget-container">
 								<div class="elementor-image">
 													<a href="https://dlh.com/nyheder/eventyrlig-oppussing/">
-							<img src="https://dlh.com/wp-content/uploads/elementor/thumbs/1-pu0pzyixz284k7kylfxz1v43osejcig2lplq39gx14.jpg" title="1" alt="1" />								</a>
+							<img decoding="async" src="https://dlh.com/wp-content/uploads/elementor/thumbs/1-pu0pzyixz284k7kylfxz1v43osejcig2lplq39gx14.jpg" title="1" alt="1" />								</a>
 														</div>
 						</div>
 				</div>
@@ -843,7 +865,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-widget-container">
 								<div class="elementor-image">
 													<a href="https://dlh.com/nyheder/byager-vaenge/">
-							<img src="https://dlh.com/wp-content/uploads/elementor/thumbs/Byager-Vænge-Kebony-ptqasapho396vg7puojnmh4f7xy5dtys4zro75ex4o.jpg" title="Byager Vænge, Kebony" alt="Byager Vænge, Kebony" />								</a>
+							<img decoding="async" src="https://dlh.com/wp-content/uploads/elementor/thumbs/Byager-Vænge-Kebony-ptqasapho396vg7puojnmh4f7xy5dtys4zro75ex4o.jpg" title="Byager Vænge, Kebony" alt="Byager Vænge, Kebony" />								</a>
 														</div>
 						</div>
 				</div>
@@ -863,7 +885,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-widget-container">
 								<div class="elementor-image">
 													<a href="https://www.upmprofi.com/da/kompositproducenten/produktnyheder/news/det-fineste-franske-kokken-og-europas-bedste-kompositbraedder/" target="_blank">
-							<img src="https://dlh.com/wp-content/uploads/elementor/thumbs/upm-profi-piazza-reference-fr-01_frontpage-pszylt82mrpu7mgj9v1xy6zoaihes6f9qz4ol8yfqw.jpg" title="upm-profi-piazza-reference-fr-01_frontpage" alt="upm-profi-piazza-reference-fr-01_frontpage" />								</a>
+							<img decoding="async" src="https://dlh.com/wp-content/uploads/elementor/thumbs/upm-profi-piazza-reference-fr-01_frontpage-pszylt82mrpu7mgj9v1xy6zoaihes6f9qz4ol8yfqw.jpg" title="upm-profi-piazza-reference-fr-01_frontpage" alt="upm-profi-piazza-reference-fr-01_frontpage" />								</a>
 														</div>
 						</div>
 				</div>
@@ -889,7 +911,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-widget-container">
 								<div class="elementor-image">
 													<a href="https://dlh.com/nyheder/plankebord-i-smoked-eg/">
-							<img src="https://dlh.com/wp-content/uploads/elementor/thumbs/Horneman-Trend-Bord-miljø-scaled-polk8fj3jtiaecxepmla6qtd01zs0sozaohzm9mwqg.jpg" title="Horneman Trend-Bord miljø" alt="Horneman Trend-Bord miljø" />								</a>
+							<img decoding="async" src="https://dlh.com/wp-content/uploads/elementor/thumbs/Horneman-Trend-Bord-miljø-scaled-polk8fj3jtiaecxepmla6qtd01zs0sozaohzm9mwqg.jpg" title="Horneman Trend-Bord miljø" alt="Horneman Trend-Bord miljø" />								</a>
 														</div>
 						</div>
 				</div>
@@ -909,7 +931,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-widget-container">
 								<div class="elementor-image">
 													<a href="https://dlh.com/produkter/interior/akustikplader/">
-							<img src="https://dlh.com/wp-content/uploads/elementor/thumbs/Skærmbillede-2022-09-27-155625-pvds3ldujjyax4m56l8hm9j96mh4o66ubopv8lb7lk.jpg" title="Skærmbillede 2022-09-27 155625" alt="Skærmbillede 2022-09-27 155625" />								</a>
+							<img decoding="async" src="https://dlh.com/wp-content/uploads/elementor/thumbs/Skærmbillede-2022-09-27-155625-pvds3ldujjyax4m56l8hm9j96mh4o66ubopv8lb7lk.jpg" title="Skærmbillede 2022-09-27 155625" alt="Skærmbillede 2022-09-27 155625" />								</a>
 														</div>
 						</div>
 				</div>
@@ -929,7 +951,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-widget-container">
 								<div class="elementor-image">
 													<a href="https://dlh.com/produkter/interior/massive-traebordplader/">
-							<img src="https://dlh.com/wp-content/uploads/elementor/thumbs/IMG_6463-scaled-or6taumboieyed3djcwkbst633f3h39m56a1b8yx4o.jpg" title="IMG_6463" alt="IMG_6463" />								</a>
+							<img decoding="async" src="https://dlh.com/wp-content/uploads/elementor/thumbs/IMG_6463-scaled-or6taumboieyed3djcwkbst633f3h39m56a1b8yx4o.jpg" title="IMG_6463" alt="IMG_6463" />								</a>
 														</div>
 						</div>
 				</div>
@@ -955,7 +977,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-widget-container">
 								<div class="elementor-image">
 													<a href="https://dlh.com/produkter/interior/kebony/">
-							<img src="https://dlh.com/wp-content/uploads/elementor/thumbs/kebony_1-pqedl7z9go99dx3d3fiwxfrpqcsgrm0azznd8sts8o.jpg" title="kebony_1" alt="kebony_1" />								</a>
+							<img decoding="async" src="https://dlh.com/wp-content/uploads/elementor/thumbs/kebony_1-pqedl7z9go99dx3d3fiwxfrpqcsgrm0azznd8sts8o.jpg" title="kebony_1" alt="kebony_1" />								</a>
 														</div>
 						</div>
 				</div>
@@ -975,7 +997,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-widget-container">
 								<div class="elementor-image">
 													<a href="https://dlh.com/produkter/interior/dlh-termogulv/">
-							<img src="https://dlh.com/wp-content/uploads/elementor/thumbs/gulvvarme-orjfhopcaxh5xilc53hvrq24dk8c4qy8uaoxe1f86w.jpg" title="gulvvarme" alt="gulvvarme" />								</a>
+							<img decoding="async" src="https://dlh.com/wp-content/uploads/elementor/thumbs/gulvvarme-orjfhopcaxh5xilc53hvrq24dk8c4qy8uaoxe1f86w.jpg" title="gulvvarme" alt="gulvvarme" />								</a>
 														</div>
 						</div>
 				</div>
@@ -995,7 +1017,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-widget-container">
 								<div class="elementor-image">
 													<a href="https://dlh.com/komposit-terrassebraeder/komposit/">
-							<img width="2560" height="1707" src="https://dlh.com/wp-content/uploads/2021/03/upm-profi-deck-150-pg-click-system-lyhty-FI-7926-scaled.jpg" class="attachment-full size-full" alt="" srcset="https://dlh.com/wp-content/uploads/2021/03/upm-profi-deck-150-pg-click-system-lyhty-FI-7926-scaled.jpg 2560w, https://dlh.com/wp-content/uploads/2021/03/upm-profi-deck-150-pg-click-system-lyhty-FI-7926-300x200.jpg 300w, https://dlh.com/wp-content/uploads/2021/03/upm-profi-deck-150-pg-click-system-lyhty-FI-7926-1024x683.jpg 1024w, https://dlh.com/wp-content/uploads/2021/03/upm-profi-deck-150-pg-click-system-lyhty-FI-7926-768x512.jpg 768w, https://dlh.com/wp-content/uploads/2021/03/upm-profi-deck-150-pg-click-system-lyhty-FI-7926-1536x1024.jpg 1536w, https://dlh.com/wp-content/uploads/2021/03/upm-profi-deck-150-pg-click-system-lyhty-FI-7926-2048x1365.jpg 2048w, https://dlh.com/wp-content/uploads/2021/03/upm-profi-deck-150-pg-click-system-lyhty-FI-7926-720x480.jpg 720w" sizes="(max-width: 2560px) 100vw, 2560px" />								</a>
+							<img decoding="async" width="2560" height="1707" src="https://dlh.com/wp-content/uploads/2021/03/upm-profi-deck-150-pg-click-system-lyhty-FI-7926-scaled.jpg" class="attachment-full size-full" alt="" loading="lazy" srcset="https://dlh.com/wp-content/uploads/2021/03/upm-profi-deck-150-pg-click-system-lyhty-FI-7926-scaled.jpg 2560w, https://dlh.com/wp-content/uploads/2021/03/upm-profi-deck-150-pg-click-system-lyhty-FI-7926-300x200.jpg 300w, https://dlh.com/wp-content/uploads/2021/03/upm-profi-deck-150-pg-click-system-lyhty-FI-7926-1024x683.jpg 1024w, https://dlh.com/wp-content/uploads/2021/03/upm-profi-deck-150-pg-click-system-lyhty-FI-7926-768x512.jpg 768w, https://dlh.com/wp-content/uploads/2021/03/upm-profi-deck-150-pg-click-system-lyhty-FI-7926-1536x1024.jpg 1536w, https://dlh.com/wp-content/uploads/2021/03/upm-profi-deck-150-pg-click-system-lyhty-FI-7926-2048x1365.jpg 2048w, https://dlh.com/wp-content/uploads/2021/03/upm-profi-deck-150-pg-click-system-lyhty-FI-7926-720x480.jpg 720w" sizes="(max-width: 2560px) 100vw, 2560px" />								</a>
 														</div>
 						</div>
 				</div>
@@ -1040,7 +1062,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-widget-container">
 								<div class="elementor-image">
 													<a href="https://www.dlh.com/konstruktion/">
-							<img src="https://dlh.com/wp-content/uploads/elementor/thumbs/Miljøbillede-krydsfiner-or6yp141je8eud1anskzxas7xobum35dua03e321q0.jpg" title="Miljøbillede krydsfiner" alt="Miljøbillede krydsfiner" />								</a>
+							<img decoding="async" src="https://dlh.com/wp-content/uploads/elementor/thumbs/Miljøbillede-krydsfiner-or6yp141je8eud1anskzxas7xobum35dua03e321q0.jpg" title="Miljøbillede krydsfiner" alt="Miljøbillede krydsfiner" />								</a>
 														</div>
 						</div>
 				</div>
@@ -1060,7 +1082,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-widget-container">
 								<div class="elementor-image">
 													<a href="https://dlh.com/nyheder/kebony-character/">
-							<img src="https://dlh.com/wp-content/uploads/elementor/thumbs/kebony_character-pj4xmrewx2wfo78p03mk24ha5t013ckgsx48c84lyw.jpg" title="kebony_character" alt="kebony_character" />								</a>
+							<img decoding="async" src="https://dlh.com/wp-content/uploads/elementor/thumbs/kebony_character-pj4xmrewx2wfo78p03mk24ha5t013ckgsx48c84lyw.jpg" title="kebony_character" alt="kebony_character" />								</a>
 														</div>
 						</div>
 				</div>
@@ -1080,7 +1102,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-widget-container">
 								<div class="elementor-image">
 													<a href="https://www.upmprofi.com/da/kompositproducenten/produktnyheder/news/baeredygtig-kvalitet-planker/?utm_campaign=unspecified&#038;utm_content=unspecified&#038;utm_medium=email&#038;utm_source=apsis-anp-3" target="_blank">
-							<img src="https://dlh.com/wp-content/uploads/elementor/thumbs/upm-profi-piazza-one-californian-oak-house-tuusula-fi-111-scaled-pbi5ru73nddbf6eybf9suyrx40p1tlrpnarv4hetyw.jpg" title="upm-profi-piazza-one-californian-oak-house-tuusula-fi-111" alt="upm-profi-piazza-one-californian-oak-house-tuusula-fi-111" />								</a>
+							<img decoding="async" src="https://dlh.com/wp-content/uploads/elementor/thumbs/upm-profi-piazza-one-californian-oak-house-tuusula-fi-111-scaled-pbi5ru73nddbf6eybf9suyrx40p1tlrpnarv4hetyw.jpg" title="upm-profi-piazza-one-californian-oak-house-tuusula-fi-111" alt="upm-profi-piazza-one-californian-oak-house-tuusula-fi-111" />								</a>
 														</div>
 						</div>
 				</div>
@@ -1125,7 +1147,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-widget-container">
 								<div class="elementor-image">
 													<a href="https://dlh.com/komposit-terrassebraeder/upm-profi-piazza-2/">
-							<img src="https://dlh.com/wp-content/uploads/elementor/thumbs/upm-profi-piazza-st-stausee-de-061-p1l7uj7ft4j6z6t7o6zdus8wivxjzwj7r7zdgn1pvc.jpg" title="upm-profi-piazza-st-stausee-de-061" alt="upm-profi-piazza-st-stausee-de-061" />								</a>
+							<img decoding="async" src="https://dlh.com/wp-content/uploads/elementor/thumbs/upm-profi-piazza-st-stausee-de-061-p1l7uj7ft4j6z6t7o6zdus8wivxjzwj7r7zdgn1pvc.jpg" title="upm-profi-piazza-st-stausee-de-061" alt="upm-profi-piazza-st-stausee-de-061" />								</a>
 														</div>
 						</div>
 				</div>
@@ -1145,7 +1167,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-widget-container">
 								<div class="elementor-image">
 													<a href="https://dlh.com/rocko/">
-							<img src="https://dlh.com/wp-content/uploads/elementor/thumbs/R096_aranz-p5lfwtb77o3bp3e1jx4hkm7ly78f779s30kifzdpa0.jpg" title="Interior Of Bathroom" alt="Photo taken in New York City, United States" />								</a>
+							<img decoding="async" src="https://dlh.com/wp-content/uploads/elementor/thumbs/R096_aranz-p5lfwtb77o3bp3e1jx4hkm7ly78f779s30kifzdpa0.jpg" title="Interior Of Bathroom" alt="Photo taken in New York City, United States" />								</a>
 														</div>
 						</div>
 				</div>
@@ -1165,7 +1187,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-widget-container">
 								<div class="elementor-image">
 													<a href="https://www.upmprofi.com/da/kompositproducenten/produktnyheder/news/De-miljovenlige-terrasser-i-hoj-kvalitet-der-er-fremstillet-af-UPM-ProFi-Piazza-komposit-blev-valgt-til-de-fantastiske-havudsigter-i-Kuningatarvuori-i-Hanko/" target="_blank">
-							<img src="https://dlh.com/wp-content/uploads/elementor/thumbs/upm-profi-piazza-hanko-fi-01-pmo3eyptz7ydejr2ke81tv807nrzkey7q6vujj8308.jpg" title="upm-profi-piazza-hanko-fi-01" alt="upm-profi-piazza-hanko-fi-01" />								</a>
+							<img decoding="async" src="https://dlh.com/wp-content/uploads/elementor/thumbs/upm-profi-piazza-hanko-fi-01-pmo3eyptz7ydejr2ke81tv807nrzkey7q6vujj8308.jpg" title="upm-profi-piazza-hanko-fi-01" alt="upm-profi-piazza-hanko-fi-01" />								</a>
 														</div>
 						</div>
 				</div>
@@ -1210,7 +1232,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-widget-container">
 								<div class="elementor-image">
 													<a href="https://dlh.com/komposit-terrassebraeder/komposit/">
-							<img src="https://dlh.com/wp-content/uploads/elementor/thumbs/upm-profi-deck-150-pg-VillaTye-SE-4-1-scaled-p1lfjyamvuark1ueqlyg9a1g5ukgryv9kbhdhlprg8.jpg" title="upm-profi-deck-150-pg-VillaTye-SE-4" alt="upm-profi-deck-150-pg-VillaTye-SE-4" />								</a>
+							<img decoding="async" src="https://dlh.com/wp-content/uploads/elementor/thumbs/upm-profi-deck-150-pg-VillaTye-SE-4-1-scaled-p1lfjyamvuark1ueqlyg9a1g5ukgryv9kbhdhlprg8.jpg" title="upm-profi-deck-150-pg-VillaTye-SE-4" alt="upm-profi-deck-150-pg-VillaTye-SE-4" />								</a>
 														</div>
 						</div>
 				</div>
@@ -1230,7 +1252,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-widget-container">
 								<div class="elementor-image">
 													<a href="https://dlh.com/nyheder/randers-familien/">
-							<img src="https://dlh.com/wp-content/uploads/elementor/thumbs/rockogulv1-scaled-piwy3etfpmoll95km67xsr1zsnhj3nfdaht96a6ed4.jpg" title="rockogulv1" alt="rockogulv1" />								</a>
+							<img decoding="async" src="https://dlh.com/wp-content/uploads/elementor/thumbs/rockogulv1-scaled-piwy3etfpmoll95km67xsr1zsnhj3nfdaht96a6ed4.jpg" title="rockogulv1" alt="rockogulv1" />								</a>
 														</div>
 						</div>
 				</div>
@@ -1281,7 +1303,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-widget-container">
 								<div class="elementor-image">
 													<a href="https://dlh.com/om-os/historie/">
-							<img width="450" height="190" src="https://dlh.com/wp-content/uploads/2020/06/tekst_7.jpg" class="attachment-large size-large" alt="" srcset="https://dlh.com/wp-content/uploads/2020/06/tekst_7.jpg 450w, https://dlh.com/wp-content/uploads/2020/06/tekst_7-300x127.jpg 300w" sizes="(max-width: 450px) 100vw, 450px" />								</a>
+							<img decoding="async" width="450" height="190" src="https://dlh.com/wp-content/uploads/2020/06/tekst_7.jpg" class="attachment-large size-large" alt="" loading="lazy" srcset="https://dlh.com/wp-content/uploads/2020/06/tekst_7.jpg 450w, https://dlh.com/wp-content/uploads/2020/06/tekst_7-300x127.jpg 300w" sizes="(max-width: 450px) 100vw, 450px" />								</a>
 														</div>
 						</div>
 				</div>
@@ -1386,7 +1408,7 @@ gtag("config", "G-X8HWTPW5SC");
 								</div>
 					</div>
 		</section>
-				<section class="elementor-section elementor-inner-section elementor-element elementor-element-5f95d53 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="5f95d53" data-element_type="section">
+				<section class="elementor-section elementor-inner-section elementor-element elementor-element-5f95d53 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="5f95d53" data-element_type="section" data-settings="{&quot;animation&quot;:&quot;none&quot;}">
 						<div class="elementor-container elementor-column-gap-default">
 							<div class="elementor-row">
 					<div class="elementor-column elementor-col-33 elementor-inner-column elementor-element elementor-element-cde990c" data-id="cde990c" data-element_type="column">
@@ -1462,7 +1484,7 @@ gtag("config", "G-X8HWTPW5SC");
 				<div class="elementor-element elementor-element-1d210c4 elementor-widget elementor-widget-text-editor" data-id="1d210c4" data-element_type="widget" data-widget_type="text-editor.default">
 				<div class="elementor-widget-container">
 								<div class="elementor-text-editor elementor-clearfix">
-				<p>Orionvej 5</p><p>DK-8700 Horsens</p><p>Telefon 43 50 08 00</p><p>Kontakt@dlh.com</p><p>CVR 40921672</p>					</div>
+				<p>Orionvej 5</p><p>DK-8700 Horsens</p><p>Telefon 43 500 800</p><p>Kontakt@dlh.com</p><p>CVR 40921672</p>					</div>
 						</div>
 				</div>
 						</div>
@@ -1532,13 +1554,19 @@ gtag("config", "G-X8HWTPW5SC");
 		</div>
 				</div>
 				</div>
-				<div class="elementor-element elementor-element-756a2c6 elementor-nav-menu__text-align-aside elementor-widget elementor-widget-nav-menu" data-id="756a2c6" data-element_type="widget" data-settings="{&quot;layout&quot;:&quot;dropdown&quot;,&quot;submenu_icon&quot;:{&quot;value&quot;:&quot;&lt;i class=\&quot;fas fa-caret-down\&quot;&gt;&lt;\/i&gt;&quot;,&quot;library&quot;:&quot;fa-solid&quot;}}" data-widget_type="nav-menu.default">
+				<div class="elementor-element elementor-element-756a2c6 elementor-nav-menu__align-left elementor-nav-menu--dropdown-tablet elementor-nav-menu__text-align-aside elementor-widget elementor-widget-nav-menu" data-id="756a2c6" data-element_type="widget" data-settings="{&quot;layout&quot;:&quot;vertical&quot;,&quot;submenu_icon&quot;:{&quot;value&quot;:&quot;&lt;i class=\&quot;fas fa-caret-down\&quot;&gt;&lt;\/i&gt;&quot;,&quot;library&quot;:&quot;fa-solid&quot;}}" data-widget_type="nav-menu.default">
 				<div class="elementor-widget-container">
+						<nav migration_allowed="1" migrated="0" role="navigation" class="elementor-nav-menu--main elementor-nav-menu__container elementor-nav-menu--layout-vertical e--pointer-none">
+				<ul id="menu-1-756a2c6" class="elementor-nav-menu sm-vertical"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10254"><a href="https://dlh.com/om-os/samarbejdspartnere/" class="elementor-item">Partnere</a></li>
+<li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-10252"><a href="https://dlh.com/produkter/" class="elementor-item">Produkter</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10253"><a href="https://dlh.com/om-os/" class="elementor-item">Om os</a></li>
+<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10251"><a href="https://dlh.com/kontakt/" class="elementor-item">Kontakt</a></li>
+</ul>			</nav>
 					<div class="elementor-menu-toggle" role="button" tabindex="0" aria-label="Menu Toggle" aria-expanded="false">
 			<i aria-hidden="true" role="presentation" class="eicon-menu-bar"></i>			<span class="elementor-screen-only">Menu</span>
 		</div>
 			<nav class="elementor-nav-menu--dropdown elementor-nav-menu__container" role="navigation" aria-hidden="true">
-				<ul id="menu-2-756a2c6" class="elementor-nav-menu"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10254"><a href="https://dlh.com/om-os/samarbejdspartnere/" class="elementor-item" tabindex="-1">Partnere</a></li>
+				<ul id="menu-2-756a2c6" class="elementor-nav-menu sm-vertical"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10254"><a href="https://dlh.com/om-os/samarbejdspartnere/" class="elementor-item" tabindex="-1">Partnere</a></li>
 <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-10252"><a href="https://dlh.com/produkter/" class="elementor-item" tabindex="-1">Produkter</a></li>
 <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10253"><a href="https://dlh.com/om-os/" class="elementor-item" tabindex="-1">Om os</a></li>
 <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10251"><a href="https://dlh.com/kontakt/" class="elementor-item" tabindex="-1">Kontakt</a></li>
@@ -1612,7 +1640,7 @@ gtag("config", "G-X8HWTPW5SC");
 						<div class="elementor-element elementor-element-5e6688b elementor-widget elementor-widget-text-editor" data-id="5e6688b" data-element_type="widget" data-widget_type="text-editor.default">
 				<div class="elementor-widget-container">
 								<div class="elementor-text-editor elementor-clearfix">
-				<p><a href="https://www.facebook.com/dlhdk">Facebook</a></p>					</div>
+				<p><span style="color: #ffffff;"><a style="color: #ffffff;" href="https://www.facebook.com/dlhdk">Facebook</a></span></p>					</div>
 						</div>
 				</div>
 						</div>
@@ -1624,7 +1652,7 @@ gtag("config", "G-X8HWTPW5SC");
 						<div class="elementor-element elementor-element-2a00a4b elementor-widget elementor-widget-text-editor" data-id="2a00a4b" data-element_type="widget" data-widget_type="text-editor.default">
 				<div class="elementor-widget-container">
 								<div class="elementor-text-editor elementor-clearfix">
-				<p><a href="https://www.instagram.com/dlh_as/?hl=en">Instagram</a></p>					</div>
+				<p><span style="color: #ffffff;"><a style="color: #ffffff;" href="https://www.instagram.com/dlh_as/?hl=en">Instagram</a></span></p>					</div>
 						</div>
 				</div>
 						</div>
@@ -1711,13 +1739,13 @@ This website uses cookies to improve your experience. We'll assume you're ok wit
 						<div class="elementor-element elementor-element-4d9dd21a elementor-nav-menu__align-center elementor-nav-menu--dropdown-none elementor-widget elementor-widget-nav-menu" data-id="4d9dd21a" data-element_type="widget" data-settings="{&quot;layout&quot;:&quot;vertical&quot;,&quot;submenu_icon&quot;:{&quot;value&quot;:&quot;&lt;i class=\&quot;fas fa-caret-down\&quot;&gt;&lt;\/i&gt;&quot;,&quot;library&quot;:&quot;fa-solid&quot;}}" data-widget_type="nav-menu.default">
 				<div class="elementor-widget-container">
 						<nav migration_allowed="1" migrated="0" role="navigation" class="elementor-nav-menu--main elementor-nav-menu__container elementor-nav-menu--layout-vertical e--pointer-underline e--animation-fade">
-				<ul id="menu-1-4d9dd21a" class="elementor-nav-menu sm-vertical"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5287"><a href="https://dlh.com/produkter/interior/dlh-termogulv/" class="elementor-item">DLH Termogulv</a></li>
+				<ul id="menu-1-4d9dd21a" class="elementor-nav-menu sm-vertical"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5287"><a href="https://dlh.com/produkter/interior/dlh-termogulv/" class="elementor-item">DLH Thermogulv</a></li>
 </ul>			</nav>
 					<div class="elementor-menu-toggle" role="button" tabindex="0" aria-label="Menu Toggle" aria-expanded="false">
 			<i aria-hidden="true" role="presentation" class="eicon-menu-bar"></i>			<span class="elementor-screen-only">Menu</span>
 		</div>
 			<nav class="elementor-nav-menu--dropdown elementor-nav-menu__container" role="navigation" aria-hidden="true">
-				<ul id="menu-2-4d9dd21a" class="elementor-nav-menu sm-vertical"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5287"><a href="https://dlh.com/produkter/interior/dlh-termogulv/" class="elementor-item" tabindex="-1">DLH Termogulv</a></li>
+				<ul id="menu-2-4d9dd21a" class="elementor-nav-menu sm-vertical"><li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5287"><a href="https://dlh.com/produkter/interior/dlh-termogulv/" class="elementor-item" tabindex="-1">DLH Thermogulv</a></li>
 </ul>			</nav>
 				</div>
 				</div>
@@ -1775,18 +1803,18 @@ This website uses cookies to improve your experience. We'll assume you're ok wit
 		</section>
 				</div>
 		</div>
-		<link rel='stylesheet' id='elementor-post-5313-css'  href='https://dlh.com/wp-content/uploads/elementor/css/post-5313.css?ver=1664461607' type='text/css' media='all' />
-<link rel='stylesheet' id='elementor-post-5241-css'  href='https://dlh.com/wp-content/uploads/elementor/css/post-5241.css?ver=1664276120' type='text/css' media='all' />
-<link rel='stylesheet' id='elementor-post-17102-css'  href='https://dlh.com/wp-content/uploads/elementor/css/post-17102.css?ver=1664276120' type='text/css' media='all' />
-<link rel='stylesheet' id='e-animations-css'  href='https://dlh.com/wp-content/plugins/elementor/assets/lib/animations/animations.min.css?ver=3.4.7' type='text/css' media='all' />
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/lib/slick/slick.min.js?ver=1.8.1'></script>
-<script type='text/javascript' src='https://dlh.com/wp-includes/js/imagesloaded.min.js?ver=3.2.0'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/themes/airi/js/vendor/navigation.js?ver=20180717'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/themes/airi/js/vendor/skip-link-focus-fix.js?ver=20151215'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/themes/airi/js/vendor/scripts.js?ver=20180223'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/themes/airi/js/custom/custom.min.js?ver=20181017'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementskit-lite/libs/framework/assets/js/frontend-script.js?ver=2.0.10'></script>
-<script type='text/javascript'>
+		<link rel='stylesheet' id='elementor-post-5313-css' href='https://dlh.com/wp-content/uploads/elementor/css/post-5313.css?ver=1669729434' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-post-5241-css' href='https://dlh.com/wp-content/uploads/elementor/css/post-5241.css?ver=1669728856' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-post-17102-css' href='https://dlh.com/wp-content/uploads/elementor/css/post-17102.css?ver=1669729105' type='text/css' media='all' />
+<link rel='stylesheet' id='e-animations-css' href='https://dlh.com/wp-content/plugins/elementor/assets/lib/animations/animations.min.css?ver=3.4.7' type='text/css' media='all' />
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/lib/slick/slick.min.js?ver=1.8.1' id='jquery-slick-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-includes/js/imagesloaded.min.js?ver=4.1.4' id='imagesloaded-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/themes/airi/js/vendor/navigation.js?ver=20180717' id='airi-navigation-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/themes/airi/js/vendor/skip-link-focus-fix.js?ver=20151215' id='airi-skip-link-focus-fix-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/themes/airi/js/vendor/scripts.js?ver=20180223' id='airi-scripts-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/themes/airi/js/custom/custom.min.js?ver=20181017' id='airi-main-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementskit-lite/libs/framework/assets/js/frontend-script.js?ver=2.0.10' id='elementskit-framework-js-frontend-js'></script>
+<script type='text/javascript' id='elementskit-framework-js-frontend-js-after'>
 
 		var elementskit = {
             resturl: 'https://dlh.com/wp-json/elementskit/v1/',
@@ -1794,30 +1822,29 @@ This website uses cookies to improve your experience. We'll assume you're ok wit
 
 		
 </script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementskit-lite/widgets/init/assets/js/widget-scripts.js?ver=2.0.10'></script>
-<script type='text/javascript' src='https://dlh.com/wp-includes/js/wp-embed.min.js?ver=5.4.11'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor-pro/assets/lib/smartmenus/jquery.smartmenus.min.js?ver=1.0.1'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor-pro/assets/js/webpack-pro.runtime.min.js?ver=3.5.0'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/js/webpack.runtime.min.js?ver=3.4.7'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/js/frontend-modules.min.js?ver=3.4.7'></script>
-<script type='text/javascript'>
-var ElementorProFrontendConfig = {"ajaxurl":"https:\/\/dlh.com\/wp-admin\/admin-ajax.php","nonce":"67f0f0dce3","urls":{"assets":"https:\/\/dlh.com\/wp-content\/plugins\/elementor-pro\/assets\/","rest":"https:\/\/dlh.com\/wp-json\/"},"i18n":{"toc_no_headings_found":"No headings were found on this page."},"shareButtonsNetworks":{"facebook":{"title":"Facebook","has_counter":true},"twitter":{"title":"Twitter"},"linkedin":{"title":"LinkedIn","has_counter":true},"pinterest":{"title":"Pinterest","has_counter":true},"reddit":{"title":"Reddit","has_counter":true},"vk":{"title":"VK","has_counter":true},"odnoklassniki":{"title":"OK","has_counter":true},"tumblr":{"title":"Tumblr"},"digg":{"title":"Digg"},"skype":{"title":"Skype"},"stumbleupon":{"title":"StumbleUpon","has_counter":true},"mix":{"title":"Mix"},"telegram":{"title":"Telegram"},"pocket":{"title":"Pocket","has_counter":true},"xing":{"title":"XING","has_counter":true},"whatsapp":{"title":"WhatsApp"},"email":{"title":"Email"},"print":{"title":"Print"}},"facebook_sdk":{"lang":"en_US","app_id":""},"lottie":{"defaultAnimationUrl":"https:\/\/dlh.com\/wp-content\/plugins\/elementor-pro\/modules\/lottie\/assets\/animations\/default.json"}};
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementskit-lite/widgets/init/assets/js/widget-scripts.js?ver=2.0.10' id='ekit-widget-scripts-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor-pro/assets/lib/smartmenus/jquery.smartmenus.min.js?ver=1.0.1' id='smartmenus-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor-pro/assets/js/webpack-pro.runtime.min.js?ver=3.5.0' id='elementor-pro-webpack-runtime-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/js/webpack.runtime.min.js?ver=3.4.7' id='elementor-webpack-runtime-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/js/frontend-modules.min.js?ver=3.4.7' id='elementor-frontend-modules-js'></script>
+<script type='text/javascript' id='elementor-pro-frontend-js-before'>
+var ElementorProFrontendConfig = {"ajaxurl":"https:\/\/dlh.com\/wp-admin\/admin-ajax.php","nonce":"0b92dda979","urls":{"assets":"https:\/\/dlh.com\/wp-content\/plugins\/elementor-pro\/assets\/","rest":"https:\/\/dlh.com\/wp-json\/"},"i18n":{"toc_no_headings_found":"No headings were found on this page."},"shareButtonsNetworks":{"facebook":{"title":"Facebook","has_counter":true},"twitter":{"title":"Twitter"},"linkedin":{"title":"LinkedIn","has_counter":true},"pinterest":{"title":"Pinterest","has_counter":true},"reddit":{"title":"Reddit","has_counter":true},"vk":{"title":"VK","has_counter":true},"odnoklassniki":{"title":"OK","has_counter":true},"tumblr":{"title":"Tumblr"},"digg":{"title":"Digg"},"skype":{"title":"Skype"},"stumbleupon":{"title":"StumbleUpon","has_counter":true},"mix":{"title":"Mix"},"telegram":{"title":"Telegram"},"pocket":{"title":"Pocket","has_counter":true},"xing":{"title":"XING","has_counter":true},"whatsapp":{"title":"WhatsApp"},"email":{"title":"Email"},"print":{"title":"Print"}},"facebook_sdk":{"lang":"en_US","app_id":""},"lottie":{"defaultAnimationUrl":"https:\/\/dlh.com\/wp-content\/plugins\/elementor-pro\/modules\/lottie\/assets\/animations\/default.json"}};
 </script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor-pro/assets/js/frontend.min.js?ver=3.5.0'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/lib/waypoints/waypoints.min.js?ver=4.0.2'></script>
-<script type='text/javascript' src='https://dlh.com/wp-includes/js/jquery/ui/position.min.js?ver=1.11.4'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/lib/swiper/swiper.min.js?ver=5.3.6'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/lib/share-link/share-link.min.js?ver=3.4.7'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/lib/dialog/dialog.min.js?ver=4.8.1'></script>
-<script type='text/javascript'>
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor-pro/assets/js/frontend.min.js?ver=3.5.0' id='elementor-pro-frontend-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/lib/waypoints/waypoints.min.js?ver=4.0.2' id='elementor-waypoints-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-includes/js/jquery/ui/core.min.js?ver=1.13.2' id='jquery-ui-core-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/lib/swiper/swiper.min.js?ver=5.3.6' id='swiper-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/lib/share-link/share-link.min.js?ver=3.4.7' id='share-link-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/lib/dialog/dialog.min.js?ver=4.8.1' id='elementor-dialog-js'></script>
+<script type='text/javascript' id='elementor-frontend-js-before'>
 var elementorFrontendConfig = {"environmentMode":{"edit":false,"wpPreview":false,"isScriptDebug":false},"i18n":{"shareOnFacebook":"Share on Facebook","shareOnTwitter":"Share on Twitter","pinIt":"Pin it","download":"Download","downloadImage":"Download image","fullscreen":"Fullscreen","zoom":"Zoom","share":"Share","playVideo":"Play Video","previous":"Previous","next":"Next","close":"Close"},"is_rtl":false,"breakpoints":{"xs":0,"sm":480,"md":768,"lg":1025,"xl":1440,"xxl":1600},"responsive":{"breakpoints":{"mobile":{"label":"Mobile","value":767,"default_value":767,"direction":"max","is_enabled":true},"mobile_extra":{"label":"Mobile Extra","value":880,"default_value":880,"direction":"max","is_enabled":false},"tablet":{"label":"Tablet","value":1024,"default_value":1024,"direction":"max","is_enabled":true},"tablet_extra":{"label":"Tablet Extra","value":1200,"default_value":1200,"direction":"max","is_enabled":false},"laptop":{"label":"Laptop","value":1366,"default_value":1366,"direction":"max","is_enabled":false},"widescreen":{"label":"Widescreen","value":2400,"default_value":2400,"direction":"min","is_enabled":false}}},"version":"3.4.7","is_static":false,"experimentalFeatures":{"e_import_export":true,"theme_builder_v2":true,"landing-pages":true,"elements-color-picker":true,"admin-top-bar":true,"form-submissions":true},"urls":{"assets":"https:\/\/dlh.com\/wp-content\/plugins\/elementor\/assets\/"},"settings":{"page":[],"editorPreferences":[]},"kit":{"viewport_tablet":"1024","active_breakpoints":["viewport_mobile","viewport_tablet"],"global_image_lightbox":"yes","lightbox_enable_counter":"yes","lightbox_enable_fullscreen":"yes","lightbox_enable_zoom":"yes","lightbox_enable_share":"yes","lightbox_title_src":"title","lightbox_description_src":"description"},"post":{"id":4301,"title":"DLH","excerpt":"","featuredImage":false}};
 </script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/js/frontend.min.js?ver=3.4.7'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor-pro/assets/js/preloaded-elements-handlers.min.js?ver=3.5.0'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementskit-lite/widgets/init/assets/js/elementor.js?ver=2.0.10'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/js/preloaded-modules.min.js?ver=3.4.7'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor-pro/assets/lib/sticky/jquery.sticky.min.js?ver=3.5.0'></script>
-<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementskit-lite/modules/controls/assets/js/widgetarea-editor.js?ver=2.0.10'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/js/frontend.min.js?ver=3.4.7' id='elementor-frontend-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor-pro/assets/js/preloaded-elements-handlers.min.js?ver=3.5.0' id='pro-preloaded-elements-handlers-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementskit-lite/widgets/init/assets/js/elementor.js?ver=2.0.10' id='elementskit-elementor-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor/assets/js/preloaded-modules.min.js?ver=3.4.7' id='preloaded-modules-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementor-pro/assets/lib/sticky/jquery.sticky.min.js?ver=3.5.0' id='e-sticky-js'></script>
+<script type='text/javascript' src='https://dlh.com/wp-content/plugins/elementskit-lite/modules/controls/assets/js/widgetarea-editor.js?ver=2.0.10' id='elementskit-js-widgetarea-control-editor-js'></script>
 
 </body>
 </html>

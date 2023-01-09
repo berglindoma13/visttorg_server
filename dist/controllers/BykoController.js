@@ -72,9 +72,12 @@ const InsertAllBykoProducts = async (req, res) => {
         //process all data and insert into database - first convert to databaseProduct Array
         const allConvertedBykoProducts = [];
         for (var i = 0; i < bykoData.productList.length; i++) {
-            const convertedProduct = await convertBykoProductToDatabaseProduct(bykoData.productList[i]);
             //here is a single product
-            allConvertedBykoProducts.push(convertedProduct);
+            const convertedProduct = await convertBykoProductToDatabaseProduct(bykoData.productList[i]);
+            //if the product has any matching categories -> add it
+            if (convertedProduct.categories.length !== 0) {
+                allConvertedBykoProducts.push(convertedProduct);
+            }
         }
         await ProcessForDatabase(allConvertedBykoProducts);
         return res.end("Successful import");
@@ -120,6 +123,7 @@ const ProcessForDatabase = async (products) => {
     updatedProducts = [];
     createdProducts = [];
     productsNotValid = [];
+    console.log('processing product list');
     const allProductPromises = products.map(async (product) => {
         const productWithProps = { approved: false, certChange: false, create: false, product: null, productState: 1, validDate: null, validatedCertificates: [] };
         const prod = await (0, PrismaHelper_1.GetUniqueProduct)(product.productid, CompanyID);
@@ -178,6 +182,7 @@ const ProcessForDatabase = async (products) => {
     });
     return Promise.all(allProductPromises).then(async (productsWithProps) => {
         const filteredArray = productsWithProps.filter(prod => prod.productState !== 1);
+        console.log('starting transaction for products');
         await prisma_1.default.$transaction(filteredArray.map(productWithProps => {
             const systemArray = (0, CertificateValidator_1.mapToCertificateSystem)(productWithProps.product);
             return prisma_1.default.product.upsert({
@@ -232,7 +237,9 @@ const ProcessForDatabase = async (products) => {
                 }
             });
         }));
+        console.log('starting to delete all certs');
         await (0, PrismaHelper_1.DeleteAllCertByCompany)(CompanyID);
+        console.log('done deleting and starting to create new ones');
         const allCertificates = filteredArray.map(prod => {
             return prod.validatedCertificates.map(cert => {
                 let fileurl = '';
@@ -275,6 +282,7 @@ const ProcessForDatabase = async (products) => {
             });
         }));
     }).then(() => {
+        console.log('done and gone into then');
         // write all appropriate files
         (0, ProductHelper_1.WriteAllFiles)(createdProducts, updatedProducts, productsNotValid, CompanyName);
     });

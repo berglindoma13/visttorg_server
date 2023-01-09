@@ -60,6 +60,10 @@ const convertTemplateProductToDatabaseProduct = async(product: TemplateProductPr
       t.name === value.name
     ))
   )
+
+  if(uniqueMappedCategories.length === 0){
+    return null
+  }
   
   const convertedCertificates: Array<string> = product.certificates.map(certificate => { return TemplateCertMapper[certificate.cert] })
 
@@ -106,7 +110,9 @@ export const InsertAllTemplateProducts = async(req: Request, res: Response) => {
     for(var i = 0; i < Data.products.length; i++){
       const convertedProduct = await convertTemplateProductToDatabaseProduct(Data.products[i])
       //here is a single product
-      allConvertedProducts.push(convertedProduct)
+      if(!!convertedProduct){
+        allConvertedProducts.push(convertedProduct)
+      }
     }
 
     await ProcessForDatabase(allConvertedProducts)

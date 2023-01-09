@@ -73,9 +73,11 @@ const ValidDate = async (validatedCertificates, product) => {
                     filedatestring = dateOfFileSwapedC;
                 }
                 const parsedate = new Date(filedatestring);
-                console.log('data', parsedate);
+                console.log('data epd', parsedate);
                 const test = check(parsedate);
                 arr[0] = test;
+            }).catch((error) => {
+                console.log('error', error);
             });
         }
         if (cert.name === "FSC") {
@@ -88,7 +90,10 @@ const ValidDate = async (validatedCertificates, product) => {
                 const newdate = swap(filedate).join("-");
                 const parsedate = new Date(newdate);
                 const test = check(parsedate);
+                console.log('data fsc');
                 arr[1] = test;
+            }).catch((error) => {
+                console.log('error', error);
             });
         }
         if (cert.name === "VOC") {
@@ -113,11 +118,14 @@ const ValidDate = async (validatedCertificates, product) => {
                 // }
                 const parsedate = new Date(filedate);
                 const test = check(parsedate);
+                console.log('data voc');
                 arr[2] = test;
+            }).catch((error) => {
+                console.log('error', error);
             });
         }
     })).catch((err) => {
-        // console.error(err)
+        console.error(err);
     });
     return arr;
 };

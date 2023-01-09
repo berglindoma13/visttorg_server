@@ -6,8 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Register = exports.Login = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const prisma_1 = __importDefault(require("../lib/prisma"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const salt = bcryptjs_1.default.genSaltSync(10);
 /* Login function */
-const Login = (req, res) => {
+const Login = async (req, res) => {
     //TODO WHEN ISLAND.IS IS CONNECTED
     // const { token } = req.body;
     //new IslandISLogin({ audienceUrl: process.env.BACKEND_URL});    
@@ -25,43 +27,54 @@ const Login = (req, res) => {
     //   console.log('Error verifying token');
     //   console.log(err);
     // });
-    const { username, password } = req.body;
-    const foundUser = prisma_1.default.vistbokUser.findUnique({
+    const { email, password } = req.body.data;
+    const foundUser = await prisma_1.default.vistbokUser.findUnique({
         where: {
-            username: username
+            email: email
         }
     });
     if (!!foundUser) {
-        var token = jsonwebtoken_1.default.sign({ username: username }, 'thisisasuperprivatekey000111');
-        return res.status(200).send(JSON.stringify(token));
+        console.log('foundUser', foundUser);
+        if (bcryptjs_1.default.compareSync(password, foundUser.password) === true) {
+            var token = jsonwebtoken_1.default.sign({ email: email, password: foundUser.password, fullname: foundUser.fullname, jobtitle: foundUser.jobtitle, company: foundUser.company }, 'thisisasuperprivatekey000111');
+            return res.status(200).send(JSON.stringify(token));
+        }
+        else {
+            return res.status(401).end('password does not match user');
+        }
     }
     else {
-        return res.status(500).send('user not found');
+        return res.status(404).send('user not found');
     }
 };
 exports.Login = Login;
 /* Register function */
-const Register = (req, res) => {
-    const { username, password } = req.body;
+const Register = async (req, res) => {
+    const { email, password, fullname, jobtitle, company } = req.body.data;
+    const hashedPassword = bcryptjs_1.default.hashSync(password, salt);
     // check if user already exists
-    const foundUser = prisma_1.default.vistbokUser.findUnique({
+    const foundUser = await prisma_1.default.vistbokUser.findUnique({
         where: {
-            username: username
+            email: email
         }
     });
     //user was found
     if (!!foundUser) {
-        return res.status(500).send('user already exists');
+        return res.status(403).end('user already exists');
     }
     //user was not found - create
     else {
-        prisma_1.default.vistbokUser.create({
+        await prisma_1.default.vistbokUser.create({
             data: {
-                username: username,
-                password: password
+                email: email,
+                password: hashedPassword,
+                fullname: fullname,
+                jobtitle: jobtitle,
+                company: company
             }
         });
-        return res.status(200).send('user created');
+        var token = jsonwebtoken_1.default.sign({ email: email, password: hashedPassword, fullname: fullname, jobtitle: jobtitle, company: company }, 'thisisasuperprivatekey000111');
+        return res.status(200).send(JSON.stringify(token));
     }
 };
 exports.Register = Register;
