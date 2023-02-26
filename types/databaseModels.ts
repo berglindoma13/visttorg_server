@@ -1,35 +1,23 @@
-export interface DatabaseCertificate {
-  name: string
-}
-
-export interface DatabaseCertificateSystem {
-  name: string
+export interface DatabaseProduct {
+  productid: string,
+  title: string,
+  companyid: number
+  sellingcompany?: DatabaseCompany
+  description: string,
+  shortdescription: string,
+  categories: Array<DatabaseCategory>,
+  subCategories: Array<ConnectedSubCategory>,
+  productimageurl: string,
+  url: string,
+  brand: string,
+  certificates: Array<DatabaseProductCertificate>
+  certificateSystems?: Array<DatabaseCertificateSystem>
 }
 
 export interface DatabaseCompany {
   name: string
   websiteurl: string
   email: string
-}
-
-
-export interface DatabaseProduct {
-  productid: string,
-  title: string,
-  description: string,
-  shortdescription: string,
-  categories: string | Array<ConnectedCategory>,
-  subCategories: Array<ConnectedSubCategory>,
-  sellingcompany?: DatabaseCompany
-  productimageurl: string,
-  url: string,
-  brand: string,
-  fscUrl: string,
-  epdUrl: string,
-  vocUrl: string,
-  ceUrl: string,
-  certificates: Array<DatabaseCertificate>
-  certificateSystems?: Array<DatabaseCertificateSystem>
 }
 
 export interface ConnectedCategory {
@@ -49,16 +37,6 @@ interface ConnectedSubCatIdentifier {
   parentCategoryName: string
 }
 
-export interface ProductWithPropsProps {
-  approved: boolean
-  certChange: boolean
-  create: boolean
-  product:DatabaseProduct
-  productState: number
-  validDate: Array<ValidDateObj>
-  validatedCertificates: Array<DatabaseCertificate>
-}
-
 export interface ValidDateObj {
   message: string,
   date ?: Date 
@@ -70,11 +48,15 @@ export interface DatabaseProductCertificate {
   name: string
   fileurl: string
   productId: string
+  certificateId: number
+  certificate: DatabaseCertificate
+  connectedProduct: DatabaseProduct
 }
 
 export interface DatabaseCategory {
   name: string
   subCategories?: Array<DatabaseSubCategory>
+  products: Array<DatabaseProduct>
 }
 
 export interface DatabaseSubCategory {
@@ -91,3 +73,13 @@ interface SubCategoryMapperItem {
   name: string
   items: Array<string>
 }
+
+export interface DatabaseCertificateSystem {
+  name: string
+}
+
+export interface DatabaseCertificate {
+  id: number
+  name: string
+}
+

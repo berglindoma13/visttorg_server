@@ -1,5 +1,5 @@
 import prismaInstance from "../lib/prisma";
-import { DatabaseCategory, DatabaseProduct, DatabaseSubCategory } from "../types/models";
+import { DatabaseCategory, DatabaseProduct, DatabaseSubCategory } from "../types/databaseModels";
 
 export const DeleteAllProductsByCompany = async(companyid : number) => {
     // delete all products with given company id

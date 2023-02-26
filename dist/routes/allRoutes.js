@@ -21,7 +21,6 @@ const fs_1 = __importDefault(require("fs"));
 const PrismaHelper_1 = require("../helpers/PrismaHelper");
 const SendEmail_1 = require("../helpers/SendEmail");
 const CommonController_1 = require("../controllers/CommonController");
-const testController_1 = require("../controllers/testController");
 const FagefniController_1 = require("../controllers/FagefniController");
 const HTHController_1 = require("../controllers/HTHController");
 exports.allRoutes = (0, express_1.Router)();
@@ -132,7 +131,6 @@ exports.allRoutes.get('/api/hth/fixcerts', (req, res) => {
     (0, CommonController_1.FixValidatedCerts)('HTH');
     res.send('succesfull');
 });
-exports.allRoutes.get('/api/test', testController_1.InsertAllTemplateProducts);
 // allRoutes.get('/api/deletesheets', DeleteAllSheetsProducts);
 // allRoutes.get('/api/deletesheetscertificates', DeleteAllSheetsCert);
 // companyRoutes.get('/api/testnewindatabase', ProcessNewInDatabase)

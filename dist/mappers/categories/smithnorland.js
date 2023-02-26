@@ -3,11 +3,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = [
     {
         "name": "Baðherbergi",
-        "items": [],
+        "items": [
+            "Þvottavélar og þurrkarar",
+            "Þurrkarar",
+        ],
         "subCategories": [
             {
                 "name": "Hreinlætistæki",
-                "items": [],
+                "items": [
+                    "Þvottavélar og þurrkarar",
+                    "Þurrkarar",
+                ],
             },
             {
                 "name": "Niðurföll",
@@ -25,7 +31,21 @@ exports.default = [
     },
     {
         "name": "Eldhús",
-        "items": [],
+        "items": [
+            "Eldunartæki",
+            "Bakstursofnar",
+            "Veggofnar",
+            "Háfar og gufugleypar",
+            "Veggháfar",
+            "Gufusuðuofnar",
+            "Eyjuháfar",
+            "Kæli- og frystitæki",
+            "Kæli- og frystiskápar",
+            "Uppþvottavélar",
+            "Gufugleypar",
+            "Hvtíar/stál uppþvottavélar",
+            "Borðviftur",
+        ],
         "subCategories": [
             {
                 "name": "Innréttingar",
@@ -41,7 +61,21 @@ exports.default = [
             },
             {
                 "name": "Heimilistæki",
-                "items": []
+                "items": [
+                    "Eldunartæki",
+                    "Bakstursofnar",
+                    "Veggofnar",
+                    "Háfar og gufugleypar",
+                    "Veggháfar",
+                    "Gufusuðuofnar",
+                    "Eyjuháfar",
+                    "Kæli- og frystitæki",
+                    "Kæli- og frystiskápar",
+                    "Uppþvottavélar",
+                    "Gufugleypar",
+                    "Hvtíar/stál uppþvottavélar",
+                    "Borðviftur",
+                ]
             }
         ]
     },

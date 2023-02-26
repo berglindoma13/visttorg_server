@@ -3,7 +3,6 @@ import { BykoProduct, BykoResponseData } from '../types/byko'
 import axios from 'axios'
 import fs from 'fs'
 import BykoCategoryMapper from '../mappers/categories/byko'
-import { DatabaseProduct, ConnectedCategory, ProductWithPropsProps, DatabaseProductCertificate, ConnectedSubCategory } from '../types/models'
 import BykoCertificateMapper from '../mappers/certificates/byko'
 import { DeleteAllProductsByCompany,
   DeleteAllCertByCompany,
@@ -18,6 +17,7 @@ import { certIdFinder } from '../mappers/certificates/certificateIds';
 import { getMappedCategory, getMappedCategorySub } from '../helpers/MapCategories';
 import { client } from '../lib/sanity';
 import { mapToCertificateSystem } from '../helpers/CertificateValidator';
+import { ConnectedCategory, ConnectedSubCategory, MigratingProduct, MigratingProductCertificate, ProductWithExtraProps } from '../types/migratingModels';
  
 // BYKO COMPANY ID = 1
 
@@ -25,9 +25,9 @@ const BykoAPI = "https://byko.is/umhverfisvottadar?password=cert4env"
 const CompanyID = 1
 const CompanyName = 'BYKO'
 
-var updatedProducts: Array<DatabaseProduct> = [];
-var createdProducts: Array<DatabaseProduct> = [];
-var productsNotValid: Array<DatabaseProduct> = [];
+var updatedProducts: Array<MigratingProduct> = [];
+var createdProducts: Array<MigratingProduct> = [];
+var productsNotValid: Array<MigratingProduct> = [];
 
 const convertBykoProductToDatabaseProduct = async(product: BykoProduct) => {
 
@@ -48,7 +48,7 @@ const convertBykoProductToDatabaseProduct = async(product: BykoProduct) => {
   //Map certificates and validate them before adding to database
   const convertedCertificates: Array<string> = product.certificates.map(certificate => { return BykoCertificateMapper[certificate.cert] })
 
-  const convertedProduct : DatabaseProduct = {
+  const convertedProduct : MigratingProduct = {
     productid: product.axId !== '' ? `${CompanyID}${product.axId}` : product.axId,
     title: product.prodName,
     description: product.longDescription,
@@ -133,7 +133,7 @@ const requestBykoApi = async(pageNr : number) => {
   });
 }
 
-const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
+const ProcessForDatabase = async(products : Array<MigratingProduct>) => {
   // check if any product in the list is in database but not coming in from company api anymore
   deleteOldProducts(products, CompanyID)
 
@@ -142,11 +142,8 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
   createdProducts = [];
   productsNotValid = []
 
-  console.log('processing product list')
-
-
   const allProductPromises = products.map(async(product) => {
-    const productWithProps:ProductWithPropsProps = { approved: false, certChange: false, create: false, product: null, productState: 1, validDate: null, validatedCertificates:[]}
+    const productWithProps:ProductWithExtraProps = { approved: false, certChange: false, create: false, product: null, productState: 1, validDate: null, validatedCertificates:[]}
     const prod = await GetUniqueProduct(product.productid, CompanyID)
 
     var approved = false;
@@ -212,8 +209,6 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
     const filteredArray = productsWithProps.filter(prod => prod.productState !== 1)
 
-    console.log('starting transaction for products')
-
     await prismaInstance.$transaction(
       filteredArray.map(productWithProps => {
         const systemArray = mapToCertificateSystem(productWithProps.product)
@@ -278,7 +273,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
     console.log('done deleting and starting to create new ones')
 
-    const allCertificates: Array<DatabaseProductCertificate> = filteredArray.map(prod => {
+    const allCertificates: Array<MigratingProductCertificate> = filteredArray.map(prod => {
       return prod.validatedCertificates.map(cert => {
         let fileurl = ''
         let validdate = null
@@ -294,7 +289,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
           fileurl = prod.product.vocUrl
           validdate = prod.validDate[2].date
         }
-        const certItem: DatabaseProductCertificate = { 
+        const certItem: MigratingProductCertificate = { 
           name: cert.name,
           fileurl: fileurl,
           validDate: validdate,
@@ -323,16 +318,15 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
       })
     ) 
   }).then(() => {
-    console.log('done and gone into then')
     // write all appropriate files
     WriteAllFiles(createdProducts, updatedProducts, productsNotValid, CompanyName)
   });
 }
 
 const ListCategories = async(data : BykoResponseData) => {
-  const filteredProdType = data.productList.filter(product => product.prodTypeParent != 'Fatnaður')
-  const prodtypelist = filteredProdType.map(product => product.prodType)
-  const parentprodtypelist = filteredProdType.map(product => product.prodTypeParent)
+
+  const prodtypelist = data.productList.map(product => product.prodType)
+  const parentprodtypelist = data.productList.map(product => product.prodTypeParent)
 
   const combined = prodtypelist.concat(parentprodtypelist)
 

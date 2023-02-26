@@ -12,11 +12,10 @@ import { DeleteAllBirgissonCert, DeleteAllBirgissonProducts, GetAllInvalidBirgis
 // import { InsertAllTestProducts } from '../controllers/testController';
 import { DeleteAllSmithNorlandCert, DeleteAllSmithNorlandProducts, GetAllInvalidSmithNorlandCertificates, GetAllSmithNorlandCategories, InsertAllSmithNorlandProducts } from '../controllers/SmithNorlandController';
 import fs from 'fs'
-import { DatabaseCategory } from '../types/models';
+import { DatabaseCategory } from '../types/databaseModels';
 import { UpsertAllCategories } from '../helpers/PrismaHelper';
 import { SendEmailAPI } from '../helpers/SendEmail';
 import { FixValidatedCerts, setProductsToCertificateSystems, UploadValidatedCerts } from '../controllers/CommonController';
-import { InsertAllTemplateProducts } from '../controllers/testController';
 import { DeleteAllFagefniCert, DeleteAllFagefniProducts, GetAllInvalidFagefniCertificates, InsertAllFagefniProducts } from '../controllers/FagefniController';
 import { DeleteAllHTHCert, DeleteAllHTHProducts, GetAllInvalidHTHCertificates, InsertAllHTHProducts } from '../controllers/HTHController';
 
@@ -142,7 +141,6 @@ allRoutes.get('/api/hth/fixcerts', (req,res) => {
 })
 
 
-allRoutes.get('/api/test', InsertAllTemplateProducts);
 // allRoutes.get('/api/deletesheets', DeleteAllSheetsProducts);
 // allRoutes.get('/api/deletesheetscertificates', DeleteAllSheetsCert);
 

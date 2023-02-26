@@ -1,5 +1,5 @@
 import reader from 'g-sheets-api';
-import { DatabaseProduct, DatabaseProductCertificate, ProductWithPropsProps } from '../types/models'
+import { DatabaseProduct, DatabaseProductCertificate } from '../types/databaseModels'
 import { Request, Response } from 'express';
 import { DeleteAllProductsByCompany,
         DeleteAllCertByCompany,
@@ -13,15 +13,16 @@ import prismaInstance from '../lib/prisma';
 import { certIdFinder } from '../mappers/certificates/certificateIds';
 import { client } from '../lib/sanity';
 import { mapToCertificateSystem } from '../helpers/CertificateValidator';
+import { MigratingProduct, MigratingProductCertificate, ProductWithExtraProps } from '../types/migratingModels';
 
 // company id 2, get data from google sheets and insert into database from Ebson
 const CompanyID = 2
 const SheetID = '1mbdkZvGHbBnj4QeOQdfAIQWQ1uOUQdm5aWYmoV-6yeg'
 const CompanyName = 'Ebson'
 
-var updatedProducts: Array<DatabaseProduct> = [];
-var createdProducts: Array<DatabaseProduct> = [];
-var productsNotValid: Array<DatabaseProduct> = [];
+var updatedProducts: Array<MigratingProduct> = [];
+var createdProducts: Array<MigratingProduct> = [];
+var productsNotValid: Array<MigratingProduct> = [];
 
 export const InsertAllEbsonProducts = async(req: Request,res: Response) => {
     // get all data from sheets file
@@ -39,7 +40,7 @@ export const DeleteAllEbsonCert = async(req: Request, res: Response) => {
   res.end(`All ${CompanyName} product certificates deleted`);
 }
 
-const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
+const ProcessForDatabase = async(products : Array<MigratingProduct>) => {
   // check if any product in the list is in database but not coming in from company api anymore
   deleteOldProducts(products, CompanyID)
 
@@ -50,7 +51,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
 
 
   const allProductPromises = products.map(async(product) => {
-    const productWithProps:ProductWithPropsProps = { approved: false, certChange: false, create: false, product: null, productState: 1, validDate: null, validatedCertificates:[]}
+    const productWithProps:ProductWithExtraProps = { approved: false, certChange: false, create: false, product: null, productState: 1, validDate: null, validatedCertificates:[]}
     const prod = await GetUniqueProduct(product.productid, CompanyID)
 
     var approved = false;
@@ -181,7 +182,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
     await DeleteAllCertByCompany(CompanyID)
 
 
-    const allCertificates: Array<DatabaseProductCertificate> = filteredArray.map(prod => {
+    const allCertificates: Array<MigratingProductCertificate> = filteredArray.map(prod => {
       return prod.validatedCertificates.map(cert => {
         let fileurl = ''
         let validdate = null
@@ -197,7 +198,7 @@ const ProcessForDatabase = async(products : Array<DatabaseProduct>) => {
           fileurl = prod.product.vocUrl
           validdate = prod.validDate[2].date
         }
-        const certItem: DatabaseProductCertificate = { 
+        const certItem: MigratingProductCertificate = { 
           name: cert.name,
           fileurl: fileurl,
           validDate: validdate,

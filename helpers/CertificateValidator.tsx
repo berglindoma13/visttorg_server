@@ -1,18 +1,19 @@
-import { ConnectedCertificateSystem, DatabaseCertificate, DatabaseProduct, ProductWithPropsProps } from '../types/models'
+import { DatabaseProduct } from '../types/databaseModels'
+import { ConnectedCertificateSystem, MigratingCertificate } from '../types/migratingModels'
 
 interface CertificateValidatorProps {
-  certificates: Array<DatabaseCertificate>
+  certificates: Array<MigratingCertificate>
   epdUrl?: string
   fscUrl?: string
   vocUrl?: string
   ceUrl?: string
 }
 
-export const CertificateValidator = ({ certificates, epdUrl, fscUrl, vocUrl, ceUrl } : CertificateValidatorProps) : Array<DatabaseCertificate> => {
+export const CertificateValidator = ({ certificates, epdUrl, fscUrl, vocUrl, ceUrl } : CertificateValidatorProps) : Array<MigratingCertificate> => {
 
-  const ValidCertificates: Array<DatabaseCertificate> = []
+  const ValidCertificates: Array<MigratingCertificate> = []
 
-  certificates.map((certificate: DatabaseCertificate) => {
+  certificates.map((certificate: MigratingCertificate) => {
     switch(certificate.name) {
       case 'EPD':
         if(!!epdUrl){ValidCertificates.push({ name: 'EPD'})}

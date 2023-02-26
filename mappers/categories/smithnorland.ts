@@ -3,11 +3,16 @@ export default [
 
     "name": "Baðherbergi",
     "items":[
+      "Þvottavélar og þurrkarar",
+      "Þurrkarar",
     ],
     "subCategories": [
       {
         "name":"Hreinlætistæki",
-        "items":[],
+        "items":[
+          "Þvottavélar og þurrkarar",
+          "Þurrkarar",
+        ],
       },
       {
         "name":"Niðurföll",
@@ -26,7 +31,21 @@ export default [
   {
 
     "name": "Eldhús",
-    "items":[],
+    "items":[
+      "Eldunartæki",
+      "Bakstursofnar",
+      "Veggofnar",
+      "Háfar og gufugleypar",
+      "Veggháfar",
+      "Gufusuðuofnar",
+      "Eyjuháfar",
+      "Kæli- og frystitæki",
+      "Kæli- og frystiskápar",
+      "Uppþvottavélar",
+      "Gufugleypar",
+      "Hvtíar/stál uppþvottavélar",
+      "Borðviftur",
+    ],
     "subCategories": [
       {
         "name":"Innréttingar",
@@ -42,7 +61,21 @@ export default [
       },
       {
         "name":"Heimilistæki",
-        "items":[]
+        "items":[
+          "Eldunartæki",
+          "Bakstursofnar",
+          "Veggofnar",
+          "Háfar og gufugleypar",
+          "Veggháfar",
+          "Gufusuðuofnar",
+          "Eyjuháfar",
+          "Kæli- og frystitæki",
+          "Kæli- og frystiskápar",
+          "Uppþvottavélar",
+          "Gufugleypar",
+          "Hvtíar/stál uppþvottavélar",
+          "Borðviftur",
+        ]
       }
     ]
   },

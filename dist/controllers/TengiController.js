@@ -21,7 +21,7 @@ const CompanyName = 'Tengi';
 var updatedProducts = [];
 var createdProducts = [];
 var productsNotValid = [];
-const convertTengiProductToDatabaseProduct = async (product) => {
+const convertTengiProductToMigratingProduct = async (product) => {
     //map the product category to vistbóks category dictionary
     const prodCategories = product.StandardFields.Categories.map(cat => {
         return cat.Name;
@@ -60,9 +60,11 @@ const InsertAllTengiProducts = async (req, res) => {
         //process all data and insert into database - first convert to databaseProduct Array
         const allConvertedTengiProducts = [];
         for (var i = 0; i < tengiData.Data.length; i++) {
-            const convertedProduct = await convertTengiProductToDatabaseProduct(tengiData.Data[i]);
-            //here is a single product
-            allConvertedTengiProducts.push(convertedProduct);
+            const convertedProduct = await convertTengiProductToMigratingProduct(tengiData.Data[i]);
+            //if the product has any matching categories -> add it
+            if (convertedProduct.categories.length !== 0) {
+                allConvertedTengiProducts.push(convertedProduct);
+            }
         }
         await ProcessForDatabase(allConvertedTengiProducts);
         return res.end("Successful import");

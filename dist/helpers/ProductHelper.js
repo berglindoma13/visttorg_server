@@ -53,27 +53,25 @@ const VerifyProduct = async (product, create, certChange) => {
 exports.VerifyProduct = VerifyProduct;
 // check if product list database has any products that are not coming from sheets anymore
 const deleteOldProducts = async (products, companyId) => {
+    console.log('products', products.map(i => i.productid));
     // get all current products from this company
     const currentProducts = await (0, PrismaHelper_1.GetAllProductsByCompanyid)(companyId);
+    console.log('currentproducts', currentProducts.map(i => i.productid));
     const productsNoLongerInDatabase = currentProducts.filter(curr_prod => {
         const matches = products.filter(product => { return curr_prod.productid == product.productid; });
         //product was not found in list
         return matches.length === 0;
     });
+    console.log('productsNoLongerInDatabase', productsNoLongerInDatabase.map(i => i.productid));
     (0, exports.productsNoLongerComingInWriteFile)(productsNoLongerInDatabase);
-    // deleta prodcut from prisma database
-    await prisma_1.default.$transaction(productsNoLongerInDatabase.map(product => {
-        return prisma_1.default.productcertificate.deleteMany({
-            where: {
-                productid: product.productid
-            }
-        });
-    }));
-    await prisma_1.default.$transaction(productsNoLongerInDatabase.map(product => {
-        return prisma_1.default.product.delete({
-            where: { productIdentifier: { productid: product.productid, companyid: companyId } },
-        });
-    }));
+    const transactionPromises = [];
+    productsNoLongerInDatabase.map(async (product) => {
+        transactionPromises.push(await prisma_1.default.$transaction([
+            prisma_1.default.productcertificate.deleteMany({ where: { connectedproduct: { productid: product.productid } } }),
+            prisma_1.default.product.delete({ where: { productIdentifier: { productid: product.productid, companyid: companyId } } })
+        ]));
+    });
+    await Promise.all(transactionPromises);
 };
 exports.deleteOldProducts = deleteOldProducts;
 const productsNoLongerComingInWriteFile = async (productsNoLongerInDatabase) => {

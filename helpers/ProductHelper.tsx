@@ -1,4 +1,4 @@
-import { ConnectedCategory, DatabaseProduct, DatabaseProductCertificate, ValidDateObj } from "../types/models";
+import { DatabaseProductCertificate, ValidDateObj } from "../types/databaseModels";
 import { CertificateValidator } from "./CertificateValidator";
 import { DeleteProductCertificates, GetAllProductsByCompanyid } from "./PrismaHelper";
 import { ValidDate } from "./ValidDate";
@@ -8,6 +8,7 @@ import { WriteFile } from "./WriteFile";
 import prismaInstance from "../lib/prisma";
 import reader from 'g-sheets-api';
 import { SheetProduct } from "../types/sheets";
+import { ConnectedCategory, MigratingProduct } from "../types/migratingModels";
 
 //states for product state
 //1 = not valid
@@ -15,7 +16,7 @@ import { SheetProduct } from "../types/sheets";
 //3 = certificate updated
 //4 = valid product, no certificate change, not created
 
-export const VerifyProduct = async(product : DatabaseProduct, create : boolean, certChange : boolean) => {   
+export const VerifyProduct = async(product : MigratingProduct, create : boolean, certChange : boolean) => {   
    const validatedCertificates = CertificateValidator({ certificates: product.certificates, fscUrl: product.fscUrl, epdUrl: product.epdUrl, vocUrl: product.vocUrl, ceUrl: product.ceUrl })
    var validDate: ValidDateObj[] = [{ message: '', date: null }, {message: '', date: null}, {message: '', date: null}]
    
@@ -56,33 +57,32 @@ export const VerifyProduct = async(product : DatabaseProduct, create : boolean, 
  }
 
 // check if product list database has any products that are not coming from sheets anymore
-export const deleteOldProducts = async(products : Array<DatabaseProduct>, companyId: number) => {
+export const deleteOldProducts = async(products : Array<MigratingProduct>, companyId: number) => {
+  console.log('products', products.map(i => i.productid))
   // get all current products from this company
   const currentProducts = await GetAllProductsByCompanyid(companyId)
+
+  console.log('currentproducts', currentProducts.map(i => i.productid))
   const productsNoLongerInDatabase = currentProducts.filter(curr_prod => {
     const matches = products.filter(product => { return curr_prod.productid == product.productid })
     //product was not found in list
     return matches.length === 0
   })
-  productsNoLongerComingInWriteFile(productsNoLongerInDatabase)
-  // deleta prodcut from prisma database
-  await prismaInstance.$transaction(
-    productsNoLongerInDatabase.map(product => {
-      return prismaInstance.productcertificate.deleteMany({
-        where: {
-          productid: product.productid
-        }
-      })
-    })
-  )
 
-  await prismaInstance.$transaction(
-    productsNoLongerInDatabase.map(product => {
-      return prismaInstance.product.delete({
-        where : { productIdentifier: { productid : product.productid, companyid: companyId }},
-      })
-    })
-  )
+  console.log('productsNoLongerInDatabase', productsNoLongerInDatabase.map(i => i.productid))
+  productsNoLongerComingInWriteFile(productsNoLongerInDatabase)
+
+  const transactionPromises = []
+
+  productsNoLongerInDatabase.map(async(product) => {
+    transactionPromises.push(await prismaInstance.$transaction([
+      prismaInstance.productcertificate.deleteMany({ where: { connectedproduct: { productid: product.productid} }}),
+      prismaInstance.product.delete({ where : { productIdentifier: { productid : product.productid, companyid: companyId }}})
+    ]))
+  })
+
+  await Promise.all(transactionPromises)
+
 }
 
 export const productsNoLongerComingInWriteFile = async(productsNoLongerInDatabase: Array<product>) => {
@@ -91,7 +91,7 @@ export const productsNoLongerComingInWriteFile = async(productsNoLongerInDatabas
   // SendEmail("Products no longer coming in from company")
 }
 
-export const WriteAllFiles = async(createdProducts: Array<DatabaseProduct>, updatedProducts: Array<DatabaseProduct>, productsNotValid: Array<DatabaseProduct>, companyName: string, invalidCertificates?: Array<DatabaseProductCertificate>) => {
+export const WriteAllFiles = async(createdProducts: Array<MigratingProduct>, updatedProducts: Array<MigratingProduct>, productsNotValid: Array<MigratingProduct>, companyName: string, invalidCertificates?: Array<DatabaseProductCertificate>) => {
   WriteFile(`${companyName}Created`, createdProducts);
   WriteFile(`${companyName}Updated`, updatedProducts);
   WriteFile(`${companyName}NotValid`, productsNotValid);
@@ -106,13 +106,13 @@ export const getAllProductsFromGoogleSheets = (sheetId: string, callBack: any, c
   };
 
   reader(options, (results: Array<SheetProduct>) => {
-    const allprod : Array<DatabaseProduct> = [];
+    const allprod : Array<MigratingProduct> = [];
     
     for (var i=1; i< results.length; i++) {
       const allCat = results[i].fl.split(',')
       const mappedCategories: Array<ConnectedCategory> = allCat.map(cat => { return { name: cat } })
   
-      const temp_prod : DatabaseProduct = {
+      const temp_prod : MigratingProduct = {
           productid: results[i].nr !== ''  ? `${companyID}${results[i].nr}` : results[i].nr,
           title: results[i].name,
           description: results[i].long,

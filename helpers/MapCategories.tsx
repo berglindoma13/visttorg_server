@@ -1,4 +1,4 @@
-import { CategoryMapperItem, ConnectedCategory, ConnectedSubCategory } from "../types/models"
+import { CategoryMapperItem, ConnectedCategory, ConnectedSubCategory } from "../types/databaseModels"
 
 // export const getMappedCategory = (categoryList: Array<string>, mapper: any) => {
 //   const matchedCategory: Array<ConnectedCategory> = []

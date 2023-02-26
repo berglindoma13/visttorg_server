@@ -123,7 +123,6 @@ const ProcessForDatabase = async (products) => {
     updatedProducts = [];
     createdProducts = [];
     productsNotValid = [];
-    console.log('processing product list');
     const allProductPromises = products.map(async (product) => {
         const productWithProps = { approved: false, certChange: false, create: false, product: null, productState: 1, validDate: null, validatedCertificates: [] };
         const prod = await (0, PrismaHelper_1.GetUniqueProduct)(product.productid, CompanyID);
@@ -182,7 +181,6 @@ const ProcessForDatabase = async (products) => {
     });
     return Promise.all(allProductPromises).then(async (productsWithProps) => {
         const filteredArray = productsWithProps.filter(prod => prod.productState !== 1);
-        console.log('starting transaction for products');
         await prisma_1.default.$transaction(filteredArray.map(productWithProps => {
             const systemArray = (0, CertificateValidator_1.mapToCertificateSystem)(productWithProps.product);
             return prisma_1.default.product.upsert({
@@ -282,15 +280,13 @@ const ProcessForDatabase = async (products) => {
             });
         }));
     }).then(() => {
-        console.log('done and gone into then');
         // write all appropriate files
         (0, ProductHelper_1.WriteAllFiles)(createdProducts, updatedProducts, productsNotValid, CompanyName);
     });
 };
 const ListCategories = async (data) => {
-    const filteredProdType = data.productList.filter(product => product.prodTypeParent != 'Fatnaður');
-    const prodtypelist = filteredProdType.map(product => product.prodType);
-    const parentprodtypelist = filteredProdType.map(product => product.prodTypeParent);
+    const prodtypelist = data.productList.map(product => product.prodType);
+    const parentprodtypelist = data.productList.map(product => product.prodTypeParent);
     const combined = prodtypelist.concat(parentprodtypelist);
     const uniqueArrayProdType = combined.filter(function (item, pos) {
         return combined.indexOf(item) == pos;

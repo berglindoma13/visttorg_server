@@ -21,7 +21,7 @@ const CompanyName = 'SmithNorland';
 var updatedProducts = [];
 var createdProducts = [];
 var productsNotValid = [];
-const convertSmithNorlandProductToDatabaseProduct = async (product) => {
+const convertSmithNorlandProductToMigratingProduct = async (product) => {
     //map the product category to vistbóks category dictionary
     const prodCategories = product.category.map(cat => {
         return cat;
@@ -60,9 +60,11 @@ const InsertAllSmithNorlandProducts = async (req, res) => {
         //process all data and insert into database - first convert to databaseProduct Array
         const allConvertedSmithNorlandProducts = [];
         for (var i = 0; i < SmithNorlandData.products.length; i++) {
-            const convertedProduct = await convertSmithNorlandProductToDatabaseProduct(SmithNorlandData.products[i]);
-            //here is a single product
-            allConvertedSmithNorlandProducts.push(convertedProduct);
+            const convertedProduct = await convertSmithNorlandProductToMigratingProduct(SmithNorlandData.products[i]);
+            //if the product has any matching categories -> add it
+            if (convertedProduct.categories.length !== 0) {
+                allConvertedSmithNorlandProducts.push(convertedProduct);
+            }
         }
         await ProcessForDatabase(allConvertedSmithNorlandProducts);
         return res.end("Successful import");

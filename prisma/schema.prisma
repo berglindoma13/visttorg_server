@@ -38,6 +38,7 @@ model product {
   approved        Boolean?
   createdAt       DateTime?
   updatedAt       DateTime?
+  userFavorite  vistbokUser[]
 
    @@unique([productid, companyid], name: "productIdentifier")
 }
@@ -99,6 +100,34 @@ model vistbokUser {
   fullname String
   company String
   jobtitle String
+  favoriteproducts product[]
+  projects vistbokProject[]
+}
+
+model vistbokProject {
+  id Int @id @default(autoincrement())
+  title String
+  address String
+  country String
+  status String
+  users vistbokUser[]
+  certificatesystem projectCertificateSystem[]
+}
+
+model projectCertificateSystem {
+  id Int @id @default(autoincrement())
+  title String
+  base  String
+  secondlayer String
+  thirdlayer  String
+  projects  vistbokProject[]
+  requirements certificateSystemRequirement[]
+}
+
+model certificateSystemRequirement {
+  id  Int @id @default(autoincrement())
+  system  projectCertificateSystem @relation(fields: [id], references: [id])
+  requirement String
 }
 
 // model attachedFile {

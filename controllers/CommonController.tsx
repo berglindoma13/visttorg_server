@@ -42,6 +42,8 @@ export const FixValidatedCerts = async(companyName) => {
   client.getDocuments(referenceList).then(async(reflist: unknown) => {
     const list: Array<SanityCertificate> = reflist as Array<SanityCertificate>
 
+    console.log('list', list)
+
     await prismaInstance.$transaction(
       list.map(cert => {  
         return prismaInstance.productcertificate.updateMany({
