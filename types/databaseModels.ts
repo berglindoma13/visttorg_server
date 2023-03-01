@@ -6,7 +6,7 @@ export interface DatabaseProduct {
   description: string,
   shortdescription: string,
   categories: Array<DatabaseCategory>,
-  subCategories: Array<ConnectedSubCategory>,
+  subCategories: Array<DatabaseSubCategory>,
   productimageurl: string,
   url: string,
   brand: string,
@@ -18,18 +18,6 @@ export interface DatabaseCompany {
   name: string
   websiteurl: string
   email: string
-}
-
-export interface ConnectedCategory {
-  name: string
-}
-
-export interface ConnectedSubCategory {
-  subCatIdentifier: ConnectedSubCatIdentifier
-}
-
-export interface ConnectedCertificateSystem {
-  name: string
 }
 
 interface ConnectedSubCatIdentifier {
@@ -47,7 +35,7 @@ export interface DatabaseProductCertificate {
   validDate?: Date
   name: string
   fileurl: string
-  productId: string
+  productid: string
   certificateId: number
   certificate: DatabaseCertificate
   connectedProduct: DatabaseProduct

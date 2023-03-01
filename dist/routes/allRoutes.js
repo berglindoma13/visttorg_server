@@ -39,6 +39,10 @@ exports.allRoutes.get('/api/byko/fixcerts', (req, res) => {
     (0, CommonController_1.FixValidatedCerts)('BYKO');
     res.send('succesfull');
 });
+exports.allRoutes.get('/api/byko/deleteOldSanityCerts', (req, res) => {
+    (0, CommonController_1.DeleteOldSanityEntries)('BYKO', 1);
+    res.send('successfull');
+});
 //TENGI ROUTES - API
 exports.allRoutes.get('/api/tengi', TengiController_1.InsertAllTengiProducts);
 exports.allRoutes.get('/api/tengi/getallcategories', TengiController_1.GetAllTengiCategories);
@@ -57,6 +61,10 @@ exports.allRoutes.get('/api/shelgason/invalidcerts', ShelgasonController_1.GetAl
 exports.allRoutes.get('/api/shelgason/fixcerts', (req, res) => {
     (0, CommonController_1.FixValidatedCerts)('S.Helgason');
     res.send('succesfull');
+});
+exports.allRoutes.get('/api/shelgason/deleteOldSanityCerts', (req, res) => {
+    (0, CommonController_1.DeleteOldSanityEntries)('S.Helgason', 5);
+    res.send('successfull');
 });
 //Smith&Norland ROUTES - API
 exports.allRoutes.get('/api/smithnorland', SmithNorlandController_1.InsertAllSmithNorlandProducts);
@@ -77,6 +85,10 @@ exports.allRoutes.get('/api/ebson/fixcerts', (req, res) => {
     (0, CommonController_1.FixValidatedCerts)('Ebson');
     res.send('succesfull');
 });
+exports.allRoutes.get('/api/ebson/deleteOldSanityCerts', (req, res) => {
+    (0, CommonController_1.DeleteOldSanityEntries)('Ebson', 2);
+    res.send('successfull');
+});
 //Sérefni ROUTES - GOOGLE SHEETS
 exports.allRoutes.get('/api/serefni', SerefniController_1.InsertAllSerefniProducts);
 exports.allRoutes.get('/api/serefni/deletecert', SerefniController_1.DeleteAllSerefniCert);
@@ -85,6 +97,10 @@ exports.allRoutes.get('/api/serefni/invalidcerts', SerefniController_1.GetAllInv
 exports.allRoutes.get('/api/serefni/fixcerts', (req, res) => {
     (0, CommonController_1.FixValidatedCerts)('Serefni');
     res.send('succesfull');
+});
+exports.allRoutes.get('/api/serefni/deleteOldSanityCerts', (req, res) => {
+    (0, CommonController_1.DeleteOldSanityEntries)('Serefni', 6);
+    res.send('successfull');
 });
 //BMVallá ROUTES - GOOGLE SHEETS
 exports.allRoutes.get('/api/bmvalla', BmvallaController_1.InsertAllBMVallaProducts);
@@ -112,6 +128,10 @@ exports.allRoutes.get('/api/birgisson/invalidcerts', BirgissonController_1.GetAl
 exports.allRoutes.get('/api/birgisson/fixcerts', (req, res) => {
     (0, CommonController_1.FixValidatedCerts)('Birgisson');
     res.send('succesfull');
+});
+exports.allRoutes.get('/api/birgisson/deleteOldSanityCerts', (req, res) => {
+    (0, CommonController_1.DeleteOldSanityEntries)('Birgisson', 9);
+    res.send('successfull');
 });
 //FAGEFNI ROUTES - GOOGLE SHEETS
 exports.allRoutes.get('/api/fagefni', FagefniController_1.InsertAllFagefniProducts);

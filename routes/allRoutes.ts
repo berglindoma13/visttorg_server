@@ -15,7 +15,7 @@ import fs from 'fs'
 import { DatabaseCategory } from '../types/databaseModels';
 import { UpsertAllCategories } from '../helpers/PrismaHelper';
 import { SendEmailAPI } from '../helpers/SendEmail';
-import { FixValidatedCerts, setProductsToCertificateSystems, UploadValidatedCerts } from '../controllers/CommonController';
+import { DeleteOldSanityEntries, FixValidatedCerts, setProductsToCertificateSystems, UploadValidatedCerts } from '../controllers/CommonController';
 import { DeleteAllFagefniCert, DeleteAllFagefniProducts, GetAllInvalidFagefniCertificates, InsertAllFagefniProducts } from '../controllers/FagefniController';
 import { DeleteAllHTHCert, DeleteAllHTHProducts, GetAllInvalidHTHCertificates, InsertAllHTHProducts } from '../controllers/HTHController';
 
@@ -36,6 +36,10 @@ allRoutes.get('/api/byko/invalidcerts', GetAllInvalidBykoCertificates)
 allRoutes.get('/api/byko/fixcerts', (req,res) => {
   FixValidatedCerts('BYKO')
   res.send('succesfull')
+})
+allRoutes.get('/api/byko/deleteOldSanityCerts', (req,res) => {
+  DeleteOldSanityEntries('BYKO', 1)
+  res.send('successfull')
 })
 
 //TENGI ROUTES - API
@@ -58,6 +62,10 @@ allRoutes.get('/api/shelgason/fixcerts', (req,res) => {
   FixValidatedCerts('S.Helgason')
   res.send('succesfull')
 })
+allRoutes.get('/api/shelgason/deleteOldSanityCerts', (req,res) => {
+  DeleteOldSanityEntries('S.Helgason', 5)
+  res.send('successfull')
+})
 
 //Smith&Norland ROUTES - API
 allRoutes.get('/api/smithnorland', InsertAllSmithNorlandProducts)
@@ -79,6 +87,10 @@ allRoutes.get('/api/ebson/fixcerts', (req,res) => {
   FixValidatedCerts('Ebson')
   res.send('succesfull')
 })
+allRoutes.get('/api/ebson/deleteOldSanityCerts', (req,res) => {
+  DeleteOldSanityEntries('Ebson', 2)
+  res.send('successfull')
+})
 
 //Sérefni ROUTES - GOOGLE SHEETS
 allRoutes.get('/api/serefni', InsertAllSerefniProducts)
@@ -88,6 +100,10 @@ allRoutes.get('/api/serefni/invalidcerts', GetAllInvalidSerefniCertificates)
 allRoutes.get('/api/serefni/fixcerts', (req,res) => {
   FixValidatedCerts('Serefni')
   res.send('succesfull')
+})
+allRoutes.get('/api/serefni/deleteOldSanityCerts', (req,res) => {
+  DeleteOldSanityEntries('Serefni', 6)
+  res.send('successfull')
 })
 
 //BMVallá ROUTES - GOOGLE SHEETS
@@ -118,6 +134,10 @@ allRoutes.get('/api/birgisson/invalidcerts', GetAllInvalidBirgissonCertificates)
 allRoutes.get('/api/birgisson/fixcerts', (req,res) => {
   FixValidatedCerts('Birgisson')
   res.send('succesfull')
+})
+allRoutes.get('/api/birgisson/deleteOldSanityCerts', (req,res) => {
+  DeleteOldSanityEntries('Birgisson', 9)
+  res.send('successfull')
 })
 
 //FAGEFNI ROUTES - GOOGLE SHEETS
