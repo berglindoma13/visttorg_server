@@ -1,4 +1,5 @@
-import { CategoryMapperItem, ConnectedCategory, ConnectedSubCategory } from "../types/databaseModels"
+import { CategoryMapperItem } from "../types/databaseModels"
+import { ConnectedCategory, ConnectedSubCategory } from "../types/migratingModels"
 
 // export const getMappedCategory = (categoryList: Array<string>, mapper: any) => {
 //   const matchedCategory: Array<ConnectedCategory> = []
