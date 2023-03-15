@@ -15,9 +15,10 @@ import fs from 'fs'
 import { DatabaseCategory } from '../types/databaseModels';
 import { UpsertAllCategories } from '../helpers/PrismaHelper';
 import { SendEmailAPI } from '../helpers/SendEmail';
-import { DeleteOldSanityEntries, FixValidatedCerts, setProductsToCertificateSystems, UploadValidatedCerts } from '../controllers/CommonController';
+import { CleanUpFunctionSanityCertificates, DeleteOldSanityEntries, FixValidatedCerts, setProductsToCertificateSystems, UploadValidatedCerts } from '../controllers/CommonController';
 import { DeleteAllFagefniCert, DeleteAllFagefniProducts, GetAllInvalidFagefniCertificates, InsertAllFagefniProducts } from '../controllers/FagefniController';
 import { DeleteAllHTHCert, DeleteAllHTHProducts, GetAllInvalidHTHCertificates, InsertAllHTHProducts } from '../controllers/HTHController';
+import { DeleteAllGolfefnabudinCert, DeleteAllGolfefnabudinProducts, GetAllInvalidGolfefnabudinCertificates, InsertAllGolfefnabudinProducts } from '../controllers/GolfefnabudinController';
 
 export const allRoutes = Router();
 
@@ -26,6 +27,9 @@ allRoutes.get('/', (req: Request, res: Response) => {
   res.send('Server is up and running here NOW!')
 })
 allRoutes.post('/api/fixcerts', UploadValidatedCerts)
+
+allRoutes.get('/api/cleanupsanity', CleanUpFunctionSanityCertificates)
+
 // allRoutes.get('/api/certsystemmapper', setProductsToCertificateSystems)
 
 //BYKO ROUTES - API
@@ -89,6 +93,20 @@ allRoutes.get('/api/ebson/fixcerts', (req,res) => {
 })
 allRoutes.get('/api/ebson/deleteOldSanityCerts', (req,res) => {
   DeleteOldSanityEntries('Ebson', 2)
+  res.send('successfull')
+})
+
+//GOLFEFNABUDIN ROUTES - GOOGLE SHEETS
+allRoutes.get('/api/golfefnabudin', InsertAllGolfefnabudinProducts)
+allRoutes.get('/api/golfefnabudin/deletecert', DeleteAllGolfefnabudinCert)
+allRoutes.get('/api/golfefnabudin/deleteproducts', DeleteAllGolfefnabudinProducts)
+allRoutes.get('/api/golfefnabudin/invalidcerts', GetAllInvalidGolfefnabudinCertificates)
+allRoutes.get('/api/golfefnabudin/fixcerts', (req,res) => {
+  FixValidatedCerts('Golfefnabuðin')
+  res.send('succesfull')
+})
+allRoutes.get('/api/golfefnabudin/deleteOldSanityCerts', (req,res) => {
+  DeleteOldSanityEntries('Golfefnabuðin', 13)
   res.send('successfull')
 })
 

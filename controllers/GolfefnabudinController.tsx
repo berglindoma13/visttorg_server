@@ -1,36 +1,41 @@
+import reader from 'g-sheets-api';
+import { DatabaseProduct, DatabaseProductCertificate } from '../types/databaseModels'
 import { Request, Response } from 'express';
 import { DeleteAllProductsByCompany,
         DeleteAllCertByCompany,
         GetUniqueProduct,
-        GetAllInvalidProductCertsByCompany
+        GetAllInvalidProductCertsByCompany,
       } from '../helpers/PrismaHelper'
+import fs from 'fs'
 import { deleteOldProducts, WriteAllFiles, VerifyProduct, getAllProductsFromGoogleSheets } from '../helpers/ProductHelper';
 import prismaInstance from '../lib/prisma';
-import { certIdFinder } from '../mappers/certificates/certificateIds';
 import { client } from '../lib/sanity';
 import { mapToCertificateSystem } from '../helpers/CertificateValidator';
+import { certIdFinder } from '../mappers/certificates/certificateIds';
 import { MigratingProduct, MigratingProductCertificate, ProductWithExtraProps } from '../types/migratingModels';
 
-const CompanyID = 5
-const SheetID = '1fMgOGGoI20sqTiapQNC-89F9UrrqnvselMnw-OXlgX8'
-const CompanyName = 'S.Helgason'
+//crtl-f Golfefnabudin -> replace with company name
+
+const CompanyID = 13
+const SheetID = '1Gt6kpkR-E3mTvQx9p1x70vUsb7z4BLbAv8MLaeulnyw'
+const CompanyName = 'Golfefnabudin'
 
 var updatedProducts: Array<MigratingProduct> = [];
 var createdProducts: Array<MigratingProduct> = [];
 var productsNotValid: Array<MigratingProduct> = [];
 
-export const InsertAllSHelgasonProducts = async(req: Request,res: Response) => {
+export const InsertAllGolfefnabudinProducts = async(req: Request,res: Response) => {
     // get all data from sheets file
     getAllProductsFromGoogleSheets(SheetID, ProcessForDatabase, CompanyID);
     res.end(`All ${CompanyName} products inserted`)
 }
 
-export const DeleteAllSHelgasonProducts = async(req: Request, res: Response) => {
+export const DeleteAllGolfefnabudinProducts = async(req: Request, res: Response) => {
   DeleteAllProductsByCompany(CompanyID)
   res.end(`All ${CompanyName} products deleted`);
 }
 
-export const DeleteAllSHelgasonCert = async(req: Request, res: Response) => {
+export const DeleteAllGolfefnabudinCert = async(req: Request, res: Response) => {
   DeleteAllCertByCompany(CompanyID)
   res.end(`All ${CompanyName} product certificates deleted`);
 }
@@ -84,7 +89,7 @@ const ProcessForDatabase = async(products : Array<MigratingProduct>) => {
       created = true;
       //var certChange = true;
     }
-    
+
     productWithProps.approved = approved
     productWithProps.certChange = certChange
     productWithProps.create = created
@@ -104,10 +109,10 @@ const ProcessForDatabase = async(products : Array<MigratingProduct>) => {
     else if(productInfo.productState === 3){
       updatedProducts.push(product)
     }
-    console.log('prod',productWithProps)
+
     return productWithProps
   })
-  
+
   Promise.all(allProductPromises).then(async(productsWithProps) => {
 
     const filteredArray = productsWithProps.filter(prod => prod.productState !== 1)
@@ -172,7 +177,10 @@ const ProcessForDatabase = async(products : Array<MigratingProduct>) => {
       })
     )
 
-   const deletedProductsCerts = await DeleteAllCertByCompany(CompanyID)
+    // const arrayWithCertifiateChanges = productsWithProps.filter(prod => prod.productState !== 1 && prod.productState !== 4)
+
+    await DeleteAllCertByCompany(CompanyID)
+
 
     const allCertificates: Array<MigratingProductCertificate> = filteredArray.map(prod => {
       return prod.validatedCertificates.map(cert => {
@@ -190,7 +198,7 @@ const ProcessForDatabase = async(products : Array<MigratingProduct>) => {
           fileurl = prod.product.vocUrl
           validdate = prod.validDate[2].date
         }
-        const certItem: MigratingProductCertificate = { 
+        const certItem: MigratingProductCertificate = {
           name: cert.name,
           fileurl: fileurl,
           validDate: validdate,
@@ -210,7 +218,7 @@ const ProcessForDatabase = async(products : Array<MigratingProduct>) => {
             connectedproduct : {
               connect : { 
                 productIdentifier : { productid: cert.productId, companyid: CompanyID}
-              },
+               },
             },
             fileurl : cert.fileurl,
             validDate : cert.validDate
@@ -218,13 +226,14 @@ const ProcessForDatabase = async(products : Array<MigratingProduct>) => {
         })
       })
     ) 
+
   }).then(() => {
     // write all appropriate files
     WriteAllFiles(createdProducts, updatedProducts, productsNotValid, CompanyName)
   });
 }
 
-export const GetAllInvalidSHelgasonCertificates = async(req, res) => {
+export const GetAllInvalidGolfefnabudinCertificates = async(req,res) => {
   const allCerts = await GetAllInvalidProductCertsByCompany(CompanyID)
 
   const SanityCertArray = allCerts.map(cert => {
@@ -255,13 +264,12 @@ export const GetAllInvalidSHelgasonCertificates = async(req, res) => {
       _type:"CertificateList",
       CompanyName: CompanyName,
     }
-    
+
     client
     .transaction()
     .createIfNotExists(doc)
-    .patch(`${CompanyName}CertList`, (p) => 
+    .patch(`${CompanyName}CertList`, (p) =>
       p.setIfMissing({Certificates: []})
-      // Add the items after the last item in the array (append)
       .insert('replace', 'Certificates[-1]', sanityCertReferences)
     )
     .commit({ autoGenerateArrayKeys: true })
