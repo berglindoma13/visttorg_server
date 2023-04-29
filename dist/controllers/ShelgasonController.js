@@ -35,7 +35,6 @@ exports.DeleteAllSHelgasonCert = DeleteAllSHelgasonCert;
 const ProcessForDatabase = async (products) => {
     // check if any product in the list is in database but not coming in from company api anymore
     (0, ProductHelper_1.deleteOldProducts)(products, CompanyID);
-    console.log('here');
     //Reset global lists
     updatedProducts = [];
     createdProducts = [];
@@ -94,6 +93,7 @@ const ProcessForDatabase = async (products) => {
         else if (productInfo.productState === 3) {
             updatedProducts.push(product);
         }
+        console.log('prod', productWithProps);
         return productWithProps;
     });
     Promise.all(allProductPromises).then(async (productsWithProps) => {

@@ -40,6 +40,7 @@ export const FixValidatedCerts = async(companyName) => {
 
   //Get each individual certificate from Sanity
   const referenceList = CertListItem.Certificates.map(cert => cert._ref)
+  console.log('refe', referenceList)
   client.getDocuments(referenceList).then(async(reflist: unknown) => {
     const list: Array<SanityCertificate> = reflist as Array<SanityCertificate>
 
@@ -134,10 +135,8 @@ export const DeleteOldSanityEntries = async(companyName: string, companyId: numb
           t.certfileurl === value.certfileurl && t.productid === value.productid && t.validdate === value.validdate
         ))
       )
-  
+
     })
-  
-    console.log('finalList', finalList)
   
     const sanityCertReferences = []
 
@@ -167,4 +166,27 @@ export const DeleteOldSanityEntries = async(companyName: string, companyId: numb
       })
     })
   }
+}
+
+export const CleanUpFunctionSanityCertificates = async(req, res) => {
+  const certLists = await client.fetch('*[_type == "CertificateList"]')
+  
+  const validCertList = certLists.map(listItem => {
+    return listItem.Certificates
+  })
+
+  const refList = validCertList.map(item => {
+    return item.map(i => i._ref)
+  }).flat()
+   
+  const allCerts = await client.fetch('*[_type == "Certificate"]')
+
+  allCerts.map(async(cert, index) => {
+    
+    if(!refList.includes(cert._id)){
+      await client.delete(cert._id)  
+    }
+  })
+
+  return res.send('success')
 }

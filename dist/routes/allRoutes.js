@@ -24,12 +24,14 @@ const CommonController_1 = require("../controllers/CommonController");
 const FagefniController_1 = require("../controllers/FagefniController");
 const HTHController_1 = require("../controllers/HTHController");
 const ProjectsController_1 = require("../controllers/ProjectsController");
+const GolfefnabudinController_1 = require("../controllers/GolfefnabudinController");
 exports.allRoutes = (0, express_1.Router)();
 //ALMENNT
 exports.allRoutes.get('/', (req, res) => {
     res.send('Server is up and running here NOW!');
 });
 exports.allRoutes.post('/api/fixcerts', CommonController_1.UploadValidatedCerts);
+exports.allRoutes.get('/api/cleanupsanity', CommonController_1.CleanUpFunctionSanityCertificates);
 // allRoutes.get('/api/certsystemmapper', setProductsToCertificateSystems)
 //BYKO ROUTES - API
 exports.allRoutes.get('/api/byko', BykoController_1.InsertAllBykoProducts);
@@ -88,6 +90,19 @@ exports.allRoutes.get('/api/ebson/fixcerts', (req, res) => {
 });
 exports.allRoutes.get('/api/ebson/deleteOldSanityCerts', (req, res) => {
     (0, CommonController_1.DeleteOldSanityEntries)('Ebson', 2);
+    res.send('successfull');
+});
+//GOLFEFNABUDIN ROUTES - GOOGLE SHEETS
+exports.allRoutes.get('/api/golfefnabudin', GolfefnabudinController_1.InsertAllGolfefnabudinProducts);
+exports.allRoutes.get('/api/golfefnabudin/deletecert', GolfefnabudinController_1.DeleteAllGolfefnabudinCert);
+exports.allRoutes.get('/api/golfefnabudin/deleteproducts', GolfefnabudinController_1.DeleteAllGolfefnabudinProducts);
+exports.allRoutes.get('/api/golfefnabudin/invalidcerts', GolfefnabudinController_1.GetAllInvalidGolfefnabudinCertificates);
+exports.allRoutes.get('/api/golfefnabudin/fixcerts', (req, res) => {
+    (0, CommonController_1.FixValidatedCerts)('Golfefnabuðin');
+    res.send('succesfull');
+});
+exports.allRoutes.get('/api/golfefnabudin/deleteOldSanityCerts', (req, res) => {
+    (0, CommonController_1.DeleteOldSanityEntries)('Golfefnabuðin', 13);
     res.send('successfull');
 });
 //Sérefni ROUTES - GOOGLE SHEETS
