@@ -40,12 +40,16 @@ export const FixValidatedCerts = async(companyName) => {
 
   //Get each individual certificate from Sanity
   const referenceList = CertListItem.Certificates.map(cert => cert._ref)
-  console.log('refe', referenceList)
+  
   client.getDocuments(referenceList).then(async(reflist: unknown) => {
     const list: Array<SanityCertificate> = reflist as Array<SanityCertificate>
 
+    console.log('list', list)
+
+    const filteredValList = list.filter(x => !!x.validdate)
+
     await prismaInstance.$transaction(
-      list.map(cert => {  
+      filteredValList.map(cert => {  
         return prismaInstance.productcertificate.updateMany({
           where:{
             productid: cert.productid,
@@ -129,10 +133,19 @@ export const DeleteOldSanityEntries = async(companyName: string, companyId: numb
   
         return found
       })
+
+      const sorted = newList.sort((a,b) => {
+        if( a.validdate > b.validdate){
+          return 1
+        }
+        else return -1
+      })
+
+      console.log('sorted',sorted)
   
       finalList = newList.filter((value, index, self) =>
         index === self.findIndex((t) => (
-          t.certfileurl === value.certfileurl && t.productid === value.productid && t.validdate === value.validdate
+          t.certfileurl === value.certfileurl && t.productid === value.productid
         ))
       )
 
@@ -140,32 +153,32 @@ export const DeleteOldSanityEntries = async(companyName: string, companyId: numb
   
     const sanityCertReferences = []
 
-    const SanityPromises = finalList.map(sanityCert => {
-      return client.createIfNotExists(sanityCert).then(createdCert => {
-        sanityCertReferences.push({ "_type":"reference", "_ref": createdCert._id })
-      }).catch(error => {
-        console.log('error', error)
-      })
-    })
+  //   const SanityPromises = finalList.map(sanityCert => {
+  //     return client.createIfNotExists(sanityCert).then(createdCert => {
+  //       sanityCertReferences.push({ "_type":"reference", "_ref": createdCert._id })
+  //     }).catch(error => {
+  //       console.log('error', error)
+  //     })
+  //   })
   
-    Promise.all(SanityPromises).then(() => {
-      client
-      .transaction()
-      .patch(`${companyName}CertList`, (p) => 
-        p.setIfMissing({Certificates: []})
-        // Add the items after the last item in the array (append)
-        .insert('replace', 'Certificates[0:]', sanityCertReferences)
-      )
-      .commit({ autoGenerateArrayKeys: true })
-      .then((updatedCert) => {
-        console.log('Hurray, the cert is updated! New document:')
-        console.log(updatedCert)
-      })
-      .catch((err) => {
-        console.error('Oh no, the update failed: ', err.message)
-      })
-    })
-  }
+  //   Promise.all(SanityPromises).then(() => {
+  //     client
+  //     .transaction()
+  //     .patch(`${companyName}CertList`, (p) => 
+  //       p.setIfMissing({Certificates: []})
+  //       // Add the items after the last item in the array (append)
+  //       .insert('replace', 'Certificates[0:]', sanityCertReferences)
+  //     )
+  //     .commit({ autoGenerateArrayKeys: true })
+  //     .then((updatedCert) => {
+  //       console.log('Hurray, the cert is updated! New document:')
+  //       console.log(updatedCert)
+  //     })
+  //     .catch((err) => {
+  //       console.error('Oh no, the update failed: ', err.message)
+  //     })
+  //   })
+   }
 }
 
 export const CleanUpFunctionSanityCertificates = async(req, res) => {
