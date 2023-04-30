@@ -18,6 +18,7 @@ import { SendEmailAPI } from '../helpers/SendEmail';
 import { CleanUpFunctionSanityCertificates, DeleteOldSanityEntries, FixValidatedCerts, setProductsToCertificateSystems, UploadValidatedCerts } from '../controllers/CommonController';
 import { DeleteAllFagefniCert, DeleteAllFagefniProducts, GetAllInvalidFagefniCertificates, InsertAllFagefniProducts } from '../controllers/FagefniController';
 import { DeleteAllHTHCert, DeleteAllHTHProducts, GetAllInvalidHTHCertificates, InsertAllHTHProducts } from '../controllers/HTHController';
+import { AddProject, GetProject } from '../controllers/ProjectsController'
 import { DeleteAllGolfefnabudinCert, DeleteAllGolfefnabudinProducts, GetAllInvalidGolfefnabudinCertificates, InsertAllGolfefnabudinProducts } from '../controllers/GolfefnabudinController';
 
 export const allRoutes = Router();
@@ -209,3 +210,7 @@ allRoutes.get('/api/sendmail', SendEmailAPI)
 //login function
 allRoutes.post('/api/login', Login)
 allRoutes.post('/api/register', Register)
+
+// add new project
+allRoutes.post('/api/addproject', AddProject)
+allRoutes.post('/api/getproject', GetProject)

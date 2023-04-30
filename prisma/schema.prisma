@@ -110,8 +110,10 @@ model vistbokProject {
   address String
   country String
   status String
-  users vistbokUser[]
-  certificatesystem projectCertificateSystem[]
+  ownerEmail String
+  owner vistbokUser @relation(fields: [ownerEmail], references: [email])
+  // users vistbokUser[]
+  // certificatesystem projectCertificateSystem[]
 }
 
 model projectCertificateSystem {
@@ -120,7 +122,7 @@ model projectCertificateSystem {
   base  String
   secondlayer String
   thirdlayer  String
-  projects  vistbokProject[]
+  // projects  vistbokProject[]
   requirements certificateSystemRequirement[]
 }
 

@@ -23,6 +23,7 @@ const SendEmail_1 = require("../helpers/SendEmail");
 const CommonController_1 = require("../controllers/CommonController");
 const FagefniController_1 = require("../controllers/FagefniController");
 const HTHController_1 = require("../controllers/HTHController");
+const ProjectsController_1 = require("../controllers/ProjectsController");
 const GolfefnabudinController_1 = require("../controllers/GolfefnabudinController");
 exports.allRoutes = (0, express_1.Router)();
 //ALMENNT
@@ -187,3 +188,6 @@ exports.allRoutes.get('/api/sendmail', SendEmail_1.SendEmailAPI);
 //login function
 exports.allRoutes.post('/api/login', loginController_1.Login);
 exports.allRoutes.post('/api/register', loginController_1.Register);
+// add new project
+exports.allRoutes.post('/api/addproject', ProjectsController_1.AddProject);
+exports.allRoutes.post('/api/getproject', ProjectsController_1.GetProject);
