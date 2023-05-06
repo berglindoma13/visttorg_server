@@ -114,6 +114,9 @@ model vistbokProject {
   owner vistbokUser @relation(fields: [ownerEmail], references: [email])
   // users vistbokUser[]
   // certificatesystem projectCertificateSystem[]
+  certificatesystem String?
+
+  @@unique([title, ownerEmail], name: "projectIdentifier")
 }
 
 model projectCertificateSystem {
