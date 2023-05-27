@@ -203,7 +203,7 @@ allRoutes.get('/updatecategories', (req, res) => {
 
 //add to postlist
 allRoutes.post('/api/postlist', Postlist)
-allRoutes.post('/api/postlist/unsubscribe', PostlistUnsubscribe)
+allRoutes.get('/api/postlist/unsubscribe', PostlistUnsubscribe)
 
 //send email
 allRoutes.get('/api/sendmail', SendEmailAPI)

@@ -31,23 +31,20 @@ export const Postlist = async (req: any, res: any): Promise<void> => {
 export const PostlistUnsubscribe = async (req: any, res: any): Promise<void> => {
 
   const {
-    postlistEmail = '',
+    email = '',
   } = req.query
 
-  console.log('req.query', req.query)
-  console.log('req.body', req.body)
-
-  if (!postlistEmail) {
+  if (!email) {
     return res.status(400).send('Vantar tölvupóst')
   }
 
-  if (!validateEmail(postlistEmail)) {
+  if (!validateEmail(email)) {
     return res.status(400).send('Netfang ekki gilt')
   }
 
   await prismaInstance.postlist.deleteMany({
     where: {
-      email: postlistEmail
+      email: email
     }
   })
 
