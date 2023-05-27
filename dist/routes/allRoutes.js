@@ -183,6 +183,7 @@ exports.allRoutes.get('/updatecategories', (req, res) => {
 });
 //add to postlist
 exports.allRoutes.post('/api/postlist', Postlist_1.Postlist);
+exports.allRoutes.post('/api/postlist/unsubscribe', Postlist_1.PostlistUnsubscribe);
 //send email
 exports.allRoutes.get('/api/sendmail', SendEmail_1.SendEmailAPI);
 //login function

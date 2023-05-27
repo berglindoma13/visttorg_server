@@ -328,7 +328,6 @@ const GetAllInvalidBykoCertificates = async (req, res) => {
             .transaction()
             .createIfNotExists(doc)
             .patch(`${CompanyName}CertList`, (p) => p.setIfMissing({ Certificates: [] })
-            // Add the items after the last item in the array (append)
             .insert('replace', 'Certificates[-1]', sanityCertReferences))
             .commit({ autoGenerateArrayKeys: true })
             .then((updatedCert) => {

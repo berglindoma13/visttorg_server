@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { InsertAllBykoProducts, GetAllCategories, DeleteAllProducts, GetAllInvalidBykoCertificates } from '../controllers/BykoController';
 import { InsertAllEbsonProducts, DeleteAllEbsonCert, DeleteAllEbsonProducts, GetAllInvalidEbsonCertificates } from '../controllers/EbsonController'
-import { Postlist } from '../controllers/Postlist'
+import { Postlist, PostlistUnsubscribe } from '../controllers/Postlist'
 import { Login, Register } from '../controllers/loginController';
 import { DeleteAllTengiCert, DeleteAllTengiProducts, GetAllInvalidTengiCertificates, GetAllTengiCategories, InsertAllTengiProducts } from '../controllers/TengiController';
 import { DeleteAllSHelgasonCert, DeleteAllSHelgasonProducts, GetAllInvalidSHelgasonCertificates, InsertAllSHelgasonProducts } from '../controllers/ShelgasonController';
@@ -203,6 +203,7 @@ allRoutes.get('/updatecategories', (req, res) => {
 
 //add to postlist
 allRoutes.post('/api/postlist', Postlist)
+allRoutes.post('/api/postlist/unsubscribe', PostlistUnsubscribe)
 
 //send email
 allRoutes.get('/api/sendmail', SendEmailAPI)
