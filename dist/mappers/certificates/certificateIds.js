@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.certIdFinder = void 0;
+exports.certNameFinder = exports.certIdFinder = void 0;
 exports.certIdFinder = {
     'EPD': 1,
     'FSC': 2,
@@ -12,4 +12,16 @@ exports.certIdFinder = {
     'EV': 8,
     'CE': 9,
     'ENERGY': 10
+};
+exports.certNameFinder = {
+    1: 'EPD',
+    2: 'FSC',
+    3: 'VOC',
+    4: 'SV',
+    5: 'SV_ALLOWED',
+    6: 'BREEAM',
+    7: 'BLENGILL',
+    8: 'EV',
+    9: 'CE',
+    10: 'ENERGY'
 };

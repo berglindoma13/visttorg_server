@@ -143,19 +143,24 @@ export const DeleteOldSanityEntries = async(companyName: string, companyId: numb
         return found
       })
 
+      console.log('certItemsInDatabase', certItemsInDatabase.filter(x => x._id.includes('Ebson')))
+
       const perfectDuplicatesRemoved = certItemsInDatabase.filter((value, index, self) =>
         index === self.findIndex((t) => (
           t.certfileurl === value.certfileurl && t.productid === value.productid && t.validdate === value.validdate
         ))
       )
 
+      console.log('perfectDuplicatesRemoved', perfectDuplicatesRemoved.filter(x => x._id.includes('Ebson')))
+
       const removedOlderCert = perfectDuplicatesRemoved.filter(cert => {
         let foundAndNewer = true
         const myDate = new Date(cert._updatedAt)
         perfectDuplicatesRemoved.map(innercert => {
+          
           const innerDate = new Date(innercert._updatedAt)
-          if(innercert.productid === cert.productid && innercert.certfileurl !== cert.certfileurl && innerDate > myDate){
-            console.log('found', innercert, '----', cert)
+          
+          if(innercert.productid === cert.productid && innercert.certfileurl !== cert.certfileurl && innerDate > myDate && innercert.certificateName !== cert.certificateName){
             foundAndNewer = false
           }
         })
@@ -166,23 +171,31 @@ export const DeleteOldSanityEntries = async(companyName: string, companyId: numb
 
      })
 
+     console.log('finalList', finalList.filter(x => x._id.includes('Ebson')))
+
   
     const sanityCertReferences = []
 
     const SanityPromises = finalList.map(sanityCert => {
       return client.createIfNotExists(sanityCert).then(createdCert => {
+        console.log('in here')
         sanityCertReferences.push({ "_type":"reference", "_ref": createdCert._id })
       }).catch(error => {
         console.log('error', error)
       })
     })
   
+
+   
+
     Promise.all(SanityPromises).then(() => {
+      console.log('sanityCertReferences', sanityCertReferences)
+
       client
       .transaction()
       .patch(`${companyName}CertList`, (p) => 
         p.setIfMissing({Certificates: []})
-        .insert('replace', 'Certificates[-1]', sanityCertReferences)
+        .insert("replace", "Certificates[0:]", sanityCertReferences)
       )
       .commit({ autoGenerateArrayKeys: true })
       .then((updatedCert) => {
@@ -203,14 +216,15 @@ export const CleanUpFunctionSanityCertificates = async(req, res) => {
     return listItem.Certificates
   })
 
+  // console.log('validCertList', validCertList)
+
   const refList = validCertList.map(item => {
     return item.map(i => i._ref)
   }).flat()
-   
+
   const allCerts = await client.fetch('*[_type == "Certificate"]')
 
   allCerts.map(async(cert, index) => {
-    
     if(!refList.includes(cert._id)){
       await client.delete(cert._id)  
     }

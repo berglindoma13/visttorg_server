@@ -23,18 +23,16 @@ const Postlist = async (req, res) => {
 };
 exports.Postlist = Postlist;
 const PostlistUnsubscribe = async (req, res) => {
-    const { postlistEmail = '', } = req.query;
-    console.log('req.query', req.query);
-    console.log('req.body', req.body);
-    if (!postlistEmail) {
+    const { email = '', } = req.query;
+    if (!email) {
         return res.status(400).send('Vantar tölvupóst');
     }
-    if (!(0, emailValidation_1.validateEmail)(postlistEmail)) {
+    if (!(0, emailValidation_1.validateEmail)(email)) {
         return res.status(400).send('Netfang ekki gilt');
     }
     await prisma_1.default.postlist.deleteMany({
         where: {
-            email: postlistEmail
+            email: email
         }
     });
     return res.status(200).send('success');

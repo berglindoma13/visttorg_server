@@ -9,10 +9,8 @@ import { DeleteAllSerefniCert, DeleteAllSerefniProducts, GetAllInvalidSerefniCer
 import { DeleteAllBMVallaCert, DeleteAllBMVallaProducts, GetAllInvalidBMVallaCertificates, InsertAllBMVallaProducts } from '../controllers/BmvallaController';
 import { DeleteAllGksCert, DeleteAllGksProducts, GetAllInvalidGksCertificates, InsertAllGksProducts } from '../controllers/GksController';
 import { DeleteAllBirgissonCert, DeleteAllBirgissonProducts, GetAllInvalidBirgissonCertificates, InsertAllBirgissonProducts } from '../controllers/BirgissonController';
-// import { InsertAllTestProducts } from '../controllers/testController';
 import { DeleteAllSmithNorlandCert, DeleteAllSmithNorlandProducts, GetAllInvalidSmithNorlandCertificates, GetAllSmithNorlandCategories, InsertAllSmithNorlandProducts } from '../controllers/SmithNorlandController';
 import fs from 'fs'
-import { DatabaseCategory } from '../types/databaseModels';
 import { UpsertAllCategories } from '../helpers/PrismaHelper';
 import { SendEmailAPI } from '../helpers/SendEmail';
 import { CleanUpFunctionSanityCertificates, DeleteOldSanityEntries, FixValidatedCerts, setProductsToCertificateSystems, UploadValidatedCerts } from '../controllers/CommonController';

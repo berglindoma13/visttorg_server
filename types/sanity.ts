@@ -19,4 +19,7 @@ export interface SanityCertificate {
   certfileurl: string
   productid: string
   validdate?: string
+  checked: boolean
+  companyName: string
+  certificateName: string
 }

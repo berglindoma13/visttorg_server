@@ -15,7 +15,6 @@ const SerefniController_1 = require("../controllers/SerefniController");
 const BmvallaController_1 = require("../controllers/BmvallaController");
 const GksController_1 = require("../controllers/GksController");
 const BirgissonController_1 = require("../controllers/BirgissonController");
-// import { InsertAllTestProducts } from '../controllers/testController';
 const SmithNorlandController_1 = require("../controllers/SmithNorlandController");
 const fs_1 = __importDefault(require("fs"));
 const PrismaHelper_1 = require("../helpers/PrismaHelper");
@@ -183,7 +182,7 @@ exports.allRoutes.get('/updatecategories', (req, res) => {
 });
 //add to postlist
 exports.allRoutes.post('/api/postlist', Postlist_1.Postlist);
-exports.allRoutes.post('/api/postlist/unsubscribe', Postlist_1.PostlistUnsubscribe);
+exports.allRoutes.get('/api/postlist/unsubscribe', Postlist_1.PostlistUnsubscribe);
 //send email
 exports.allRoutes.get('/api/sendmail', SendEmail_1.SendEmailAPI);
 //login function

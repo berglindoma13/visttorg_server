@@ -10,3 +10,16 @@ export const certIdFinder = {
   'CE': 9,
   'ENERGY': 10
 }
+
+export const certNameFinder = {
+  1: 'EPD',
+  2: 'FSC',
+  3: 'VOC',
+  4: 'SV',
+  5: 'SV_ALLOWED',
+  6: 'BREEAM',
+  7: 'BLENGILL',
+  8: 'EV',
+  9: 'CE',
+  10: 'ENERGY'
+}
