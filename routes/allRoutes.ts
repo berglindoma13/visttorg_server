@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { InsertAllBykoProducts, GetAllCategories, DeleteAllProducts, GetAllInvalidBykoCertificates } from '../controllers/BykoController';
 import { InsertAllEbsonProducts, DeleteAllEbsonCert, DeleteAllEbsonProducts, GetAllInvalidEbsonCertificates } from '../controllers/EbsonController'
-import { Postlist } from '../controllers/Postlist'
+import { Postlist, PostlistUnsubscribe } from '../controllers/Postlist'
 import { Login, Register } from '../controllers/loginController';
 import { DeleteAllTengiCert, DeleteAllTengiProducts, GetAllInvalidTengiCertificates, GetAllTengiCategories, InsertAllTengiProducts } from '../controllers/TengiController';
 import { DeleteAllSHelgasonCert, DeleteAllSHelgasonProducts, GetAllInvalidSHelgasonCertificates, InsertAllSHelgasonProducts } from '../controllers/ShelgasonController';
@@ -9,10 +9,8 @@ import { DeleteAllSerefniCert, DeleteAllSerefniProducts, GetAllInvalidSerefniCer
 import { DeleteAllBMVallaCert, DeleteAllBMVallaProducts, GetAllInvalidBMVallaCertificates, InsertAllBMVallaProducts } from '../controllers/BmvallaController';
 import { DeleteAllGksCert, DeleteAllGksProducts, GetAllInvalidGksCertificates, InsertAllGksProducts } from '../controllers/GksController';
 import { DeleteAllBirgissonCert, DeleteAllBirgissonProducts, GetAllInvalidBirgissonCertificates, InsertAllBirgissonProducts } from '../controllers/BirgissonController';
-// import { InsertAllTestProducts } from '../controllers/testController';
 import { DeleteAllSmithNorlandCert, DeleteAllSmithNorlandProducts, GetAllInvalidSmithNorlandCertificates, GetAllSmithNorlandCategories, InsertAllSmithNorlandProducts } from '../controllers/SmithNorlandController';
 import fs from 'fs'
-import { DatabaseCategory } from '../types/databaseModels';
 import { UpsertAllCategories } from '../helpers/PrismaHelper';
 import { SendEmailAPI } from '../helpers/SendEmail';
 import { CleanUpFunctionSanityCertificates, DeleteOldSanityEntries, FixValidatedCerts, setProductsToCertificateSystems, UploadValidatedCerts } from '../controllers/CommonController';
@@ -203,6 +201,7 @@ allRoutes.get('/updatecategories', (req, res) => {
 
 //add to postlist
 allRoutes.post('/api/postlist', Postlist)
+allRoutes.get('/api/postlist/unsubscribe', PostlistUnsubscribe)
 
 //send email
 allRoutes.get('/api/sendmail', SendEmailAPI)

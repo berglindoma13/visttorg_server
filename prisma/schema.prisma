@@ -102,6 +102,7 @@ model vistbokUser {
   jobtitle String
   favoriteproducts product[]
   projects vistbokProject[]
+  accessProjects vistbokProject[] @relation("myAccessProjects")
 }
 
 model vistbokProject {
@@ -112,7 +113,7 @@ model vistbokProject {
   status String
   ownerEmail String
   owner vistbokUser @relation(fields: [ownerEmail], references: [email])
-  // users vistbokUser[]
+  users vistbokUser[] @relation("myAccessProjects")
   // certificatesystem projectCertificateSystem[]
   certificatesystem String?
 

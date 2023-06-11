@@ -10,7 +10,7 @@ import { DeleteAllProductsByCompany,
 import fs from 'fs'
 import { deleteOldProducts, WriteAllFiles, VerifyProduct, getAllProductsFromGoogleSheets } from '../helpers/ProductHelper';
 import prismaInstance from '../lib/prisma';
-import { certIdFinder } from '../mappers/certificates/certificateIds';
+import { certIdFinder, certNameFinder } from '../mappers/certificates/certificateIds';
 import { client } from '../lib/sanity';
 import { mapToCertificateSystem } from '../helpers/CertificateValidator';
 import { MigratingProduct, MigratingProductCertificate, ProductWithExtraProps } from '../types/migratingModels';
@@ -236,13 +236,17 @@ const ProcessForDatabase = async(products : Array<MigratingProduct>) => {
 export const GetAllInvalidEbsonCertificates = async(req,res) => {
   const allCerts = await GetAllInvalidProductCertsByCompany(CompanyID)
 
+  
   const SanityCertArray = allCerts.map(cert => {
+    
     return {
       _id:`${CompanyName}Cert${cert.id}`,
       _type:"Certificate",
       productid:`${cert.productid}`,
       certfileurl:`${cert.fileurl}`,
-      checked: false
+      checked: false,
+      companyName: CompanyName,
+      certName: certNameFinder[cert.certificateid]
     }
   })
 
@@ -257,6 +261,7 @@ export const GetAllInvalidEbsonCertificates = async(req,res) => {
   })
 
   Promise.all(SanityPromises).then(() => {
+    console.log('sanityCertReferences', sanityCertReferences)
 
     //SANITY.IO CREATE CERTIFICATELIST IF IT DOES NOT EXIST
     const doc = {

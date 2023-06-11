@@ -95,6 +95,15 @@ export const setProductsToCertificateSystems = async(req, res) => {
   res.send('successfull')
 }
 
+/*
+  This function does:
+  1: retreives all certificates from database for a specific company
+  2: retreives all certificates from Sanity for a specific company
+  3: filters out all Sanity certificates that are no longer in the databse certificate list
+  4: removes all perfect duplicates, where the productId and certificate file url are the same
+  5: filters out Sanity certificates that have duplicates values in the list but have an older update date
+  6: updates the Sanity certifiates list through the Sanity API client
+*/
 export const DeleteOldSanityEntries = async(companyName: string, companyId: number) => {
 
   let finalList
@@ -122,7 +131,7 @@ export const DeleteOldSanityEntries = async(companyName: string, companyId: numb
     await client.getDocuments(referenceList).then(async(reflist: unknown) => {
       const list: Array<SanityCertificate> = reflist as Array<SanityCertificate>
   
-      const newList = list.filter((listitem: SanityCertificate) => {
+      const certItemsInDatabase = list.filter((listitem: SanityCertificate) => {
         let found = false
   
         databaseList.map((databaseItem: DatabaseProductCertificate) => {
@@ -134,50 +143,69 @@ export const DeleteOldSanityEntries = async(companyName: string, companyId: numb
         return found
       })
 
-      const sorted = newList.sort((a,b) => {
-        if( a.validdate > b.validdate){
-          return 1
-        }
-        else return -1
-      })
+      console.log('certItemsInDatabase', certItemsInDatabase.filter(x => x._id.includes('Ebson')))
 
-      console.log('sorted',sorted)
-  
-      finalList = newList.filter((value, index, self) =>
+      const perfectDuplicatesRemoved = certItemsInDatabase.filter((value, index, self) =>
         index === self.findIndex((t) => (
-          t.certfileurl === value.certfileurl && t.productid === value.productid
+          t.certfileurl === value.certfileurl && t.productid === value.productid && t.validdate === value.validdate
         ))
       )
 
-    })
+      console.log('perfectDuplicatesRemoved', perfectDuplicatesRemoved.filter(x => x._id.includes('Ebson')))
+
+      const removedOlderCert = perfectDuplicatesRemoved.filter(cert => {
+        let foundAndNewer = true
+        const myDate = new Date(cert._updatedAt)
+        perfectDuplicatesRemoved.map(innercert => {
+          
+          const innerDate = new Date(innercert._updatedAt)
+          
+          if(innercert.productid === cert.productid && innercert.certfileurl !== cert.certfileurl && innerDate > myDate && innercert.certificateName !== cert.certificateName){
+            foundAndNewer = false
+          }
+        })
+        return foundAndNewer
+      })
+
+      finalList = removedOlderCert
+
+     })
+
+     console.log('finalList', finalList.filter(x => x._id.includes('Ebson')))
+
   
     const sanityCertReferences = []
 
-  //   const SanityPromises = finalList.map(sanityCert => {
-  //     return client.createIfNotExists(sanityCert).then(createdCert => {
-  //       sanityCertReferences.push({ "_type":"reference", "_ref": createdCert._id })
-  //     }).catch(error => {
-  //       console.log('error', error)
-  //     })
-  //   })
+    const SanityPromises = finalList.map(sanityCert => {
+      return client.createIfNotExists(sanityCert).then(createdCert => {
+        console.log('in here')
+        sanityCertReferences.push({ "_type":"reference", "_ref": createdCert._id })
+      }).catch(error => {
+        console.log('error', error)
+      })
+    })
   
-  //   Promise.all(SanityPromises).then(() => {
-  //     client
-  //     .transaction()
-  //     .patch(`${companyName}CertList`, (p) => 
-  //       p.setIfMissing({Certificates: []})
-  //       // Add the items after the last item in the array (append)
-  //       .insert('replace', 'Certificates[0:]', sanityCertReferences)
-  //     )
-  //     .commit({ autoGenerateArrayKeys: true })
-  //     .then((updatedCert) => {
-  //       console.log('Hurray, the cert is updated! New document:')
-  //       console.log(updatedCert)
-  //     })
-  //     .catch((err) => {
-  //       console.error('Oh no, the update failed: ', err.message)
-  //     })
-  //   })
+
+   
+
+    Promise.all(SanityPromises).then(() => {
+      console.log('sanityCertReferences', sanityCertReferences)
+
+      client
+      .transaction()
+      .patch(`${companyName}CertList`, (p) => 
+        p.setIfMissing({Certificates: []})
+        .insert("replace", "Certificates[0:]", sanityCertReferences)
+      )
+      .commit({ autoGenerateArrayKeys: true })
+      .then((updatedCert) => {
+        console.log('Hurray, the cert is updated! New document:')
+        console.log(updatedCert)
+      })
+      .catch((err) => {
+        console.error('Oh no, the update failed: ', err.message)
+      })
+    })
    }
 }
 
@@ -188,14 +216,15 @@ export const CleanUpFunctionSanityCertificates = async(req, res) => {
     return listItem.Certificates
   })
 
+  // console.log('validCertList', validCertList)
+
   const refList = validCertList.map(item => {
     return item.map(i => i._ref)
   }).flat()
-   
+
   const allCerts = await client.fetch('*[_type == "Certificate"]')
 
   allCerts.map(async(cert, index) => {
-    
     if(!refList.includes(cert._id)){
       await client.delete(cert._id)  
     }

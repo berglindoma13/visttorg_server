@@ -208,7 +208,9 @@ const GetAllInvalidEbsonCertificates = async (req, res) => {
             _type: "Certificate",
             productid: `${cert.productid}`,
             certfileurl: `${cert.fileurl}`,
-            checked: false
+            checked: false,
+            companyName: CompanyName,
+            certName: certificateIds_1.certNameFinder[cert.certificateid]
         };
     });
     const sanityCertReferences = [];
@@ -220,6 +222,7 @@ const GetAllInvalidEbsonCertificates = async (req, res) => {
         });
     });
     Promise.all(SanityPromises).then(() => {
+        console.log('sanityCertReferences', sanityCertReferences);
         //SANITY.IO CREATE CERTIFICATELIST IF IT DOES NOT EXIST
         const doc = {
             _id: `${CompanyName}CertList`,

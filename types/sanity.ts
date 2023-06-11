@@ -9,12 +9,17 @@ export interface SanityCertificateListItem {
   CompanyName: string
   _id: string
   _type: string
+  _updatedAt: string
 }
 
 export interface SanityCertificate {
    _id: string
   _type: string
+  _updatedAt: string
   certfileurl: string
   productid: string
   validdate?: string
+  checked: boolean
+  companyName: string
+  certificateName: string
 }
