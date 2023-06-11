@@ -116,8 +116,6 @@ model vistbokProject {
   users vistbokUser[] @relation("myAccessProjects")
   // certificatesystem projectCertificateSystem[]
   certificatesystem String?
-
-  @@unique([title, ownerEmail], name: "projectIdentifier")
 }
 
 model projectCertificateSystem {

@@ -35,11 +35,9 @@ export const Login = async(req: Request, res: Response) => {
 
 
   if(!!foundUser){
-
-    console.log('foundUser', foundUser)
-
+  
     if(bcrypt.compareSync(password, foundUser.password) === true){
-      var token = jwt.sign({ email: email, password: foundUser.password, fullname: foundUser.fullname, jobtitle: foundUser.jobtitle, company: foundUser.company }, 'thisisasuperprivatekey000111');
+      var token = jwt.sign({ id: foundUser.id, email: email, password: foundUser.password, fullname: foundUser.fullname, jobtitle: foundUser.jobtitle, company: foundUser.company }, 'thisisasuperprivatekey000111');
        
       return res.status(200).send(JSON.stringify(token))
     }else{

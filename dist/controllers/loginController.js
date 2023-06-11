@@ -34,9 +34,8 @@ const Login = async (req, res) => {
         }
     });
     if (!!foundUser) {
-        console.log('foundUser', foundUser);
         if (bcryptjs_1.default.compareSync(password, foundUser.password) === true) {
-            var token = jsonwebtoken_1.default.sign({ email: email, password: foundUser.password, fullname: foundUser.fullname, jobtitle: foundUser.jobtitle, company: foundUser.company }, 'thisisasuperprivatekey000111');
+            var token = jsonwebtoken_1.default.sign({ id: foundUser.id, email: email, password: foundUser.password, fullname: foundUser.fullname, jobtitle: foundUser.jobtitle, company: foundUser.company }, 'thisisasuperprivatekey000111');
             return res.status(200).send(JSON.stringify(token));
         }
         else {
