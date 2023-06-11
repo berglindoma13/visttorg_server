@@ -13,6 +13,7 @@ export interface MigratingProduct {
   epdUrl: string,
   vocUrl: string,
   ceUrl: string,
+  energyUrl?: string
   certificates: Array<MigratingCertificate>
 }
 

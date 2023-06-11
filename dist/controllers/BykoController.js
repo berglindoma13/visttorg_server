@@ -235,9 +235,7 @@ const ProcessForDatabase = async (products) => {
                 }
             });
         }));
-        console.log('starting to delete all certs');
         await (0, PrismaHelper_1.DeleteAllCertByCompany)(CompanyID);
-        console.log('done deleting and starting to create new ones');
         const allCertificates = filteredArray.map(prod => {
             return prod.validatedCertificates.map(cert => {
                 let fileurl = '';
@@ -306,7 +304,9 @@ const GetAllInvalidBykoCertificates = async (req, res) => {
             _type: "Certificate",
             productid: `${cert.productid}`,
             certfileurl: `${cert.fileurl}`,
-            checked: false
+            checked: false,
+            companyName: CompanyName,
+            certName: certificateIds_1.certNameFinder[cert.certificateid]
         };
     });
     const sanityCertReferences = [];
@@ -328,7 +328,7 @@ const GetAllInvalidBykoCertificates = async (req, res) => {
             .transaction()
             .createIfNotExists(doc)
             .patch(`${CompanyName}CertList`, (p) => p.setIfMissing({ Certificates: [] })
-            .insert('replace', 'Certificates[-1]', sanityCertReferences))
+            .insert('replace', 'Certificates[0:]', sanityCertReferences))
             .commit({ autoGenerateArrayKeys: true })
             .then((updatedCert) => {
             console.log('Hurray, the cert is updated! New document:');

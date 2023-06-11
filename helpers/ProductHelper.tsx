@@ -53,8 +53,6 @@ export const VerifyProduct = async(product : MigratingProduct, create : boolean,
 
    productState = 4
 
-   console.log('productState', productState)
-
    return { productState, validDate, validatedCertificates }
  }
 

@@ -1,6 +1,12 @@
-const nodemailer = require("nodemailer");
-const Email = require('email-templates');
 import prismaInstance from "../lib/prisma"
+import sendgrid from '@sendgrid/mail';
+    
+sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
+
+interface InvalidEmailTemplateDataProps {
+    name: string
+    productList: string
+}
 
 export const SendEmailAPI = async(req: any, res: any) => {
     GetInvalidProductsAndSendEmail();
@@ -49,7 +55,9 @@ const GetInvalidProductsAndSendEmail = async() => {
         if(prod.certificates.length > 0) {
             // get only the name of the invalid certificate for each product
             const invalCerts = prod.certificates.map(cert => {
-                return cert.certificate.name
+                const item = { name: cert.certificate.name, url: cert.fileurl }
+                
+                return item
             })
             invalidProducts.push({compid: prod.companyid, name: prod.title, invalidCertificates: invalCerts})
         }
@@ -57,67 +65,48 @@ const GetInvalidProductsAndSendEmail = async() => {
 
     const invalidProductsByCompany  = []
     Companies.map(comp => {
-        var comp_temp_invalidproducts = []
+        var comp_invalidproducts: Array<InvalidEmailTemplateDataProps> = []
         invalidProducts.map(prod => {
             if (comp.id == prod.compid) {
                 // push the name of the product along with the name of the invalid certificates for that product
-                var temp = " - Name: " + prod.name + ", Invalid Certificate/s: " + prod.invalidCertificates + "\n";
-                comp_temp_invalidproducts.push(temp)
+                let name = `Nafn: ${prod.name}`;
+                let productList = `Ógild vottunarskjöl: ${prod.invalidCertificates.map(i => { return (`${i.name}(${i.url}), `)})}`
+                comp_invalidproducts.push({ name, productList})
             }
         })
-        invalidProductsByCompany.push({compid: comp.id, products: comp_temp_invalidproducts, to: comp.contact });
+        invalidProductsByCompany.push({compid: comp.id, products: comp_invalidproducts, to: comp.contact });
     })
 
     // send email to companies with invalid products
-    invalidProductsByCompany.forEach(i => {
-        if(i.products.length !== 0) {
-            SendEmail(i.products, i.to)
+    invalidProductsByCompany.map((company, index) => {
+        if(company.products.length !== 0) {
+            index === 0 && SendEmail(company.products, company.to)
+            console.log('company', company)
         } 
     })
+
 }
 
 
 const SendEmail = async(productlist, emailTo) => {
-    // send email from test mail now - change so it sends from visttorg and to the correct email
-    const hostname = "smtp.gmail.com"; 
-    const username = "vistbok@visttorg.is"; 
-    // app-specific password:
-        // google account --> manage account --> security
-        // 2-step authentication turned on
-        // go to app password (below 2-step authentication)
-        // choose an app and device and press generate 
-    const password = "tufefmdhichptsrm"; 
 
+    //Template Dynamic ID
+    //d-4688dd864978442fb009e5957529d545
 
-    // create a string object from the product list to send to the companies
-    var fileToSend = productlist.toString();
-   
-    const transporter = nodemailer.createTransport({
-        service: "gmail",
-        host: hostname,
-        auth: {
-            user: username,
-            pass: password,
-        },
-    });
+    const options = {
+        personalizations: [
+            {
+              to: 'berglind@visttorg.is',
+              subject: 'Hello recipient 1',
+              dynamicTemplateData: {
+                productList: productlist.map((x: InvalidEmailTemplateDataProps) => { return { "itemName": x.name, "invalidList": x.productList }} )
+              },
+            },
+          ],
+          from: 'vistbok@visttorg.is',
+          templateId: 'd-4688dd864978442fb009e5957529d545',
 
-    const emailTemplate = new Email({ 
-        preview: false,
-        send: true,
-        transport: transporter,
-        message: {
-            attachments: [{
-                filename: 'Vorur.txt',
-                content: fileToSend,
-            }]
-        }
-    });
-
-    emailTemplate.send({
-        template: '../emailTemplates/invalidProducts',
-        message: {
-            to: emailTo,  
-        },
-    }).catch(console.error)
-    // console.log("Message sent: %s", info.response);
+    };
+    
+    sendgrid.send(options);SendEmail
 }

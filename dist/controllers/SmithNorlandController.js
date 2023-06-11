@@ -46,6 +46,7 @@ const convertSmithNorlandProductToMigratingProduct = async (product) => {
         epdUrl: "",
         vocUrl: "",
         ceUrl: "",
+        energyUrl: product.vottunarskjol && product.vottunarskjol[0],
         //TODO - FIX CERTIFICATES IF THEY ADD MORE TYPES OF PRODUCTS
         certificates: [
             product.vottun === 'orka' && product.vottunarskjol[0] !== '' ? { name: "ENERGY" } : null,
@@ -162,6 +163,13 @@ const ProcessForDatabase = async (products) => {
                         approved = false;
                     }
                 }
+                if (cert.certificateid == 10) {
+                    // energy file url is not the same
+                    if (cert.fileurl !== product.energyUrl) {
+                        certChange = true;
+                        approved = false;
+                    }
+                }
             });
         }
         else {
@@ -259,6 +267,9 @@ const ProcessForDatabase = async (products) => {
                 else if (cert.name === 'VOC') {
                     fileurl = prod.product.vocUrl;
                     validdate = prod.validDate[2].date;
+                }
+                else if (cert.name === 'ENERGY') {
+                    fileurl = prod.product.energyUrl;
                 }
                 const certItem = {
                     name: cert.name,

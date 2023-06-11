@@ -25,6 +25,7 @@ export const allRoutes = Router();
 allRoutes.get('/', (req: Request, res: Response) => {
   res.send('Server is up and running here NOW!')
 })
+
 allRoutes.post('/api/fixcerts', UploadValidatedCerts)
 
 allRoutes.get('/api/cleanupsanity', CleanUpFunctionSanityCertificates)

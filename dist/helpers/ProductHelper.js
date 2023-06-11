@@ -48,7 +48,6 @@ const VerifyProduct = async (product, create, certChange) => {
         }
     }
     productState = 4;
-    console.log('productState', productState);
     return { productState, validDate, validatedCertificates };
 };
 exports.VerifyProduct = VerifyProduct;

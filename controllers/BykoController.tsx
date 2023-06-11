@@ -13,11 +13,12 @@ import { DeleteAllProductsByCompany,
 } from '../helpers/PrismaHelper'
 import { deleteOldProducts, VerifyProduct, WriteAllFiles } from '../helpers/ProductHelper';
 import prismaInstance from '../lib/prisma';
-import { certIdFinder } from '../mappers/certificates/certificateIds';
+import { certIdFinder, certNameFinder } from '../mappers/certificates/certificateIds';
 import { getMappedCategory, getMappedCategorySub } from '../helpers/MapCategories';
 import { client } from '../lib/sanity';
 import { mapToCertificateSystem } from '../helpers/CertificateValidator';
 import { ConnectedCategory, ConnectedSubCategory, MigratingProduct, MigratingProductCertificate, ProductWithExtraProps } from '../types/migratingModels';
+import { SanityCertificate, SanityCertificateListItem } from '../types/sanity';
  
 // BYKO COMPANY ID = 1
 
@@ -268,10 +269,7 @@ const ProcessForDatabase = async(products : Array<MigratingProduct>) => {
       })
     )
 
-    console.log('starting to delete all certs')
     await DeleteAllCertByCompany(CompanyID)
-
-    console.log('done deleting and starting to create new ones')
 
     const allCertificates: Array<MigratingProductCertificate> = filteredArray.map(prod => {
       return prod.validatedCertificates.map(cert => {
@@ -353,7 +351,9 @@ export const GetAllInvalidBykoCertificates = async(req,res) => {
       _type:"Certificate",
       productid:`${cert.productid}`,
       certfileurl:`${cert.fileurl}`,
-      checked: false
+      checked: false,
+      companyName: CompanyName,
+      certName: certNameFinder[cert.certificateid]
     }
   })
 
@@ -381,7 +381,7 @@ export const GetAllInvalidBykoCertificates = async(req,res) => {
     .createIfNotExists(doc)
     .patch(`${CompanyName}CertList`, (p) => 
       p.setIfMissing({Certificates: []})
-      .insert('replace', 'Certificates[-1]', sanityCertReferences)
+      .insert('replace', 'Certificates[0:]', sanityCertReferences)
     )
     .commit({ autoGenerateArrayKeys: true })
     .then((updatedCert) => {
