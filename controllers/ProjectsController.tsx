@@ -8,7 +8,7 @@ export const AddProject = async(req: Request, res: Response) => {
 
 //   console.log("certificite system", certificatesystem)
 
-    await prismaInstance.vistbokProject.create({
+    const newProject = await prismaInstance.vistbokProject.create({
         data:{
             title: title,
             certificatesystem: certificatesystem,
@@ -20,17 +20,18 @@ export const AddProject = async(req: Request, res: Response) => {
     })
 
     console.log('created');
+    return res.status(200).send(JSON.stringify(newProject.id))
 };
 
 
 export const UpdateProject = async(req: Request, res: Response) => {
 
-    const { oldTitle, title, certificatesystem, address, country, status, ownerEmail } = req.body.data
-  
-    // console.log("req boy data", req.body.data )
-  
+    const { title, certificatesystem, address, country, status, ownerEmail } = req.body.data
+    const { id } = req.params
+    
       await prismaInstance.vistbokProject.update({
-            where: { projectIdentifier : { title: oldTitle, ownerEmail: ownerEmail }},
+            where: { 
+                id: parseInt(id)},
             data:{
                 title: title,
                 certificatesystem: certificatesystem,
@@ -40,21 +41,20 @@ export const UpdateProject = async(req: Request, res: Response) => {
                 ownerEmail: ownerEmail
             }
         })
-  
       console.log('updated');
+      return res.status(200)
 };
 
 export const DeleteProject = async(req: Request, res: Response) => {
 
-    const { title, ownerEmail } = req.body.data
-  
-    // console.log("req boy data", req.body.data )
+    const { id } = req.params
   
       await prismaInstance.vistbokProject.delete({
-            where: { projectIdentifier : { title: title, ownerEmail: ownerEmail }}
+            where: { id: parseInt(id)}
         })
   
       console.log('deleted');
+      return res.status(200)
 };
 
 export const GetProject = async(req: Request, res: Response) => {

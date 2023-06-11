@@ -191,5 +191,5 @@ exports.allRoutes.post('/api/register', loginController_1.Register);
 // add new project
 exports.allRoutes.post('/api/addproject', ProjectsController_1.AddProject);
 exports.allRoutes.post('/api/getproject', ProjectsController_1.GetProject);
-exports.allRoutes.post('/api/updateproject', ProjectsController_1.UpdateProject);
-exports.allRoutes.post('/api/deleteproject', ProjectsController_1.DeleteProject);
+exports.allRoutes.put('/api/updateproject/:id', ProjectsController_1.UpdateProject);
+exports.allRoutes.delete('/api/deleteproject/:id', ProjectsController_1.DeleteProject);
