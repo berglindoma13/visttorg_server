@@ -214,5 +214,5 @@ allRoutes.post('/api/register', Register)
 // add new project
 allRoutes.post('/api/addproject', AddProject)
 allRoutes.post('/api/getproject', GetProject)
-allRoutes.post('/api/updateproject', UpdateProject)
-allRoutes.post('/api/deleteproject', DeleteProject)
+allRoutes.put('/api/updateproject/:id', UpdateProject)
+allRoutes.delete('/api/deleteproject/:id', DeleteProject)
