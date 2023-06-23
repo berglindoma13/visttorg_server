@@ -11,7 +11,7 @@ import { deleteOldProducts, WriteAllFiles, VerifyProduct, getAllProductsFromGoog
 import prismaInstance from '../lib/prisma';
 import { client } from '../lib/sanity';
 import { mapToCertificateSystem } from '../helpers/CertificateValidator';
-import { certIdFinder } from '../mappers/certificates/certificateIds';
+import { certIdFinder, certNameFinder } from '../mappers/certificates/certificateIds';
 import { MigratingProduct, MigratingProductCertificate, ProductWithExtraProps } from '../types/migratingModels';
 
 //crtl-f Template -> replace with company name
@@ -242,7 +242,9 @@ export const GetAllInvalidBirgissonCertificates = async(req,res) => {
       _type:"Certificate",
       productid:`${cert.productid}`,
       certfileurl:`${cert.fileurl}`,
-      checked: false
+      checked: false,
+      companyName: CompanyName,
+      certName: certNameFinder[cert.certificateid]
     }
   })
 
@@ -270,7 +272,7 @@ export const GetAllInvalidBirgissonCertificates = async(req,res) => {
     .createIfNotExists(doc)
     .patch(`${CompanyName}CertList`, (p) =>
       p.setIfMissing({Certificates: []})
-      .insert('replace', 'Certificates[-1]', sanityCertReferences)
+      .insert('replace', 'Certificates[0:]', sanityCertReferences)
     )
     .commit({ autoGenerateArrayKeys: true })
     .then((updatedCert) => {

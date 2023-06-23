@@ -9,7 +9,7 @@ import { DeleteAllProductsByCompany,
 import fs from 'fs'
 import { deleteOldProducts, WriteAllFiles, VerifyProduct, getAllProductsFromGoogleSheets } from '../helpers/ProductHelper';
 import prismaInstance from '../lib/prisma';
-import { certIdFinder } from '../mappers/certificates/certificateIds';
+import { certIdFinder, certNameFinder } from '../mappers/certificates/certificateIds';
 import { client } from '../lib/sanity';
 import { mapToCertificateSystem } from '../helpers/CertificateValidator';
 import { MigratingProduct, MigratingProductCertificate, ProductWithExtraProps } from '../types/migratingModels';
@@ -236,7 +236,9 @@ export const GetAllInvalidSerefniCertificates = async(req, res) => {
       _type:"Certificate",
       productid:`${cert.productid}`,
       certfileurl:`${cert.fileurl}`,
-      checked: false
+      checked: false,
+      companyName: CompanyName,
+      certName: certNameFinder[cert.certificateid]
     }
   })
 
@@ -265,7 +267,7 @@ export const GetAllInvalidSerefniCertificates = async(req, res) => {
     .patch(`${CompanyName}CertList`, (p) => 
       p.setIfMissing({Certificates: []})
       // Add the items after the last item in the array (append)
-      .insert('replace', 'Certificates', sanityCertReferences)
+      .insert('replace', 'Certificates[0:]', sanityCertReferences)
     )
     .commit({ autoGenerateArrayKeys: true })
     .then((updatedCert) => {

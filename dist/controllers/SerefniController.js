@@ -206,7 +206,9 @@ const GetAllInvalidSerefniCertificates = async (req, res) => {
             _type: "Certificate",
             productid: `${cert.productid}`,
             certfileurl: `${cert.fileurl}`,
-            checked: false
+            checked: false,
+            companyName: CompanyName,
+            certName: certificateIds_1.certNameFinder[cert.certificateid]
         };
     });
     const sanityCertReferences = [];
@@ -229,7 +231,7 @@ const GetAllInvalidSerefniCertificates = async (req, res) => {
             .createIfNotExists(doc)
             .patch(`${CompanyName}CertList`, (p) => p.setIfMissing({ Certificates: [] })
             // Add the items after the last item in the array (append)
-            .insert('replace', 'Certificates', sanityCertReferences))
+            .insert('replace', 'Certificates[0:]', sanityCertReferences))
             .commit({ autoGenerateArrayKeys: true })
             .then((updatedCert) => {
             console.log('Hurray, the cert is updated! New document:');
