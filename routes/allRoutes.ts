@@ -16,7 +16,7 @@ import { SendEmailAPI } from '../helpers/SendEmail';
 import { CleanUpFunctionSanityCertificates, DeleteOldSanityEntries, FixValidatedCerts, setProductsToCertificateSystems, UploadValidatedCerts } from '../controllers/CommonController';
 import { DeleteAllFagefniCert, DeleteAllFagefniProducts, GetAllInvalidFagefniCertificates, InsertAllFagefniProducts } from '../controllers/FagefniController';
 import { DeleteAllHTHCert, DeleteAllHTHProducts, GetAllInvalidHTHCertificates, InsertAllHTHProducts } from '../controllers/HTHController';
-import { AddProject, GetProject, UpdateProject, DeleteProject } from '../controllers/ProjectsController'
+import { AddProject, GetProject, UpdateProject, DeleteProject, AddProductToProject } from '../controllers/ProjectsController'
 import { DeleteAllGolfefnabudinCert, DeleteAllGolfefnabudinProducts, GetAllInvalidGolfefnabudinCertificates, InsertAllGolfefnabudinProducts } from '../controllers/GolfefnabudinController';
 
 export const allRoutes = Router();
@@ -211,8 +211,9 @@ allRoutes.get('/api/sendmail', SendEmailAPI)
 allRoutes.post('/api/login', Login)
 allRoutes.post('/api/register', Register)
 
-// add new project
+// Vistbok Projects
 allRoutes.post('/api/addproject', AddProject)
 allRoutes.post('/api/getproject', GetProject)
 allRoutes.put('/api/updateproject/:id', UpdateProject)
 allRoutes.delete('/api/deleteproject/:id', DeleteProject)
+allRoutes.post('/api/addproducttoproject', AddProductToProject)

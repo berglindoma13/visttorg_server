@@ -2,45 +2,45 @@
 
 datasource db {
   provider = "postgresql"
-  url = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 generator client {
-  provider      = "prisma-client-js"
-  output = "../node_modules/.prisma/client"
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
 }
 
 model company {
-  id            Int       @id @default(autoincrement())
-  name          String
-  websiteurl    String
-  products      product[]
-  contact       String?
+  id         Int       @id @default(autoincrement())
+  name       String
+  websiteurl String
+  products   product[]
+  contact    String?
 }
 
 model product {
-  id               String               @id @default(uuid())
-  productid        String               
-  title            String
-  companyid        Int
-  sellingcompany   company              @relation(fields: [companyid], references: [id])
-  description      String?
-  shortdescription String?
-  categories       category[]           @relation("ConnectedCategory")
-  subCategories    subCategory[]        @relation("ConnectedSubCategory")
-  url              String? // bætti við spurningarmerki, ef að fyrirtæki eru ekki með vefverslun
-  brand            String
-  productimageurl  String?
+  id                 String               @id @default(uuid())
+  productid          String
+  title              String
+  companyid          Int
+  sellingcompany     company              @relation(fields: [companyid], references: [id])
+  description        String?
+  shortdescription   String?
+  categories         category[]           @relation("ConnectedCategory")
+  subCategories      subCategory[]        @relation("ConnectedSubCategory")
+  url                String? // bætti við spurningarmerki, ef að fyrirtæki eru ekki með vefverslun
+  brand              String
+  productimageurl    String?
   //productimageref attachedFile?
-  certificates     productcertificate[]
+  certificates       productcertificate[]
   certificateSystems certificatesystem[]  @relation("ConnectedCertficateSystem")
   // myProducts       myProducts[]
-  approved        Boolean?
-  createdAt       DateTime?
-  updatedAt       DateTime?
-  userFavorite  vistbokUser[]
+  approved           Boolean?
+  createdAt          DateTime?
+  updatedAt          DateTime?
+  vistbokProjects    productsInProjects[]
 
-   @@unique([productid, companyid], name: "productIdentifier")
+  @@unique([productid, companyid], name: "productIdentifier")
 }
 
 model productcertificate {
@@ -49,7 +49,7 @@ model productcertificate {
   certificate      certificate @relation(fields: [certificateid], references: [id])
   fileurl          String?
   productid        String
-  connectedproduct product    @relation(fields: [productid], references: [id])
+  connectedproduct product     @relation(fields: [productid], references: [id])
   validDate        DateTime?
 
   @@unique([certificateid, productid], name: "prodcertidentifier")
@@ -62,75 +62,85 @@ model certificate {
 }
 
 model certificatesystem {
-  id                 Int                  @id @default(autoincrement())
-  name               String               @unique
-  products           product[]            @relation("ConnectedCertficateSystem")
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products product[] @relation("ConnectedCertficateSystem")
 }
 
 model category {
-  id       Int @id @default(autoincrement())
-  name     String @unique
+  id            Int           @id @default(autoincrement())
+  name          String        @unique
   subCategories subCategory[]
-  products product[] @relation("ConnectedCategory")
+  products      product[]     @relation("ConnectedCategory")
 }
 
 model subCategory {
-  id  Int @id @default(autoincrement())  
-  name  String 
-  parentCategoryName  String
-  parentCategory category @relation(fields: [parentCategoryName], references: [name])
-  products product[] @relation("ConnectedSubCategory")
+  id                 Int       @id @default(autoincrement())
+  name               String
+  parentCategoryName String
+  parentCategory     category  @relation(fields: [parentCategoryName], references: [name])
+  products           product[] @relation("ConnectedSubCategory")
 
   @@unique([name, parentCategoryName], name: "subCatIdentifier")
 }
 
 model manualProducts {
-  id       Int       @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 }
 
 model postlist {
-  id  Int @id @default(autoincrement())
+  id    Int    @id @default(autoincrement())
   email String
 }
 
+model productsInProjects {
+  productId String
+  product   product   @relation(fields: [productId], references: [id])
+  projectId Int
+  project   vistbokProject   @relation(fields: [projectId], references: [id])
+
+  @@id([productId, projectId])
+}
+
 model vistbokUser {
-  id Int @id @default(autoincrement())
-  email String  @unique
+  id       Int              @id @default(autoincrement())
+  email    String           @unique
   password String
   fullname String
-  company String
+  company  String
   jobtitle String
-  favoriteproducts product[]
   projects vistbokProject[]
-  accessProjects vistbokProject[] @relation("myAccessProjects")
 }
 
 model vistbokProject {
-  id Int @id @default(autoincrement())
-  title String
-  address String
-  country String
-  status String
-  ownerEmail String
-  owner vistbokUser @relation(fields: [ownerEmail], references: [email])
-  users vistbokUser[] @relation("myAccessProjects")
+  id                Int         @id @default(autoincrement())
+  title             String
+  address           String
+  country           String
+  status            String
+  ownerEmail        String
+  owner             vistbokUser @relation(fields: [ownerEmail], references: [email])
+  // users vistbokUser[]
   // certificatesystem projectCertificateSystem[]
   certificatesystem String?
+  products          productsInProjects[]
+
+  @@unique([title, ownerEmail], name: "projectIdentifier")
 }
 
 model projectCertificateSystem {
-  id Int @id @default(autoincrement())
-  title String
-  base  String
-  secondlayer String
-  thirdlayer  String
+  id           Int                            @id @default(autoincrement())
+  title        String
+  base         String
+  secondlayer  String
+  thirdlayer   String
   // projects  vistbokProject[]
   requirements certificateSystemRequirement[]
 }
 
 model certificateSystemRequirement {
-  id  Int @id @default(autoincrement())
-  system  projectCertificateSystem @relation(fields: [id], references: [id])
+  id          Int                      @id @default(autoincrement())
+  system      projectCertificateSystem @relation(fields: [id], references: [id])
   requirement String
 }
 

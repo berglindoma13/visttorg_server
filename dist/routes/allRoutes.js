@@ -188,8 +188,9 @@ exports.allRoutes.get('/api/sendmail', SendEmail_1.SendEmailAPI);
 //login function
 exports.allRoutes.post('/api/login', loginController_1.Login);
 exports.allRoutes.post('/api/register', loginController_1.Register);
-// add new project
+// Vistbok Projects
 exports.allRoutes.post('/api/addproject', ProjectsController_1.AddProject);
 exports.allRoutes.post('/api/getproject', ProjectsController_1.GetProject);
 exports.allRoutes.put('/api/updateproject/:id', ProjectsController_1.UpdateProject);
 exports.allRoutes.delete('/api/deleteproject/:id', ProjectsController_1.DeleteProject);
+exports.allRoutes.post('/api/addproducttoproject', ProjectsController_1.AddProductToProject);

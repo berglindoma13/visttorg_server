@@ -68,3 +68,18 @@ export const GetProject = async(req: Request, res: Response) => {
     console.log("maria project", projects)
   
 };
+
+export const AddProductToProject = async(req: Request, res: Response) => {
+    const { data } = req.body
+
+    console.log('data', data)
+
+    await prismaInstance.productsInProjects.create({
+        data: {
+            productId: data.productId,
+            projectId: data.projectId
+        }
+    })
+
+    return res.status(200).send('success')
+}
