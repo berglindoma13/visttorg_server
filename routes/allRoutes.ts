@@ -125,24 +125,24 @@ allRoutes.get('/api/serefni/deleteOldSanityCerts', (req,res) => {
 })
 
 //BMVallá ROUTES - GOOGLE SHEETS
-allRoutes.get('/api/bmvalla', InsertAllBMVallaProducts)
-allRoutes.get('/api/bmvalla/deletecert', DeleteAllBMVallaCert)
-allRoutes.get('/api/bmvalla/deleteproducts', DeleteAllBMVallaProducts)
-allRoutes.get('/api/bmvalla/invalidcerts', GetAllInvalidBMVallaCertificates)
-allRoutes.get('/api/bmvalla/fixcerts', (req,res) => {
-  FixValidatedCerts('BMValla')
-  res.send('succesfull')
-})
+// allRoutes.get('/api/bmvalla', InsertAllBMVallaProducts)
+// allRoutes.get('/api/bmvalla/deletecert', DeleteAllBMVallaCert)
+// allRoutes.get('/api/bmvalla/deleteproducts', DeleteAllBMVallaProducts)
+// allRoutes.get('/api/bmvalla/invalidcerts', GetAllInvalidBMVallaCertificates)
+// allRoutes.get('/api/bmvalla/fixcerts', (req,res) => {
+//   FixValidatedCerts('BMValla')
+//   res.send('succesfull')
+// })
 
 //GKS ROUTES - GOOGLE SHEETS
-allRoutes.get('/api/gks', InsertAllGksProducts)
-allRoutes.get('/api/gks/deletecert', DeleteAllGksCert)
-allRoutes.get('/api/gks/deleteproducts', DeleteAllGksProducts)
-allRoutes.get('/api/gks/invalidcerts', GetAllInvalidGksCertificates)
-allRoutes.get('/api/gks/fixcerts', (req,res) => {
-  FixValidatedCerts('GKS')
-  res.send('succesfull')
-})
+// allRoutes.get('/api/gks', InsertAllGksProducts)
+// allRoutes.get('/api/gks/deletecert', DeleteAllGksCert)
+// allRoutes.get('/api/gks/deleteproducts', DeleteAllGksProducts)
+// allRoutes.get('/api/gks/invalidcerts', GetAllInvalidGksCertificates)
+// allRoutes.get('/api/gks/fixcerts', (req,res) => {
+//   FixValidatedCerts('GKS')
+//   res.send('succesfull')
+// })
 
 //Birgisson ROUTES - GOOGLE SHEETS
 allRoutes.get('/api/birgisson', InsertAllBirgissonProducts)
@@ -159,24 +159,24 @@ allRoutes.get('/api/birgisson/deleteOldSanityCerts', (req,res) => {
 })
 
 //FAGEFNI ROUTES - GOOGLE SHEETS
-allRoutes.get('/api/fagefni', InsertAllFagefniProducts)
-allRoutes.get('/api/fagefni/deletecert', DeleteAllFagefniCert)
-allRoutes.get('/api/fagefni/deleteproducts', DeleteAllFagefniProducts)
-allRoutes.get('/api/fagefni/invalidcerts', GetAllInvalidFagefniCertificates)
-allRoutes.get('/api/fagefni/fixcerts', (req,res) => {
-  FixValidatedCerts('Fagefni')
-  res.send('succesfull')
-})
+// allRoutes.get('/api/fagefni', InsertAllFagefniProducts)
+// allRoutes.get('/api/fagefni/deletecert', DeleteAllFagefniCert)
+// allRoutes.get('/api/fagefni/deleteproducts', DeleteAllFagefniProducts)
+// allRoutes.get('/api/fagefni/invalidcerts', GetAllInvalidFagefniCertificates)
+// allRoutes.get('/api/fagefni/fixcerts', (req,res) => {
+//   FixValidatedCerts('Fagefni')
+//   res.send('succesfull')
+// })
 
 //HTH ROUTES - GOOGLE SHEETS
-allRoutes.get('/api/hth', InsertAllHTHProducts)
-allRoutes.get('/api/hth/deletecert', DeleteAllHTHCert)
-allRoutes.get('/api/hth/deleteproducts', DeleteAllHTHProducts)
-allRoutes.get('/api/hth/invalidcerts', GetAllInvalidHTHCertificates)
-allRoutes.get('/api/hth/fixcerts', (req,res) => {
-  FixValidatedCerts('HTH')
-  res.send('succesfull')
-})
+// allRoutes.get('/api/hth', InsertAllHTHProducts)
+// allRoutes.get('/api/hth/deletecert', DeleteAllHTHCert)
+// allRoutes.get('/api/hth/deleteproducts', DeleteAllHTHProducts)
+// allRoutes.get('/api/hth/invalidcerts', GetAllInvalidHTHCertificates)
+// allRoutes.get('/api/hth/fixcerts', (req,res) => {
+//   FixValidatedCerts('HTH')
+//   res.send('succesfull')
+// })
 
 
 // allRoutes.get('/api/deletesheets', DeleteAllSheetsProducts);

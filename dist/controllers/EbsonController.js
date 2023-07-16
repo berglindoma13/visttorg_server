@@ -222,7 +222,6 @@ const GetAllInvalidEbsonCertificates = async (req, res) => {
         });
     });
     Promise.all(SanityPromises).then(() => {
-        console.log('sanityCertReferences', sanityCertReferences);
         //SANITY.IO CREATE CERTIFICATELIST IF IT DOES NOT EXIST
         const doc = {
             _id: `${CompanyName}CertList`,

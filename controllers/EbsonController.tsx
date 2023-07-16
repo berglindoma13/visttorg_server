@@ -235,10 +235,8 @@ const ProcessForDatabase = async(products : Array<MigratingProduct>) => {
 
 export const GetAllInvalidEbsonCertificates = async(req,res) => {
   const allCerts = await GetAllInvalidProductCertsByCompany(CompanyID)
-
   
   const SanityCertArray = allCerts.map(cert => {
-    
     return {
       _id:`${CompanyName}Cert${cert.id}`,
       _type:"Certificate",
@@ -261,8 +259,6 @@ export const GetAllInvalidEbsonCertificates = async(req,res) => {
   })
 
   Promise.all(SanityPromises).then(() => {
-    console.log('sanityCertReferences', sanityCertReferences)
-
     //SANITY.IO CREATE CERTIFICATELIST IF IT DOES NOT EXIST
     const doc = {
       _id: `${CompanyName}CertList`,
