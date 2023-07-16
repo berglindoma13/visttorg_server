@@ -54,7 +54,7 @@ export const DeleteProject = async(req: Request, res: Response) => {
         })
   
       console.log('deleted');
-      return res.status(200)
+      return res.json('successfully deleted project')
 };
 
 export const GetProject = async(req: Request, res: Response) => {
