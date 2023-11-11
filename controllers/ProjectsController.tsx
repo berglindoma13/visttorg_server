@@ -83,3 +83,21 @@ export const AddProductToProject = async(req: Request, res: Response) => {
 
     return res.status(200).send('success')
 }
+
+
+export const DeleteProductFromProject = async(req: Request, res: Response) => {
+    const { data } = req.body
+
+    console.log('data', data)
+
+    await prismaInstance.productsInProjects.delete({
+        where: {
+            productsInProjectsIdentifier: {
+                productId: data.productId, 
+                projectId: data.projectId
+            }
+        }
+    })
+
+    return res.status(200).send('success')
+}

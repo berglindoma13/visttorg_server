@@ -190,3 +190,4 @@ exports.allRoutes.post('/api/getproject', ProjectsController_1.GetProject);
 exports.allRoutes.put('/api/updateproject/:id', ProjectsController_1.UpdateProject);
 exports.allRoutes.delete('/api/deleteproject/:id', ProjectsController_1.DeleteProject);
 exports.allRoutes.post('/api/addproducttoproject', ProjectsController_1.AddProductToProject);
+exports.allRoutes.post('/api/deleteproductfromproject', ProjectsController_1.DeleteProductFromProject);
