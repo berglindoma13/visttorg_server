@@ -109,7 +109,7 @@ export const getAllProductsFromGoogleSheets = (sheetId: string, callBack: any, c
     const allprod : Array<MigratingProduct> = [];
     
     for (var i=1; i< results.length; i++) {
-      const allCat = results[i].fl.split(',')
+      const allCat = results[i].fl ? results[i].fl.split(',') : []
       const mappedCategories: Array<ConnectedCategory> = allCat.map(cat => { return { name: cat } })
   
       const temp_prod : MigratingProduct = {
@@ -140,6 +140,7 @@ export const getAllProductsFromGoogleSheets = (sheetId: string, callBack: any, c
       }
       allprod.push(temp_prod)
     }
+    
     // process for database
     callBack(allprod);
   }, (error) => {

@@ -99,6 +99,7 @@ const ProcessForDatabase = async (products) => {
         const filteredArray = productsWithProps.filter(prod => prod.productState !== 1);
         await prisma_1.default.$transaction(filteredArray.map(productWithProps => {
             const systemArray = (0, CertificateValidator_1.mapToCertificateSystem)(productWithProps.product);
+            console.log('product', productWithProps.product);
             return prisma_1.default.product.upsert({
                 where: {
                     productIdentifier: { productid: productWithProps.product.productid, companyid: CompanyID }

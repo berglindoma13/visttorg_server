@@ -96,7 +96,7 @@ const getAllProductsFromGoogleSheets = (sheetId, callBack, companyID) => {
     (0, g_sheets_api_1.default)(options, (results) => {
         const allprod = [];
         for (var i = 1; i < results.length; i++) {
-            const allCat = results[i].fl.split(',');
+            const allCat = results[i].fl ? results[i].fl.split(',') : [];
             const mappedCategories = allCat.map(cat => { return { name: cat }; });
             const temp_prod = {
                 productid: results[i].nr !== '' ? `${companyID}${results[i].nr}` : results[i].nr,
